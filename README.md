@@ -1,4 +1,4 @@
-<img src="logo.png" alt="" width=350 align="right">
+<img src="logo.png" alt="" width=300 align="right">
 <div align="center">
   <h1>Kaiiju</h1>
   <h3>Purpur fork for anarchists.</h3>
