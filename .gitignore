@@ -46,10 +46,10 @@ out/
 # other stuff
 run/
 
-MultiPaper-Server
-MultiPaper-API
+Kaiiju-Server
+Kaiiju-API
 
 *.sh
-multipaper.jar
+kaiiju.jar
 
 !gradle/wrapper/gradle-wrapper.jar
