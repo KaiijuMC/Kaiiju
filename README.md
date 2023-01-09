@@ -2,7 +2,7 @@
 <div align="center">
   <h1>Kaiiju</h1>
   <h3>Purpur fork for anarchists.</h3>
-  <h4>Kaiiju is ❗under heavy development❗ and contributions are welcome!</h4>
+  <h4>Kaiiju is under heavy development, contributions are welcome!</h4>
   <h5><b>This project is experimental, its usage in production environment is discouraged if you are not ready to face possible bugs.</b></h5>
   
   [![Discord](https://img.shields.io/discord/1059774886672859136?color=5865F2&label=discord&style=for-the-badge)](https://discord.gg/EPwVGg9u)
