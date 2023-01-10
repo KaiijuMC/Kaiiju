@@ -5,6 +5,6 @@ pluginManagement {
     }
 }
 
-rootProject.name = "Kaiiju"
+rootProject.name = "kaiiju"
 
-include("Kaiiju-API", "Kaiiju-Server")
+include("kaiiju-api", "kaiiju-server")

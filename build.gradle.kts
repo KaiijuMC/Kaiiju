@@ -56,7 +56,7 @@ subprojects {
 }
 
 paperweight {
-    serverProject.set(project(":Kaiiju-Server"))
+    serverProject.set(project(":kaiiju-server"))
 
     remapRepo.set("https://maven.fabricmc.net/")
     decompileRepo.set("https://maven.quiltmc.org")
@@ -68,11 +68,11 @@ paperweight {
         withStandardPatcher {
             apiSourceDirPath.set("Purpur-API") 
             apiPatchDir.set(layout.projectDirectory.dir("patches/api"))
-            apiOutputDir.set(layout.projectDirectory.dir("Kaiiju-API"))
+            apiOutputDir.set(layout.projectDirectory.dir("kaiiju-api"))
 
             serverSourceDirPath.set("Purpur-Server")
             serverPatchDir.set(layout.projectDirectory.dir("patches/server"))
-            serverOutputDir.set(layout.projectDirectory.dir("Kaiiju-Server"))
+            serverOutputDir.set(layout.projectDirectory.dir("kaiiju-server"))
         }
     }
 
