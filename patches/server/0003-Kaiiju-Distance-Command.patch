@@ -1,0 +1,58 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
+Date: Sun, 15 Jan 2023 08:04:40 +0100
+Subject: [PATCH] Kaiiju Distance Command
+
+
+diff --git a/src/main/java/dev/kugge/kaiiju/KaiijuCommand.java b/src/main/java/dev/kugge/kaiiju/KaiijuCommand.java
+index 9a4d09ae7a0d6ae009e47acef5d3b6bbad77c5f1..9a4fd3e9b51e8128c67e7718b1e8fddca92de9e6 100644
+--- a/src/main/java/dev/kugge/kaiiju/KaiijuCommand.java
++++ b/src/main/java/dev/kugge/kaiiju/KaiijuCommand.java
+@@ -11,6 +11,7 @@ import net.md_5.bungee.api.ChatColor;
+ import net.minecraft.server.MinecraftServer;
+ import org.bukkit.Bukkit;
+ import org.bukkit.Location;
++import org.bukkit.entity.Player;
+ import org.bukkit.command.Command;
+ import org.bukkit.command.CommandSender;
+ 
+@@ -19,7 +20,7 @@ public class KaiijuCommand extends Command {
+     public KaiijuCommand() {
+         super("kaiiju");
+         this.description = "Kaiiju related commands";
+-        this.usageMessage = "/kaiiju [reload | version]";
++        this.usageMessage = "/kaiiju [reload | version | distance]";
+         this.setPermission("bukkit.command.kaiiju");
+     }
+ 
+@@ -30,7 +31,7 @@ public class KaiijuCommand extends Command {
+     @Override
+     public List<String> tabComplete(CommandSender sender, String alias, String[] args, Location location) throws IllegalArgumentException {
+         if (args.length == 1) {
+-            return Stream.of("reload", "version")
++            return Stream.of("reload", "version", "distance")
+               .filter(arg -> arg.startsWith(args[0].toLowerCase()))
+               .collect(Collectors.toList());
+         }
+@@ -46,7 +47,20 @@ public class KaiijuCommand extends Command {
+             sender.sendMessage(prefix + "Usage: " + usageMessage);
+             args = new String[]{"version"};
+         }
+-
++        if (args[0].equalsIgnoreCase("distance")) {
++            sender.sendMessage(prefix + "Per-player distances:");
++            sender.sendMessage(prefix + ChatColor.ITALIC + "(1) Client View Distance");
++            sender.sendMessage(prefix + ChatColor.ITALIC + "(2) Send View Distance");
++            sender.sendMessage(prefix + ChatColor.ITALIC + "(3) View Distance");
++            sender.sendMessage(prefix + ChatColor.ITALIC + "(4) Simulation Distance");
++            for (Player player : Bukkit.getOnlinePlayers()) {
++                sender.sendMessage(ChatColor.of("#00AAAA") + player.getName() + ": " + ChatColor.YELLOW
++                                                                                     + player.getClientViewDistance() + " / " 
++                                                                                     + player.getSendViewDistance() + " / " 
++                                                                                     + player.getViewDistance() + " / "
++                                                                                     + player.getSimulationDistance());
++            }
++        }
+         if (args[0].equalsIgnoreCase("reload")) {
+             MinecraftServer console = MinecraftServer.getServer();
+             try {
