@@ -150,7 +150,7 @@ index 0000000000000000000000000000000000000000..9ce95585432cde1ca013a093cf65894c
 +            }
 +        }
 +
-+        getString("info.version", 
++        getString("info.version",
 +                  "0.1",
 +                  "Configuration version. Please don't change.");
 +        setComment("info",
