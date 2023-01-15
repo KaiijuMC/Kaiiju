@@ -8,6 +8,7 @@ build/
 
 # VSCode stuff
 .vscode/
+.vs/
 
 # netbeans
 nbproject/
