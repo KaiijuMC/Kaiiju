@@ -1,17 +1,19 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
-Date: Sun, 15 Jan 2023 11:48:16 +0100
+From: Kugge <sofiane.djerbi38@gmail.com>
+Date: Sun, 15 Jan 2023 21:42:02 +0100
 Subject: [PATCH] Kaiiju AFK Distance
 
 
 diff --git a/src/main/java/dev/kugge/kaiiju/KaiijuConfig.java b/src/main/java/dev/kugge/kaiiju/KaiijuConfig.java
-index 9ce95585432cde1ca013a093cf65894c0061ffdc..b981cbc542dfc1557a8d0cf683f13ef05f652674 100644
+index 45df8d6569e0d3ca5ceec6cd4de59caeb967e69c..ef36cf46a1b26f9346fac87e1ae115b0c9dcd94f 100644
 --- a/src/main/java/dev/kugge/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kugge/kaiiju/KaiijuConfig.java
-@@ -133,4 +133,26 @@ public class KaiijuConfig {
+@@ -133,4 +133,25 @@ public class KaiijuConfig {
          return config.getStringList(key);
      }
  
+-}
+\ No newline at end of file
 +    public static boolean useIdleDistances;
 +    private static void getUseIdleDistances() {
 +        useIdleDistances = getBoolean("distances.use-afk-distances", false,
@@ -32,10 +34,10 @@ index 9ce95585432cde1ca013a093cf65894c0061ffdc..b981cbc542dfc1557a8d0cf683f13ef0
 +                                        "Simulation distance for AFK players.",
 +                                        "Require \"kick-if-idle: false\" in Purpur config.");
 +    }
- }
-\ No newline at end of file
++
++}
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index d62bf95fb067c2e2a4fc9b2757c636bd4ee75bea..8bb3c9976029aab2fd3d802e8555d87a9b089d79 100644
+index d62bf95fb067c2e2a4fc9b2757c636bd4ee75bea..abb81d8ce7b6df8c4a8cd1b7add00cb7910ca5eb 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -2084,6 +2084,12 @@ public class ServerPlayer extends Player {
@@ -43,7 +45,7 @@ index d62bf95fb067c2e2a4fc9b2757c636bd4ee75bea..8bb3c9976029aab2fd3d802e8555d87a
          this.lastActionTime = Util.getMillis();
          this.setAfk(false); // Purpur
 +        // Kaiiju start
-+        if (dev.kugge.kaiiju.KaiijuConfig.useIdleDistances) { 
++        if (dev.kugge.kaiiju.KaiijuConfig.useIdleDistances) {
 +            this.getBukkitEntity().setViewDistance(this.getBukkitEntity().getWorld().getViewDistance());
 +            this.getBukkitEntity().setSimulationDistance(this.getBukkitEntity().getWorld().getSimulationDistance());
 +        }
@@ -52,7 +54,7 @@ index d62bf95fb067c2e2a4fc9b2757c636bd4ee75bea..8bb3c9976029aab2fd3d802e8555d87a
  
      // Purpur Start
 diff --git a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index a8e205af936efe0909c94575e3b7f8ca50cead2f..103a94e6ab0a1ed9a63b76fd1f57f63c92cb4437 100644
+index a8e205af936efe0909c94575e3b7f8ca50cead2f..6d022a878287d3359145fcbb8c1e6f8743393b98 100644
 --- a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 @@ -461,6 +461,12 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
@@ -60,7 +62,7 @@ index a8e205af936efe0909c94575e3b7f8ca50cead2f..103a94e6ab0a1ed9a63b76fd1f57f63c
              this.player.setAfk(true);
              if (!this.player.level.purpurConfig.idleTimeoutKick || kickPermissionCache.getUnchecked(this.player.getBukkitEntity())) {
 +                // Kaiiju start
-+                if (dev.kugge.kaiiju.KaiijuConfig.useIdleDistances) { 
++                if (dev.kugge.kaiiju.KaiijuConfig.useIdleDistances) {
 +                    this.getCraftPlayer().setViewDistance(dev.kugge.kaiiju.KaiijuConfig.idleViewDistance);
 +                    this.getCraftPlayer().setSimulationDistance(dev.kugge.kaiiju.KaiijuConfig.idleSimulationDistance);
 +                }
