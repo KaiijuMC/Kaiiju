@@ -10,17 +10,19 @@
 
 ## Features
 
-TODO
+### Additions
+- **AFK Distance:** Reduce view and simulation distance of AFK players.
 
-## Downloads
+### Commands
+- `/kaiiju distance`: Display the view, client, and simulation distances for each player on a server.
 
-TODO
 
 ## Building
 In order to distribute and use this server software, you need a paperclip file:
 
 ```bash
-./gradlew applyPatches && ./gradlew createReobfPaperclipJar
+./gradlew applyPatches # Apply Kaiiju patches
+./gradlew createReobfPaperclipJar # Generate Paperclip executable jar
 ```
 
 ## License
