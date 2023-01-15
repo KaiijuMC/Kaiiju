@@ -19,14 +19,12 @@ index 9ce95585432cde1ca013a093cf65894c0061ffdc..b981cbc542dfc1557a8d0cf683f13ef0
 +                                  "Require \"kick-if-idle: false\" in Purpur config.");
 +    }
 +
-+
 +    public static int idleViewDistance;
 +    private static void getIdleViewDistance() {
 +        idleViewDistance = getInt("distances.afk-view-distance", 8,
 +                                  "View distance for AFK players.",
 +                                  "Require \"kick-if-idle: false\" in Purpur config.");
 +    }
-+
 +
 +    public static int idleSimulationDistance;
 +    private static void getIdleSimulationDistance() {
