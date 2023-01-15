@@ -14,7 +14,7 @@
 - **AFK Distance:** Reduce view and simulation distance of AFK players.
 
 ### Commands
-- `/kaiiju distance`: Display the view, client, and simulation distances for each player on a server.
+- `/kaiiju distance`: Display view, client, and simulation distances for each player.
 
 
 ## Building
