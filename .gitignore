@@ -47,8 +47,8 @@ out/
 # other stuff
 run/
 
-Kaiiju-Server
-Kaiiju-API
+kaiiju-server
+kaiiju-api
 
 *.sh
 kaiiju.jar
