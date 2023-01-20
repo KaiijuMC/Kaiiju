@@ -1,11 +1,11 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kugge <sofiane.djerbi38@gmail.com>
-Date: Fri, 20 Jan 2023 02:30:10 +0100
+Date: Fri, 20 Jan 2023 13:41:40 +0100
 Subject: [PATCH] Purpur Dont Send Useless Entity Packets
 
 
 diff --git a/src/main/java/dev/kugge/kaiiju/KaiijuConfig.java b/src/main/java/dev/kugge/kaiiju/KaiijuConfig.java
-index ef36cf46a1b26f9346fac87e1ae115b0c9dcd94f..6472938604a5f102a61f88d41b5abb78ea1dfcb9 100644
+index ef36cf46a1b26f9346fac87e1ae115b0c9dcd94f..2b08f1b6d2692f93481a0139e224c3b7469e7148 100644
 --- a/src/main/java/dev/kugge/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kugge/kaiiju/KaiijuConfig.java
 @@ -154,4 +154,11 @@ public class KaiijuConfig {
@@ -14,7 +14,7 @@ index ef36cf46a1b26f9346fac87e1ae115b0c9dcd94f..6472938604a5f102a61f88d41b5abb78
  
 +    public static boolean dontSendUselessEntityPackets;
 +    private static void getDontSendUselessEntityPackets() {
-+        dontSendUselessEntityPackets = getBoolean("settings.performance.dont-send-useless-entity-packets", true,
++        dontSendUselessEntityPackets = getBoolean("performance.dont-send-useless-entity-packets", true,
 +                                                  "Don't send null entity packets ? (Purpur)",
 +                                                  "Small ping/bandwith improvement.");
 +    }
