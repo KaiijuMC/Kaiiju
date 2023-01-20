@@ -1,0 +1,60 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kugge <sofiane.djerbi38@gmail.com>
+Date: Fri, 20 Jan 2023 02:30:10 +0100
+Subject: [PATCH] Purpur Dont Send Useless Entity Packets
+
+
+diff --git a/src/main/java/dev/kugge/kaiiju/KaiijuConfig.java b/src/main/java/dev/kugge/kaiiju/KaiijuConfig.java
+index ef36cf46a1b26f9346fac87e1ae115b0c9dcd94f..6472938604a5f102a61f88d41b5abb78ea1dfcb9 100644
+--- a/src/main/java/dev/kugge/kaiiju/KaiijuConfig.java
++++ b/src/main/java/dev/kugge/kaiiju/KaiijuConfig.java
+@@ -154,4 +154,11 @@ public class KaiijuConfig {
+                                         "Require \"kick-if-idle: false\" in Purpur config.");
+     }
+ 
++    public static boolean dontSendUselessEntityPackets;
++    private static void getDontSendUselessEntityPackets() {
++        dontSendUselessEntityPackets = getBoolean("settings.performance.dont-send-useless-entity-packets", true,
++                                                  "Don't send null entity packets ? (Purpur)",
++                                                  "Small ping/bandwith improvement.");
++    }
++
+ }
+diff --git a/src/main/java/net/minecraft/server/level/ServerEntity.java b/src/main/java/net/minecraft/server/level/ServerEntity.java
+index 0f9a3a6c05fee59c29764f0c0d7a6cb8a2a861b1..15d8c4d068d76e7224f538db582dfcf6c26a6ee8 100644
+--- a/src/main/java/net/minecraft/server/level/ServerEntity.java
++++ b/src/main/java/net/minecraft/server/level/ServerEntity.java
+@@ -186,6 +186,11 @@ public class ServerEntity {
+                         this.teleportDelay = 0;
+                         packet1 = new ClientboundTeleportEntityPacket(this.entity);
+                     }
++                    // Kaiiju start - dont send useless entity packets
++                    if (dev.kugge.kaiiju.KaiijuConfig.dontSendUselessEntityPackets && isUselessPacket(packet1)) {
++                        packet1 = null;
++                    }
++                    // Kaiiju end - dont send useless entity packet
+                 }
+ 
+                 if ((this.trackDelta || this.entity.hasImpulse || this.entity instanceof LivingEntity && ((LivingEntity) this.entity).isFallFlying()) && this.tickCount > 0) {
+@@ -252,6 +257,21 @@ public class ServerEntity {
+ 
+     }
+ 
++    // Kaiiju start - dont send useless entity packets
++    private boolean isUselessPacket(Packet<?> possibleUselessPacket) {
++        if (possibleUselessPacket instanceof ClientboundMoveEntityPacket packet) {
++            if (possibleUselessPacket instanceof ClientboundMoveEntityPacket.Pos) {
++                return packet.getXa() == 0 && packet.getYa() == 0 && packet.getZa() == 0;
++            } else if (possibleUselessPacket instanceof ClientboundMoveEntityPacket.PosRot) {
++                return packet.getXa() == 0 && packet.getYa() == 0 && packet.getZa() == 0 && packet.getyRot() == 0 && packet.getxRot() == 0;
++            } else if (possibleUselessPacket instanceof ClientboundMoveEntityPacket.Rot) {
++                return packet.getyRot() == 0 && packet.getxRot() == 0;
++            }
++        }
++        return false;
++    }
++    // Kaiiju end - dont send useless entity packets
++
+     public void removePairing(ServerPlayer player) {
+         this.entity.stopSeenByPlayer(player);
+         player.connection.send(new ClientboundRemoveEntitiesPacket(new int[]{this.entity.getId()}));
