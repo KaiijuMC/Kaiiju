@@ -1,0 +1,18 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kugge <sofiane.djerbi38@gmail.com>
+Date: Mon, 23 Jan 2023 15:03:10 +0100
+Subject: [PATCH] MultiPaper Don't Load Chunks When Spawning Phantoms
+
+
+diff --git a/src/main/java/net/minecraft/world/level/levelgen/PhantomSpawner.java b/src/main/java/net/minecraft/world/level/levelgen/PhantomSpawner.java
+index 69753f0b67a78c565ff455676860dc05b24bb285..8d685b308c8903080f22369848b502abe3d90f7c 100644
+--- a/src/main/java/net/minecraft/world/level/levelgen/PhantomSpawner.java
++++ b/src/main/java/net/minecraft/world/level/levelgen/PhantomSpawner.java
+@@ -73,6 +73,7 @@ public class PhantomSpawner implements CustomSpawner {
+ 
+                                     if (randomsource.nextInt(j) >= world.paperConfig().entities.behavior.playerInsomniaStartTicks) { // Paper
+                                         BlockPos blockposition1 = blockposition.above(20 + randomsource.nextInt(15)).east(-10 + randomsource.nextInt(21)).south(-10 + randomsource.nextInt(21));
++                                        if (!world.hasChunkAt(blockposition1)) continue; // Kaiiju - MultiPaper - don't load chunks when spawning phantoms
+                                         BlockState iblockdata = world.getBlockState(blockposition1);
+                                         FluidState fluid = world.getFluidState(blockposition1);
+ 
