@@ -12,6 +12,7 @@
 
 ### Additions
 - **AFK Distance:** Reduce view and simulation distance of AFK players.
+- **Xymb Linear Format**: Saves about 50% of disk space in OW and Nether and 95% in The End.
 
 ### Commands
 - `/kaiiju distance`: Display view, client, and simulation distances for each player.
