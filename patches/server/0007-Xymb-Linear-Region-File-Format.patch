@@ -44,6 +44,28 @@ index a08cde4eefe879adcee7c4118bc38f98c5097ed0..18793e8de5bb2d955a17e5084ea7c9c3
                  }
  
                  final boolean finalFailWrite = failedWrite;
+diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index b94d941ac4e86ea382592da025d5b05c0e8b0707..2e0540ab03ff5b687f7a9f9b643d3ff8629b0ba2 100644
+--- a/src/main/java/net/minecraft/server/MinecraftServer.java
++++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -855,7 +855,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+             // Paper start - rewrite chunk system
+             worldserver.save((ProgressListener) null, flush, worldserver.noSave && !force, close);
+             if (flush) {
+-                MinecraftServer.LOGGER.info("ThreadedAnvilChunkStorage ({}): All chunks are saved", worldserver.getChunkSource().chunkMap.getStorageName());
++                MinecraftServer.LOGGER.info("ThreadedLinearChunkStorage ({}): All chunks are saved", worldserver.getChunkSource().chunkMap.getStorageName()); // Kaiiju
+             }
+             // Paper end - rewrite chunk system
+         }
+@@ -879,7 +879,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+                 //MinecraftServer.LOGGER.info("ThreadedAnvilChunkStorage ({}): All chunks are saved", worldserver2.getChunkSource().chunkMap.getStorageName()); // Paper - move up
+             }
+ 
+-            MinecraftServer.LOGGER.info("ThreadedAnvilChunkStorage: All dimensions are saved");
++            MinecraftServer.LOGGER.info("ThreadedLinearChunkStorage: All dimensions are saved"); // Kaiiju
+         }
+ 
+         return flag3;
 diff --git a/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java b/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
 index 759b125cc1251b9b4f1f443c9f70c482ef5b32f8..8048122ad29ace73e6713fe62e02ffe16a89fbdc 100644
 --- a/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
