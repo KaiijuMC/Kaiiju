@@ -67,34 +67,24 @@ index b94d941ac4e86ea382592da025d5b05c0e8b0707..2e0540ab03ff5b687f7a9f9b643d3ff8
  
          return flag3;
 diff --git a/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java b/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
-index 759b125cc1251b9b4f1f443c9f70c482ef5b32f8..8048122ad29ace73e6713fe62e02ffe16a89fbdc 100644
+index 759b125cc1251b9b4f1f443c9f70c482ef5b32f8..02f8c8ff7cfc0b963ec227789bfaed49788dc099 100644
 --- a/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
 +++ b/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
-@@ -61,7 +61,11 @@ public class WorldUpgrader {
+@@ -61,7 +61,7 @@ public class WorldUpgrader {
      private volatile int skipped;
      private final Object2FloatMap<ResourceKey<LevelStem>> progressMap = Object2FloatMaps.synchronize(new Object2FloatOpenCustomHashMap(Util.identityStrategy())); // CraftBukkit
      private volatile Component status = Component.translatable("optimizeWorld.stage.counting");
 -    public static final Pattern REGEX = Pattern.compile("^r\\.(-?[0-9]+)\\.(-?[0-9]+)\\.mca$");
-+    // Kaiiju start
-+    public static final Pattern REGEX = dev.kugge.kaiiju.KaiijuConfig.useLinear
-+            ? Pattern.compile("^r\\.(-?[0-9]+)\\.(-?[0-9]+)\\.mca$")
-+            : Pattern.compile("^r\\.(-?[0-9]+)\\.(-?[0-9]+)\\.linear$");
-+    // Kaiiju end
++    public static final Pattern REGEX = Pattern.compile("^r\\.(-?[0-9]+)\\.(-?[0-9]+)\\.linear$"); // Kaiiju
      private final DimensionDataStorage overworldDataStorage;
  
      public WorldUpgrader(LevelStorageSource.LevelStorageAccess session, DataFixer dataFixer, Registry<LevelStem> dimensionOptionsRegistry, boolean eraseCache) {
-@@ -235,7 +239,13 @@ public class WorldUpgrader {
+@@ -235,7 +235,7 @@ public class WorldUpgrader {
          File file = this.levelStorage.getDimensionPath((ResourceKey) null).toFile(); // CraftBukkit
          File file1 = new File(file, "region");
          File[] afile = file1.listFiles((file2, s) -> {
 -            return s.endsWith(".mca");
-+            // Kaiiju start
-+            if (dev.kugge.kaiiju.KaiijuConfig.useLinear) {
-+                return s.endsWith(".linear");
-+            } else {
-+                return s.endsWith(".mca");
-+            }
-+            // Kaiiju end
++            return s.endsWith(".linear"); // Kaiiju
          });
  
          if (afile == null) {
@@ -1437,3 +1427,25 @@ index dcfe090c269d4cbcc2eb1b6f85392848bb34656c..9e902d1ed6995ca6718268c982191e1a
      }
 +    // Kaiiju end - Linear region file format
  }
+diff --git a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
+index bd502ca721de0cab438d995efa00ad0554c0d2fe..a4f365312df87e79580abcd20f4d6bb36bd3b130 100644
+--- a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
++++ b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
+@@ -42,7 +42,7 @@ public class RegionFileStorage implements AutoCloseable {
+     // Paper start
+     public static @Nullable ChunkPos getRegionFileCoordinates(Path file) {
+         String fileName = file.getFileName().toString();
+-        if (!fileName.startsWith("r.") || !fileName.endsWith(".mca")) {
++        if (!fileName.startsWith("r.") || !fileName.endsWith(".linear")) { // Kaiiju
+             return null;
+         }
+ 
+@@ -96,7 +96,7 @@ public class RegionFileStorage implements AutoCloseable {
+             FileUtil.createDirectoriesSafe(this.folder);
+             Path path = this.folder;
+             int j = chunkcoordintpair.getRegionX();
+-            Path path1 = path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + ".mca"); // Paper - diff on change
++            Path path1 = path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + ".linear"); // Paper - diff on change // Kaiiju
+             if (existingOnly && !java.nio.file.Files.exists(path1)) return null; // CraftBukkit
+             RegionFile regionfile1 = new RegionFile(path1, this.folder, this.sync, this.isChunkData); // Paper - allow for chunk regionfiles to regen header
+ 
