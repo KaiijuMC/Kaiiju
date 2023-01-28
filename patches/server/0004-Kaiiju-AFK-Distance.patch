@@ -37,10 +37,10 @@ index 45df8d6569e0d3ca5ceec6cd4de59caeb967e69c..ef36cf46a1b26f9346fac87e1ae115b0
 +
 +}
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index d62bf95fb067c2e2a4fc9b2757c636bd4ee75bea..a816a97cdbf85c8944ba03757048f0e0f63a0c99 100644
+index d62bf95fb067c2e2a4fc9b2757c636bd4ee75bea..fcd93d48c5faf72a298935528f139c52f8a5f75b 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-@@ -2084,6 +2084,15 @@ public class ServerPlayer extends Player {
+@@ -2084,6 +2084,16 @@ public class ServerPlayer extends Player {
      public void resetLastActionTime() {
          this.lastActionTime = Util.getMillis();
          this.setAfk(false); // Purpur
@@ -48,6 +48,7 @@ index d62bf95fb067c2e2a4fc9b2757c636bd4ee75bea..a816a97cdbf85c8944ba03757048f0e0
 +        if (dev.kugge.kaiiju.KaiijuConfig.useIdleDistances) {
 +            try {
 +                this.getBukkitEntity().setViewDistance(this.getBukkitEntity().getWorld().getViewDistance());
++                this.getBukkitEntity().setSendViewDistance(this.getBukkitEntity().getWorld().getViewDistance() + 1);
 +                this.getBukkitEntity().setSimulationDistance(this.getBukkitEntity().getWorld().getSimulationDistance());
 +            }
 +            catch (IllegalStateException e) {} // End portal. Skip
@@ -57,10 +58,10 @@ index d62bf95fb067c2e2a4fc9b2757c636bd4ee75bea..a816a97cdbf85c8944ba03757048f0e0
  
      // Purpur Start
 diff --git a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index a8e205af936efe0909c94575e3b7f8ca50cead2f..1963ec2be425002b93542d4f1d24e9c4adb8ded1 100644
+index a8e205af936efe0909c94575e3b7f8ca50cead2f..153672f0863c507120976cf44f3a762a56e7528f 100644
 --- a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -461,6 +461,15 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
+@@ -461,6 +461,16 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
              // Purpur start
              this.player.setAfk(true);
              if (!this.player.level.purpurConfig.idleTimeoutKick || kickPermissionCache.getUnchecked(this.player.getBukkitEntity())) {
@@ -68,6 +69,7 @@ index a8e205af936efe0909c94575e3b7f8ca50cead2f..1963ec2be425002b93542d4f1d24e9c4
 +                if (dev.kugge.kaiiju.KaiijuConfig.useIdleDistances) {
 +                    try {
 +                        this.getCraftPlayer().setViewDistance(dev.kugge.kaiiju.KaiijuConfig.idleViewDistance);
++                        this.getCraftPlayer().setSendViewDistance(dev.kugge.kaiiju.KaiijuConfig.idleViewDistance + 1);
 +                        this.getCraftPlayer().setSimulationDistance(dev.kugge.kaiiju.KaiijuConfig.idleSimulationDistance);
 +                    }
 +                    catch (IllegalStateException e) {} // End portal. Skip
