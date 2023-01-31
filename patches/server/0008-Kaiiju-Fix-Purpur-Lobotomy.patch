@@ -47,7 +47,6 @@ index aed1d9ccffe471b6c2a1d52d2d3d097f6431318b..f5a7399a9accf45af081fcbc5f120d53
 +        return below instanceof net.minecraft.world.level.block.BedBlock;
 +    }
 +    // Kaiiju end - Fix Purpur lobotomy
-+
- 
+
      @Override
      public Brain<Villager> getBrain() {
