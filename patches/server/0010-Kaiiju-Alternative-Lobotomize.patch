@@ -29,18 +29,9 @@ index d818947fe6a27d1f0ac42fc20bf13af7e2e207dc..7be44a24b289b834c2a226b5ab61bc53
      private static void getLobotomizeJobless() {
          lobotomizeJobless = getBoolean("performance.lobotomize.jobless-villagers", false,
 diff --git a/src/main/java/net/minecraft/world/entity/npc/Villager.java b/src/main/java/net/minecraft/world/entity/npc/Villager.java
-index 19eeb9cad69067955e12a19585d15aebf4ccecb4..cfe0777dcaea258b6a378876cc6b1253f1944b59 100644
+index 79e0992c999ea3339748bbc1445d57a9be66b9b1..cfe0777dcaea258b6a378876cc6b1253f1944b59 100644
 --- a/src/main/java/net/minecraft/world/entity/npc/Villager.java
 +++ b/src/main/java/net/minecraft/world/entity/npc/Villager.java
-@@ -243,7 +243,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
-     // Purpur end
-     // Kaiiju start - Fix Purpur lobotomy
-     private boolean needLobotomy() {
--        if (dev.kugge.kaiiju.KaiijuConfig.lobotomizeJobless
-+        if (!dev.kugge.kaiiju.KaiijuConfig.lobotomizeJobless
-             && this.getVillagerData().getProfession() == VillagerProfession.NONE) { return false; }
-         if (isOnBed()) { return false; }
-         if (canTravelFrom(new BlockPos(getX(), getY() + 0.0625D, getZ()))) { return false; }
 @@ -360,7 +360,10 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
          // Purpur start
          if (this.level.purpurConfig.villagerLobotomizeEnabled) {
