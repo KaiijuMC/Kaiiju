@@ -1,0 +1,53 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kugge <sofiane.djerbi38@gmail.com>
+Date: Tue, 31 Jan 2023 01:57:21 +0100
+Subject: [PATCH] Kaiiju Fix Purpur Lobotomy
+
+
+diff --git a/src/main/java/net/minecraft/world/entity/npc/Villager.java b/src/main/java/net/minecraft/world/entity/npc/Villager.java
+index aed1d9ccffe471b6c2a1d52d2d3d097f6431318b..f5a7399a9accf45af081fcbc5f120d533929f387 100644
+--- a/src/main/java/net/minecraft/world/entity/npc/Villager.java
++++ b/src/main/java/net/minecraft/world/entity/npc/Villager.java
+@@ -207,7 +207,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+         }
+         if (this.level.getGameTime() % interval == 0) {
+             // offset Y for short blocks like dirt_path/farmland
+-            this.isLobotomized = !canTravelFrom(new BlockPos(getX(), getY() + 0.0625D, getZ()));
++            this.isLobotomized = needLobotomy(); // Kaiiju
+ 
+             if (this.isLobotomized) {
+                 this.notLobotomizedCount = 0;
+@@ -229,6 +229,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+             return false;
+         }
+         net.minecraft.world.level.block.Block bottom = state.getBlock();
++        if (bottom instanceof net.minecraft.world.level.block.BedBlock) { return true; } // Kaiiju
+         if (bottom instanceof net.minecraft.world.level.block.FenceBlock ||
+                 bottom instanceof net.minecraft.world.level.block.FenceGateBlock ||
+                 bottom instanceof net.minecraft.world.level.block.WallBlock) {
+@@ -240,6 +241,25 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+         return !bottom.hasCollision && !top.hasCollision;
+     }
+     // Purpur end
++    // Kaiiju start - Fix Purpur lobotomy
++    private boolean needLobotomy() {
++        if (isOnBed()) { return false; }
++        if (canTravelFrom(new BlockPos(getX(), getY() + 0.0625D, getZ()))) { return false; }
++        return true;
++    }
++
++    private boolean isOnBed() {
++        BlockPos pos = new BlockPos(getX(), getY() - 0.9375D, getZ());
++        net.minecraft.world.level.block.state.BlockState state = this.level.getBlockStateIfLoaded(pos);
++        if (state == null) {
++            // chunk not loaded
++            return false;
++        }
++        net.minecraft.world.level.block.Block below = state.getBlock();
++        return below instanceof net.minecraft.world.level.block.BedBlock;
++    }
++    // Kaiiju end - Fix Purpur lobotomy
++
+ 
+     @Override
+     public Brain<Villager> getBrain() {
