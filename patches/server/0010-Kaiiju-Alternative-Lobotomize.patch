@@ -1,0 +1,54 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kugge <sofiane.djerbi38@gmail.com>
+Date: Tue, 31 Jan 2023 06:09:29 +0100
+Subject: [PATCH] Kaiiju Alternative Lobotomize
+
+
+diff --git a/src/main/java/dev/kugge/kaiiju/KaiijuConfig.java b/src/main/java/dev/kugge/kaiiju/KaiijuConfig.java
+index d818947fe6a27d1f0ac42fc20bf13af7e2e207dc..7be44a24b289b834c2a226b5ab61bc53171a1f38 100644
+--- a/src/main/java/dev/kugge/kaiiju/KaiijuConfig.java
++++ b/src/main/java/dev/kugge/kaiiju/KaiijuConfig.java
+@@ -159,6 +159,19 @@ public class KaiijuConfig {
+                                                   "Small ping/bandwith improvement.");
+     }
+ 
++    public static boolean lobotomizeAlternative;
++    private static void getLobotomizeAlternative() {
++        lobotomizeAlternative = getBoolean("performance.lobotomize.alternative-algorithm", true,
++                                           "Slow down villager brain instead of freezing it.",
++                                           "Require \"lobotomize: true\" in Purpur config.");
++    }
++
++    public static int lobotomizeFrequency;
++    private static void getLobotomizeFrequency() {
++        lobotomizeFrequency = getInt("performance.lobotomize.alternative-frequency", 3,
++                                     "Tick villager brain every <x> tick when lobotomized with alternative algorithm.");
++    }
++
+     public static boolean lobotomizeJobless;
+     private static void getLobotomizeJobless() {
+         lobotomizeJobless = getBoolean("performance.lobotomize.jobless-villagers", false,
+diff --git a/src/main/java/net/minecraft/world/entity/npc/Villager.java b/src/main/java/net/minecraft/world/entity/npc/Villager.java
+index 19eeb9cad69067955e12a19585d15aebf4ccecb4..cfe0777dcaea258b6a378876cc6b1253f1944b59 100644
+--- a/src/main/java/net/minecraft/world/entity/npc/Villager.java
++++ b/src/main/java/net/minecraft/world/entity/npc/Villager.java
+@@ -243,7 +243,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+     // Purpur end
+     // Kaiiju start - Fix Purpur lobotomy
+     private boolean needLobotomy() {
+-        if (dev.kugge.kaiiju.KaiijuConfig.lobotomizeJobless
++        if (!dev.kugge.kaiiju.KaiijuConfig.lobotomizeJobless
+             && this.getVillagerData().getProfession() == VillagerProfession.NONE) { return false; }
+         if (isOnBed()) { return false; }
+         if (canTravelFrom(new BlockPos(getX(), getY() + 0.0625D, getZ()))) { return false; }
+@@ -360,7 +360,10 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+         // Purpur start
+         if (this.level.purpurConfig.villagerLobotomizeEnabled) {
+             // treat as inactive if lobotomized
++            if (dev.kugge.kaiiju.KaiijuConfig.lobotomizeAlternative) { // Kaiiju
++            if (this.level.getGameTime() % dev.kugge.kaiiju.KaiijuConfig.lobotomizeFrequency != 0) { // Kaiiju
+             inactive = inactive || checkLobotomized();
++            }} else { inactive = inactive || checkLobotomized(); } // Kaiiju
+         } else {
+             // clean up state for API
+             this.isLobotomized = false;

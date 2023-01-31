@@ -1,0 +1,34 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kugge <sofiane.djerbi38@gmail.com>
+Date: Tue, 31 Jan 2023 05:47:32 +0100
+Subject: [PATCH] Kaiiju Lobotomize Jobless Villagers
+
+
+diff --git a/src/main/java/dev/kugge/kaiiju/KaiijuConfig.java b/src/main/java/dev/kugge/kaiiju/KaiijuConfig.java
+index b5cc058fd6ca619011209a50e6e1643d3fd20c1b..d818947fe6a27d1f0ac42fc20bf13af7e2e207dc 100644
+--- a/src/main/java/dev/kugge/kaiiju/KaiijuConfig.java
++++ b/src/main/java/dev/kugge/kaiiju/KaiijuConfig.java
+@@ -159,4 +159,10 @@ public class KaiijuConfig {
+                                                   "Small ping/bandwith improvement.");
+     }
+ 
++    public static boolean lobotomizeJobless;
++    private static void getLobotomizeJobless() {
++        lobotomizeJobless = getBoolean("performance.lobotomize.jobless-villagers", false,
++                                       "Lobotomize jobless villagers ?");
++    }
++
+ }
+diff --git a/src/main/java/net/minecraft/world/entity/npc/Villager.java b/src/main/java/net/minecraft/world/entity/npc/Villager.java
+index ea4b251e71f7c4d7d7a167ff44feb0cd43ba9511..19eeb9cad69067955e12a19585d15aebf4ccecb4 100644
+--- a/src/main/java/net/minecraft/world/entity/npc/Villager.java
++++ b/src/main/java/net/minecraft/world/entity/npc/Villager.java
+@@ -243,6 +243,8 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+     // Purpur end
+     // Kaiiju start - Fix Purpur lobotomy
+     private boolean needLobotomy() {
++        if (dev.kugge.kaiiju.KaiijuConfig.lobotomizeJobless
++            && this.getVillagerData().getProfession() == VillagerProfession.NONE) { return false; }
+         if (isOnBed()) { return false; }
+         if (canTravelFrom(new BlockPos(getX(), getY() + 0.0625D, getZ()))) { return false; }
+         return true;

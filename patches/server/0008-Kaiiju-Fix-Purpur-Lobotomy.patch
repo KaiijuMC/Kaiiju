@@ -5,7 +5,7 @@ Subject: [PATCH] Kaiiju Fix Purpur Lobotomy
 
 
 diff --git a/src/main/java/net/minecraft/world/entity/npc/Villager.java b/src/main/java/net/minecraft/world/entity/npc/Villager.java
-index aed1d9ccffe471b6c2a1d52d2d3d097f6431318b..f5a7399a9accf45af081fcbc5f120d533929f387 100644
+index aed1d9ccffe471b6c2a1d52d2d3d097f6431318b..ea4b251e71f7c4d7d7a167ff44feb0cd43ba9511 100644
 --- a/src/main/java/net/minecraft/world/entity/npc/Villager.java
 +++ b/src/main/java/net/minecraft/world/entity/npc/Villager.java
 @@ -207,7 +207,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
@@ -25,7 +25,7 @@ index aed1d9ccffe471b6c2a1d52d2d3d097f6431318b..f5a7399a9accf45af081fcbc5f120d53
          if (bottom instanceof net.minecraft.world.level.block.FenceBlock ||
                  bottom instanceof net.minecraft.world.level.block.FenceGateBlock ||
                  bottom instanceof net.minecraft.world.level.block.WallBlock) {
-@@ -240,6 +241,25 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+@@ -240,6 +241,24 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
          return !bottom.hasCollision && !top.hasCollision;
      }
      // Purpur end
@@ -47,6 +47,6 @@ index aed1d9ccffe471b6c2a1d52d2d3d097f6431318b..f5a7399a9accf45af081fcbc5f120d53
 +        return below instanceof net.minecraft.world.level.block.BedBlock;
 +    }
 +    // Kaiiju end - Fix Purpur lobotomy
-
+ 
      @Override
      public Brain<Villager> getBrain() {

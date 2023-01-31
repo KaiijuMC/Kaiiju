@@ -5,11 +5,11 @@ Subject: [PATCH] Purpur Dont Send Useless Entity Packets
 
 
 diff --git a/src/main/java/dev/kugge/kaiiju/KaiijuConfig.java b/src/main/java/dev/kugge/kaiiju/KaiijuConfig.java
-index ef36cf46a1b26f9346fac87e1ae115b0c9dcd94f..2b08f1b6d2692f93481a0139e224c3b7469e7148 100644
+index 84a782ddfca2e69438cc132d9f81a6a6a178f319..b5cc058fd6ca619011209a50e6e1643d3fd20c1b 100644
 --- a/src/main/java/dev/kugge/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kugge/kaiiju/KaiijuConfig.java
-@@ -154,4 +154,11 @@ public class KaiijuConfig {
-                                         "Require \"kick-if-idle: false\" in Purpur config.");
+@@ -152,4 +152,11 @@ public class KaiijuConfig {
+                                         "Simulation distance for AFK players.");
      }
  
 +    public static boolean dontSendUselessEntityPackets;

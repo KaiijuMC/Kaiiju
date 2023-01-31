@@ -5,10 +5,10 @@ Subject: [PATCH] Kaiiju AFK Distance
 
 
 diff --git a/src/main/java/dev/kugge/kaiiju/KaiijuConfig.java b/src/main/java/dev/kugge/kaiiju/KaiijuConfig.java
-index 45df8d6569e0d3ca5ceec6cd4de59caeb967e69c..ef36cf46a1b26f9346fac87e1ae115b0c9dcd94f 100644
+index 45df8d6569e0d3ca5ceec6cd4de59caeb967e69c..84a782ddfca2e69438cc132d9f81a6a6a178f319 100644
 --- a/src/main/java/dev/kugge/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kugge/kaiiju/KaiijuConfig.java
-@@ -133,4 +133,25 @@ public class KaiijuConfig {
+@@ -133,4 +133,23 @@ public class KaiijuConfig {
          return config.getStringList(key);
      }
  
@@ -17,22 +17,20 @@ index 45df8d6569e0d3ca5ceec6cd4de59caeb967e69c..ef36cf46a1b26f9346fac87e1ae115b0
 +    public static boolean useIdleDistances;
 +    private static void getUseIdleDistances() {
 +        useIdleDistances = getBoolean("distances.use-afk-distances", false,
-+                                  "Whether or not AFK distances should be enabled.",
-+                                  "Require \"kick-if-idle: false\" in Purpur config.");
++                                      "Whether or not AFK distances should be enabled.",
++                                      "Require \"kick-if-idle: false\" in Purpur config.");
 +    }
 +
 +    public static int idleViewDistance;
 +    private static void getIdleViewDistance() {
-+        idleViewDistance = getInt("distances.afk-view-distance", 8,
-+                                  "View distance for AFK players.",
-+                                  "Require \"kick-if-idle: false\" in Purpur config.");
++        idleViewDistance = getInt("distances.afk-view-distance", 9,
++                                  "View distance for AFK players.");
 +    }
 +
 +    public static int idleSimulationDistance;
 +    private static void getIdleSimulationDistance() {
 +        idleSimulationDistance = getInt("distances.afk-simulation-distance", 8,
-+                                        "Simulation distance for AFK players.",
-+                                        "Require \"kick-if-idle: false\" in Purpur config.");
++                                        "Simulation distance for AFK players.");
 +    }
 +
 +}
