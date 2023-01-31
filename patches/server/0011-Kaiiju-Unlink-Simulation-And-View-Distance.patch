@@ -1,0 +1,46 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kugge <sofiane.djerbi38@gmail.com>
+Date: Tue, 31 Jan 2023 15:25:00 +0100
+Subject: [PATCH] Kaiiju Unlink Simulation And View Distance
+
+
+diff --git a/src/main/java/io/papermc/paper/chunk/PlayerChunkLoader.java b/src/main/java/io/papermc/paper/chunk/PlayerChunkLoader.java
+index 0b060183429f4c72ec767075538477b4302bbf0d..705c23580e8022a4dd65d222040ddc61a3d0be51 100644
+--- a/src/main/java/io/papermc/paper/chunk/PlayerChunkLoader.java
++++ b/src/main/java/io/papermc/paper/chunk/PlayerChunkLoader.java
+@@ -210,7 +210,7 @@ public final class PlayerChunkLoader {
+ 
+     public int getLoadDistance() {
+         final int tickDistance = this.getTickDistance();
+-        return this.rawLoadDistance == -1 ? tickDistance + 1 : Math.max(tickDistance + 1, this.rawLoadDistance);
++        return this.rawLoadDistance == -1 ? tickDistance + 1 : this.rawLoadDistance; // Kaiiju
+     }
+ 
+     public void setLoadDistance(final int distance) {
+@@ -825,7 +825,7 @@ public final class PlayerChunkLoader {
+         // these view distance methods are for api
+         public int getTargetSendViewDistance() {
+             final int tickViewDistance = this.tickViewDistance == -1 ? this.loader.getTickDistance() : this.tickViewDistance;
+-            final int loadViewDistance = Math.max(tickViewDistance + 1, this.loadViewDistance == -1 ? this.loader.getLoadDistance() : this.loadViewDistance);
++            final int loadViewDistance = this.loadViewDistance == -1 ? this.loader.getLoadDistance() : this.loadViewDistance; // Kaiiju
+             final int clientViewDistance = this.getClientViewDistance();
+             final int sendViewDistance = Math.min(loadViewDistance, this.sendViewDistance == -1 ? (!GlobalConfiguration.get().chunkLoading.autoconfigSendDistance || clientViewDistance == -1 ? this.loader.getSendDistance() : clientViewDistance + 1) : this.sendViewDistance);
+             return sendViewDistance;
+@@ -863,7 +863,7 @@ public final class PlayerChunkLoader {
+         protected int getLoadDistance() {
+             final int tickViewDistance = this.tickViewDistance == -1 ? this.loader.getTickDistance() : this.tickViewDistance;
+ 
+-            return Math.max(tickViewDistance + 1, this.loadViewDistance == -1 ? this.loader.getLoadDistance() : this.loadViewDistance);
++            return this.loadViewDistance == -1 ? this.loader.getLoadDistance() : this.loadViewDistance; // Kaiiju
+         }
+ 
+         public boolean hasSentChunk(final int chunkX, final int chunkZ) {
+@@ -941,7 +941,7 @@ public final class PlayerChunkLoader {
+         public void update() {
+             final int tickViewDistance = this.tickViewDistance == -1 ? this.loader.getTickDistance() : this.tickViewDistance;
+             // load view cannot be less-than tick view + 1
+-            final int loadViewDistance = Math.max(tickViewDistance + 1, this.loadViewDistance == -1 ? this.loader.getLoadDistance() : this.loadViewDistance);
++            final int loadViewDistance = this.loadViewDistance == -1 ? this.loader.getLoadDistance() : this.loadViewDistance; // Kaiiju
+             // send view cannot be greater-than load view
+             final int clientViewDistance = this.getClientViewDistance();
+             final int sendViewDistance = Math.min(loadViewDistance, this.sendViewDistance == -1 ? (!GlobalConfiguration.get().chunkLoading.autoconfigSendDistance || clientViewDistance == -1 ? this.loader.getSendDistance() : clientViewDistance + 1) : this.sendViewDistance);
