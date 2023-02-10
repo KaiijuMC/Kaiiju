@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
+Date: Fri, 10 Feb 2023 17:45:59 +0200
+Subject: [PATCH] Kaiiju Configuration
+
+
+diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
+index e0f69edf603c2ec99bc92b16b18912272cc41bd9..b2c8c18437537eb2ea91bdeb9f715e01a182fbcb 100644
+--- a/src/main/java/org/bukkit/Server.java
++++ b/src/main/java/org/bukkit/Server.java
+@@ -1983,6 +1983,13 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+         }
+         // Purpur end
+ 
++        // Kaiiju start
++        @NotNull
++        public org.bukkit.configuration.file.YamlConfiguration getKaiijuConfig() {
++            throw new UnsupportedOperationException("Not supported yet.");
++        }
++        // Kaiiju end
++
+         /**
+          * Sends the component to the player
+          *

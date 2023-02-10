@@ -5,7 +5,7 @@ Subject: [PATCH] Kaiiju Rebranding
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 020927dfe9624453311d1d171a10f44344ec8710..6d2178ac4e37d774917c26ec5c4af325202a9ef1 100644
+index 020927dfe9624453311d1d171a10f44344ec8710..c6a4c48b14a8c927284720b79b93ee1aa9df7da6 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -7,7 +7,7 @@ plugins {
@@ -17,8 +17,39 @@ index 020927dfe9624453311d1d171a10f44344ec8710..6d2178ac4e37d774917c26ec5c4af325
      // Pufferfish start
      implementation("io.papermc.paper:paper-mojangapi:1.19.3-R0.1-SNAPSHOT") {
          exclude("io.papermc.paper", "paper-api")
+@@ -83,7 +83,7 @@ tasks.jar {
+         attributes(
+             "Main-Class" to "org.bukkit.craftbukkit.Main",
+             "Implementation-Title" to "CraftBukkit",
+-            "Implementation-Version" to "git-Purpur-$implementationVersion", // Purpur
++            "Implementation-Version" to "git-Kaiiju-$implementationVersion", // Purpur // Kaiiju
+             "Implementation-Vendor" to date, // Paper
+             "Specification-Title" to "Bukkit",
+             "Specification-Version" to project.version,
+diff --git a/src/main/java/com/destroystokyo/paper/Metrics.java b/src/main/java/com/destroystokyo/paper/Metrics.java
+index 9713263c3bd34ab8a3bfc0a8797ba0b1b88ed733..0b95cd5305e4559d6dca59011869e5b203d51576 100644
+--- a/src/main/java/com/destroystokyo/paper/Metrics.java
++++ b/src/main/java/com/destroystokyo/paper/Metrics.java
+@@ -593,7 +593,7 @@ public class Metrics {
+             boolean logFailedRequests = config.getBoolean("logFailedRequests", false);
+             // Only start Metrics, if it's enabled in the config
+             if (config.getBoolean("enabled", true)) {
+-                Metrics metrics = new Metrics("Purpur", serverUUID, logFailedRequests, Bukkit.getLogger()); // Purpur
++                Metrics metrics = new Metrics("Kaiiju", serverUUID, logFailedRequests, Bukkit.getLogger()); // Purpur // Kaiiju
+ 
+                 metrics.addCustomChart(new Metrics.SimplePie("minecraft_version", () -> {
+                     String minecraftVersion = Bukkit.getVersion();
+@@ -603,7 +603,7 @@ public class Metrics {
+ 
+                 metrics.addCustomChart(new Metrics.SingleLineChart("players", () -> Bukkit.getOnlinePlayers().size()));
+                 metrics.addCustomChart(new Metrics.SimplePie("online_mode", () -> Bukkit.getOnlineMode() ? "online" : (io.papermc.paper.configuration.GlobalConfiguration.get().proxies.isProxyOnlineMode() ? "bungee" : "offline"))); // Purpur
+-                metrics.addCustomChart(new Metrics.SimplePie("purpur_version", () -> (org.bukkit.craftbukkit.Main.class.getPackage().getImplementationVersion() != null) ? org.bukkit.craftbukkit.Main.class.getPackage().getImplementationVersion() : "unknown")); // Purpur
++                metrics.addCustomChart(new Metrics.SimplePie("kaiiju_version", () -> (org.bukkit.craftbukkit.Main.class.getPackage().getImplementationVersion() != null) ? org.bukkit.craftbukkit.Main.class.getPackage().getImplementationVersion() : "unknown")); // Purpur // Kaiiju
+ 
+                 metrics.addCustomChart(new Metrics.DrilldownPie("java_version", () -> {
+                     Map<String, Map<String, Integer>> map = new HashMap<>();
 diff --git a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
-index fba5dbdb7bcbb55400ef18342c9b54612972a718..f9bf6c63b486ab1e886c6566e2c733159ca77f82 100644
+index fba5dbdb7bcbb55400ef18342c9b54612972a718..892299d79bb8ef831825ef335614385bf1a50dc4 100644
 --- a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
 +++ b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
 @@ -20,7 +20,7 @@ import java.util.stream.StreamSupport;
@@ -26,7 +57,7 @@ index fba5dbdb7bcbb55400ef18342c9b54612972a718..f9bf6c63b486ab1e886c6566e2c73315
      private static final java.util.regex.Pattern VER_PATTERN = java.util.regex.Pattern.compile("^([0-9\\.]*)\\-.*R"); // R is an anchor, will always give '-R' at end
      // Purpur start
 -    private static final String DOWNLOAD_PAGE = "https://purpurmc.org/downloads";
-+    private static final String DOWNLOAD_PAGE = "https://github.com/kugge/Kaiiju/releases"; // Kaiiju
++    private static final String DOWNLOAD_PAGE = "https://github.com/KaiijuMC/Kaiiju/releases"; // Kaiiju
      private static int distance = -2; public int distance() { return distance; }
      // Purpur end
      private static @Nullable String mcVer;
@@ -37,7 +68,7 @@ index fba5dbdb7bcbb55400ef18342c9b54612972a718..f9bf6c63b486ab1e886c6566e2c73315
 -        String[] parts = serverVersion.substring("git-Purpur-".length()).split("[-\\s]"); // Purpur
 -        final Component updateMessage = getUpdateStatusMessage("PurpurMC/Purpur", "ver/" + getMinecraftVersion(), parts[0]); // Purpur
 +        String[] parts = serverVersion.substring("git-Kaiiju-".length()).split("[-\\s]"); // Purpur // Kaiiju
-+        final Component updateMessage = getUpdateStatusMessage("kugge/Kaiiju", "ver/" + getMinecraftVersion(), parts[0]); // Purpur // Kaiiju
++        final Component updateMessage = getUpdateStatusMessage("KaiijuMC/Kaiiju", "ver/" + getMinecraftVersion(), parts[0]); // Purpur // Kaiiju
          final Component history = getHistory();
  
          return history != null ? Component.join(net.kyori.adventure.text.JoinConfiguration.separator(Component.newline()), history, updateMessage) : updateMessage; // Purpur
@@ -129,7 +160,7 @@ index 5402098dce0d64d3dceea51f248d7d366850a74f..2b7a67c339994c34296f7057ffc8822b
                  // (async tasks must live with race-conditions if they attempt to cancel between these few lines of code)
              }
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
-index fb87620c742ff7912f5e8ccd2a7930dd605576d9..3d00598f9d2d04fedac53b68d7e6b17334668401 100644
+index fb87620c742ff7912f5e8ccd2a7930dd605576d9..0f56013165cd61023b4f30a4da424b701e14a8e2 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
 @@ -11,7 +11,7 @@ public final class Versioning {
@@ -137,7 +168,7 @@ index fb87620c742ff7912f5e8ccd2a7930dd605576d9..3d00598f9d2d04fedac53b68d7e6b173
          String result = "Unknown-Version";
  
 -        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/org.purpurmc.purpur/purpur-api/pom.properties"); // Purpur
-+        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/dev.kugge.kaiiju/kaiiju-api/pom.properties"); // Purpur // Kaiiju
++        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/dev.kaiijumc.kaiiju/kaiiju-api/pom.properties"); // Purpur // Kaiiju
          Properties properties = new Properties();
  
          if (stream != null) {
@@ -155,7 +186,7 @@ index c7c0ed8dfe58c841faf684a1fe228eeda6cd57b7..410ce2dc98c48871d2ddfb0195f2885a
          serverModName = getString("settings.server-mod-name", serverModName);
      }
 diff --git a/src/main/java/org/spigotmc/WatchdogThread.java b/src/main/java/org/spigotmc/WatchdogThread.java
-index a810bfd3b8d6bd4d8f2ef8797e4281ae4fe8a67f..eaec120aa1db7a3f2d955290fff069deaeb14ba4 100644
+index a810bfd3b8d6bd4d8f2ef8797e4281ae4fe8a67f..7e92d77edb448f2ec818bf4b876d3df56d6362cc 100644
 --- a/src/main/java/org/spigotmc/WatchdogThread.java
 +++ b/src/main/java/org/spigotmc/WatchdogThread.java
 @@ -155,14 +155,14 @@ public final class WatchdogThread extends io.papermc.paper.util.TickThread // Pa
@@ -169,7 +200,7 @@ index a810bfd3b8d6bd4d8f2ef8797e4281ae4fe8a67f..eaec120aa1db7a3f2d955290fff069de
                  log.log( Level.SEVERE, "If you see a world save or edit, then it means you did far more than your server can handle at once" );
                  log.log( Level.SEVERE, "\t If this is the case, consider increasing timeout-time in spigot.yml but note that this will replace the crash with LARGE lag spikes" );
 -                log.log( Level.SEVERE, "If you are unsure or still think this is a Purpur bug, please report this to https://github.com/PurpurMC/Purpur/issues" ); // Purpur
-+                log.log( Level.SEVERE, "If you are unsure or still think this is a Kaiiju bug, please report this to https://github.com/kugge/Kaiiju/issues" ); // Purpur // Kaiiju
++                log.log( Level.SEVERE, "If you are unsure or still think this is a Kaiiju bug, please report this to https://github.com/KaiijuMC/Kaiiju/issues" ); // Purpur // Kaiiju
                  log.log( Level.SEVERE, "Be sure to include ALL relevant console errors and Minecraft crash reports" );
 -                log.log( Level.SEVERE, "Purpur version: " + Bukkit.getServer().getVersion() ); // Purpur
 +                log.log( Level.SEVERE, "Kaiiju version: " + Bukkit.getServer().getVersion() ); // Purpur // Kaiiju
