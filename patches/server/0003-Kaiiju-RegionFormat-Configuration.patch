@@ -1,0 +1,57 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
+Date: Fri, 10 Feb 2023 20:03:58 +0200
+Subject: [PATCH] Kaiiju RegionFormat Configuration
+
+
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+index da7e04a93664e20b9187292ddb7c1f935f5f2883..66bbab7ebe1738cd937963b35fad9cdda763fa88 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+@@ -15,6 +15,7 @@ import java.io.IOException;
+ import java.lang.reflect.InvocationTargetException;
+ import java.lang.reflect.Method;
+ import java.lang.reflect.Modifier;
++import java.util.Arrays;
+ import java.util.HashMap;
+ import java.util.List;
+ import java.util.Map;
+@@ -190,4 +191,15 @@ public class KaiijuConfig {
+         }
+         return builder.build();
+     }
++
++    public static List<String> regionFormatList = Arrays.asList("ANVIL");
++    public static String regionFormatName = "ANVIL";
++
++    private static void regionFormatSettings() {
++        regionFormatName = getString("region-format.format", regionFormatName).toUpperCase();
++        if (!regionFormatList.contains(regionFormatName)) {
++            Bukkit.getLogger().log(Level.SEVERE, "Unknown region format in fusion.yml: " + regionFormatName);
++            Bukkit.getLogger().log(Level.SEVERE, "Falling back to ANVIL region file format.");
++        }
++    }
+ }
+\ No newline at end of file
+diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index 40b4bd2f1a61c2d9a59c9c09b72713401969460b..b9998c288c4e8b6a244722915e44250b6550fd7e 100644
+--- a/src/main/java/net/minecraft/server/MinecraftServer.java
++++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -855,7 +855,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+             // Paper start - rewrite chunk system
+             worldserver.save((ProgressListener) null, flush, worldserver.noSave && !force, close);
+             if (flush) {
+-                MinecraftServer.LOGGER.info("ThreadedAnvilChunkStorage ({}): All chunks are saved", worldserver.getChunkSource().chunkMap.getStorageName());
++                MinecraftServer.LOGGER.info("ThreadedChunkStorage ({}): All chunks are saved", worldserver.getChunkSource().chunkMap.getStorageName()); // Kaiiju
+             }
+             // Paper end - rewrite chunk system
+         }
+@@ -879,7 +879,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+                 //MinecraftServer.LOGGER.info("ThreadedAnvilChunkStorage ({}): All chunks are saved", worldserver2.getChunkSource().chunkMap.getStorageName()); // Paper - move up
+             }
+ 
+-            MinecraftServer.LOGGER.info("ThreadedAnvilChunkStorage: All dimensions are saved");
++            MinecraftServer.LOGGER.info("ThreadedChunkStorage: All dimensions are saved"); // Kaiiju
+         }
+ 
+         return flag3;
