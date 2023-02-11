@@ -1,0 +1,20 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
+Date: Sat, 11 Feb 2023 02:10:20 +0200
+Subject: [PATCH] Kaiiju Lobotomize Configuration
+
+
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+index 16ebf32e0c62025958c95216531f72cc418e8d14..c84d8aa09b3bd36806d33f4c90a40b735a1ecd90 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+@@ -202,4 +202,7 @@ public class KaiijuConfig {
+             Bukkit.getLogger().log(Level.SEVERE, "Falling back to ANVIL region file format.");
+         }
+     }
+-}
+\ No newline at end of file
++
++    private static void lobotomizeSettings() {
++    }
++}

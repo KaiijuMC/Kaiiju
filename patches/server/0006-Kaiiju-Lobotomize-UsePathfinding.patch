@@ -1,0 +1,58 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
+Date: Sat, 11 Feb 2023 02:22:50 +0200
+Subject: [PATCH] Kaiiju Lobotomize UsePathfinding
+
+
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+index c84d8aa09b3bd36806d33f4c90a40b735a1ecd90..3ad158e9b3042a04ec09a9732189a08d36501a98 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+@@ -203,6 +203,9 @@ public class KaiijuConfig {
+         }
+     }
+ 
++    public static boolean lobotomizeUsePathfinding = true;
++
+     private static void lobotomizeSettings() {
++        lobotomizeUsePathfinding = getBoolean("lobotomize.use-pathfinding", lobotomizeUsePathfinding);
+     }
+ }
+diff --git a/src/main/java/net/minecraft/world/entity/npc/Villager.java b/src/main/java/net/minecraft/world/entity/npc/Villager.java
+index aed1d9ccffe471b6c2a1d52d2d3d097f6431318b..ff0adda3aa59612dc125aeca326a30194515aa2a 100644
+--- a/src/main/java/net/minecraft/world/entity/npc/Villager.java
++++ b/src/main/java/net/minecraft/world/entity/npc/Villager.java
+@@ -222,7 +222,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+         return canTravelTo(pos.east()) || canTravelTo(pos.west()) || canTravelTo(pos.north()) || canTravelTo(pos.south());
+     }
+ 
+-    private boolean canTravelTo(BlockPos pos) {
++    private boolean canTravelToBlockState(BlockPos pos) { // Kaiiju
+         net.minecraft.world.level.block.state.BlockState state = this.level.getBlockStateIfLoaded(pos);
+         if (state == null) {
+             // chunk not loaded
+@@ -241,6 +241,24 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+     }
+     // Purpur end
+ 
++    // Kaiiju start - Pathfinding based lobotomize
++    private boolean canTravelTo(BlockPos pos) {
++        return dev.kaiijumc.kaiiju.KaiijuConfig.lobotomizeUsePathfinding ? canTravelToPathfinding(pos) : canTravelToBlockState(pos);
++    }
++
++    private boolean canTravelToPathfinding(BlockPos pos) {
++        net.minecraft.world.level.block.state.BlockState bottom = level.getBlockStateIfLoaded(pos);
++        if (bottom == null) {
++            // chunk not loaded
++            return false;
++        }
++        net.minecraft.world.level.block.state.BlockState top = level.getBlockState(pos.above());
++        // only if pathfindable
++        return bottom.isPathfindable(level, pos, net.minecraft.world.level.pathfinder.PathComputationType.LAND)
++               && top.isPathfindable(level, pos, net.minecraft.world.level.pathfinder.PathComputationType.LAND);
++    }
++    // Kaiiju end
++
+     @Override
+     public Brain<Villager> getBrain() {
+         return (Brain<Villager>) super.getBrain(); // CraftBukkit - decompile error
