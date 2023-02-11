@@ -1,0 +1,396 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
+Date: Sat, 11 Feb 2023 06:29:15 +0200
+Subject: [PATCH] Kaiiju Lobotomize Animal
+
+
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
+index 437d7778c29553b454980b399e9243def4fc3c7a..770fd677e760476b670346038bdf357ed4a27300 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
+@@ -124,8 +124,14 @@ public class KaiijuWorldConfig {
+     }
+ 
+     public boolean lobotomizeEnabled = false;
++    public int lobotomizeCheckInterval = 100;
++    public boolean lobotomizeLookAtPlayer = true;
++    public boolean lobotomizeFloat = true;
+ 
+     private void lobotomizeSettings() {
+         lobotomizeEnabled = getBoolean("lobotomize.enabled", lobotomizeEnabled);
++        lobotomizeCheckInterval = getInt("lobotomize.check-interval", lobotomizeCheckInterval);
++        lobotomizeLookAtPlayer = getBoolean("lobotomize.look-at-player", lobotomizeLookAtPlayer);
++        lobotomizeFloat = getBoolean("lobotomize.float", lobotomizeFloat);
+     }
+ }
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/entity/Lobotomized.java b/src/main/java/dev/kaiijumc/kaiiju/entity/Lobotomized.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..97c2c61e3b71dd571a4186731898b375ae3ebf28
+--- /dev/null
++++ b/src/main/java/dev/kaiijumc/kaiiju/entity/Lobotomized.java
+@@ -0,0 +1,45 @@
++package dev.kaiijumc.kaiiju.entity;
++
++import net.minecraft.core.BlockPos;
++import net.minecraft.world.entity.LivingEntity;
++import net.minecraft.world.level.Level;
++import net.minecraft.world.level.pathfinder.PathComputationType;
++
++public class Lobotomized {
++    private boolean isLobotomized = false;
++
++    public boolean isLobotomized() {
++        return this.isLobotomized;
++    }
++
++    public void setLobotomized(boolean b) {
++        this.isLobotomized = b;
++    }
++
++    public boolean checkLobotomized(LivingEntity livingEntity) {
++        Level level = livingEntity.getLevel();
++        int interval = level.kaiijuConfig.lobotomizeCheckInterval;
++        if ((livingEntity.getId() + livingEntity.tickCount) % interval == 0) {
++            this.isLobotomized = livingEntity.isOnGround() && !canTravelFrom(new BlockPos(livingEntity.getX(), livingEntity.getY() + 0.5D, livingEntity.getZ()), level);
++        }
++        return this.isLobotomized;
++    }
++
++    private boolean canTravelFrom(BlockPos pos, Level level) {
++        return canTravelTo(pos.east(), level)
++            || canTravelTo(pos.west(), level)
++            || canTravelTo(pos.north(), level)
++            || canTravelTo(pos.south(), level);
++    }
++
++    private boolean canTravelTo(BlockPos pos, Level level) {
++        net.minecraft.world.level.block.state.BlockState bottom = level.getBlockStateIfLoaded(pos);
++        if (bottom == null) {
++            // chunk not loaded
++            return false;
++        }
++        net.minecraft.world.level.block.state.BlockState top = level.getBlockState(pos.above());
++        return bottom.isPathfindable(level, pos, PathComputationType.LAND)
++               && top.isPathfindable(level, pos, PathComputationType.LAND);
++    }
++}
+diff --git a/src/main/java/net/minecraft/world/entity/LivingEntity.java b/src/main/java/net/minecraft/world/entity/LivingEntity.java
+index b2e4b5c463ceb19356da18e7fc52d20801b674cd..32ea0b1542ef374db3290e01978d7965715b9de6 100644
+--- a/src/main/java/net/minecraft/world/entity/LivingEntity.java
++++ b/src/main/java/net/minecraft/world/entity/LivingEntity.java
+@@ -308,6 +308,8 @@ public abstract class LivingEntity extends Entity {
+         this.brain = this.makeBrain(new Dynamic(dynamicopsnbt, (Tag) dynamicopsnbt.createMap((Map) ImmutableMap.of(dynamicopsnbt.createString("memories"), (Tag) dynamicopsnbt.emptyMap()))));
+     }
+ 
++    public boolean isLobotomized() { return false; } // Kaiiju
++
+     protected void initAttributes() {}// Purpur
+ 
+     public Brain<?> getBrain() {
+diff --git a/src/main/java/net/minecraft/world/entity/ai/goal/FloatGoal.java b/src/main/java/net/minecraft/world/entity/ai/goal/FloatGoal.java
+index 7093c62be53fe99ed9880fc8ddaa07440fe4f715..aa4c72a47326bc50a9487d41d0fd5a1b1a980afd 100644
+--- a/src/main/java/net/minecraft/world/entity/ai/goal/FloatGoal.java
++++ b/src/main/java/net/minecraft/world/entity/ai/goal/FloatGoal.java
+@@ -16,6 +16,7 @@ public class FloatGoal extends Goal {
+ 
+     @Override
+     public boolean canUse() {
++        if (!this.mob.getLevel().kaiijuConfig.lobotomizeFloat && this.mob.isLobotomized()) return false; // Kaiiju
+         return this.mob.isInWater() && this.mob.getFluidHeight(FluidTags.WATER) > this.mob.getFluidJumpThreshold() || this.mob.isInLava();
+     }
+ 
+diff --git a/src/main/java/net/minecraft/world/entity/ai/goal/FollowParentGoal.java b/src/main/java/net/minecraft/world/entity/ai/goal/FollowParentGoal.java
+index a668d5263586f955a5656ac66bcc7fe8cc51fe00..c195e60a7773f106775cded4f1c3ed51a69ca2f5 100644
+--- a/src/main/java/net/minecraft/world/entity/ai/goal/FollowParentGoal.java
++++ b/src/main/java/net/minecraft/world/entity/ai/goal/FollowParentGoal.java
+@@ -21,6 +21,7 @@ public class FollowParentGoal extends Goal {
+ 
+     @Override
+     public boolean canUse() {
++        if (this.animal.isLobotomized()) return false; // Kaiiju
+         if (this.animal.getAge() >= 0) {
+             return false;
+         } else {
+@@ -51,6 +52,7 @@ public class FollowParentGoal extends Goal {
+ 
+     @Override
+     public boolean canContinueToUse() {
++        if (this.animal.isLobotomized()) return false; // Kaiiju
+         if (this.animal.getAge() >= 0) {
+             return false;
+         } else if (!this.parent.isAlive()) {
+diff --git a/src/main/java/net/minecraft/world/entity/ai/goal/LookAtPlayerGoal.java b/src/main/java/net/minecraft/world/entity/ai/goal/LookAtPlayerGoal.java
+index 8b189d7587303263efa1790066e5a83edd45f9d7..3dcd309edfcd546ea464038404430a36127c84f7 100644
+--- a/src/main/java/net/minecraft/world/entity/ai/goal/LookAtPlayerGoal.java
++++ b/src/main/java/net/minecraft/world/entity/ai/goal/LookAtPlayerGoal.java
+@@ -48,6 +48,7 @@ public class LookAtPlayerGoal extends Goal {
+ 
+     @Override
+     public boolean canUse() {
++        if (!mob.getLevel().kaiijuConfig.lobotomizeLookAtPlayer && this.mob.isLobotomized()) return false; // Kaiiju
+         if (this.mob.getRandom().nextFloat() >= this.probability) {
+             return false;
+         } else {
+diff --git a/src/main/java/net/minecraft/world/entity/ai/goal/PanicGoal.java b/src/main/java/net/minecraft/world/entity/ai/goal/PanicGoal.java
+index 268b7457c2a93af6d36c1c5f623c5856f94a7af1..f1469e424f7bdf4e5813f250c0eae673db0b9049 100644
+--- a/src/main/java/net/minecraft/world/entity/ai/goal/PanicGoal.java
++++ b/src/main/java/net/minecraft/world/entity/ai/goal/PanicGoal.java
+@@ -29,6 +29,7 @@ public class PanicGoal extends Goal {
+ 
+     @Override
+     public boolean canUse() {
++        if (this.mob.isLobotomized()) return false; // Kaiiju
+         if (!this.shouldPanic()) {
+             return false;
+         } else {
+@@ -81,6 +82,7 @@ public class PanicGoal extends Goal {
+ 
+     @Override
+     public boolean canContinueToUse() {
++        if (this.mob.isLobotomized()) return false; // Kaiiju
+         // CraftBukkit start - introduce a temporary timeout hack until this is fixed properly
+         if ((this.mob.tickCount - this.mob.lastHurtByMobTimestamp) > 100) {
+             this.mob.setLastHurtByMob((LivingEntity) null);
+diff --git a/src/main/java/net/minecraft/world/entity/ai/goal/RandomStrollGoal.java b/src/main/java/net/minecraft/world/entity/ai/goal/RandomStrollGoal.java
+index 216929c838446c3c14d9b9906ffa625ef35fcbc8..3ea2e7c44018ec63b8f17fd3e5e3a23e2b1f72e4 100644
+--- a/src/main/java/net/minecraft/world/entity/ai/goal/RandomStrollGoal.java
++++ b/src/main/java/net/minecraft/world/entity/ai/goal/RandomStrollGoal.java
+@@ -35,6 +35,7 @@ public class RandomStrollGoal extends Goal {
+ 
+     @Override
+     public boolean canUse() {
++        if (this.mob.isLobotomized()) return false; // Kaiiju
+         if (this.mob.isVehicle()) {
+             return false;
+         } else {
+@@ -68,6 +69,7 @@ public class RandomStrollGoal extends Goal {
+ 
+     @Override
+     public boolean canContinueToUse() {
++        if (this.mob.isLobotomized()) return false; // Kaiiju
+         return !this.mob.getNavigation().isDone() && !this.mob.isVehicle();
+     }
+ 
+diff --git a/src/main/java/net/minecraft/world/entity/ai/goal/TemptGoal.java b/src/main/java/net/minecraft/world/entity/ai/goal/TemptGoal.java
+index 2cbc9adc8e417def48be03d08174a5833068ec65..3234d5bf3b9ae01dbe8e26a0a3f21ff875fe6769 100644
+--- a/src/main/java/net/minecraft/world/entity/ai/goal/TemptGoal.java
++++ b/src/main/java/net/minecraft/world/entity/ai/goal/TemptGoal.java
+@@ -43,6 +43,7 @@ public class TemptGoal extends Goal {
+ 
+     @Override
+     public boolean canUse() {
++        if (this.mob.isLobotomized()) return false; // Kaiiju
+         if (this.calmDown > 0) {
+             --this.calmDown;
+             return false;
+@@ -67,6 +68,7 @@ public class TemptGoal extends Goal {
+ 
+     @Override
+     public boolean canContinueToUse() {
++        if (this.mob.isLobotomized()) return false; // Kaiiju
+         if (this.canScare()) {
+             if (this.mob.distanceToSqr((Entity) this.player) < 36.0D) {
+                 if (this.player.distanceToSqr(this.px, this.py, this.pz) > 0.010000000000000002D) {
+diff --git a/src/main/java/net/minecraft/world/entity/ai/navigation/PathNavigation.java b/src/main/java/net/minecraft/world/entity/ai/navigation/PathNavigation.java
+index 2f2d9bb31194618ef5bba39cd1cbe7c4919e82c5..0d8f1f063b76357374022e4496ce0646757b150e 100644
+--- a/src/main/java/net/minecraft/world/entity/ai/navigation/PathNavigation.java
++++ b/src/main/java/net/minecraft/world/entity/ai/navigation/PathNavigation.java
+@@ -197,6 +197,7 @@ public abstract class PathNavigation {
+     // Paper end
+ 
+     public boolean moveTo(Entity entity, double speed) {
++        if (this.mob.isLobotomized()) return false; // Kaiiju
+         // Paper start - Pathfinding optimizations
+         if (this.pathfindFailures > 10 && this.path == null && net.minecraft.server.MinecraftServer.currentTick < this.lastFailure + 40) {
+             return false;
+@@ -217,6 +218,7 @@ public abstract class PathNavigation {
+     }
+ 
+     public boolean moveTo(@Nullable Path path, double speed) {
++        if (this.mob.isLobotomized()) return false; // Kaiiju
+         if (path == null) {
+             this.path = null;
+             return false;
+diff --git a/src/main/java/net/minecraft/world/entity/animal/Animal.java b/src/main/java/net/minecraft/world/entity/animal/Animal.java
+index 2ac88f06ebb79e515cd9934ac1e3e2c8003d9e3c..b1a80fb34359f28508f2bf473956781a55d70cf4 100644
+--- a/src/main/java/net/minecraft/world/entity/animal/Animal.java
++++ b/src/main/java/net/minecraft/world/entity/animal/Animal.java
+@@ -39,6 +39,7 @@ public abstract class Animal extends AgeableMob {
+     @Nullable
+     public UUID loveCause;
+     public ItemStack breedItem; // CraftBukkit - Add breedItem variable
++    protected dev.kaiijumc.kaiiju.entity.Lobotomized lobotomized = new dev.kaiijumc.kaiiju.entity.Lobotomized(); // Kaiiju
+     public abstract int getPurpurBreedTime(); // Purpur
+ 
+     protected Animal(EntityType<? extends Animal> type, Level world) {
+@@ -74,8 +75,32 @@ public abstract class Animal extends AgeableMob {
+             }
+         }
+ 
++        this.lobotomized.checkLobotomized(this); // Kaiiju
+     }
+ 
++    // Kaiiju start
++    @Override
++    public void travel(net.minecraft.world.phys.Vec3 vec3) {
++        if (!this.isLobotomized() || net.minecraft.server.MinecraftServer.currentTick % 100 == 0) {
++            super.travel(vec3);
++        }
++    }
++
++    @Override
++    public boolean isCollidable(boolean ignoreClimbing) {
++        if (!this.isLobotomized() || net.minecraft.server.MinecraftServer.currentTick % 20 == 0) {
++            return super.isCollidable(ignoreClimbing);
++        }
++        return false;
++    }
++
++    @Override
++    public boolean isLobotomized() {
++        if (!this.level.kaiijuConfig.lobotomizeEnabled) return false;
++        return this.lobotomized.isLobotomized();
++    }
++    // Kaiiju end
++
+     /* CraftBukkit start
+     // Function disabled as it has no special function anymore after
+     // setSitting is disabled.
+@@ -102,6 +127,7 @@ public abstract class Animal extends AgeableMob {
+         if (this.loveCause != null) {
+             nbt.putUUID("LoveCause", this.loveCause);
+         }
++        nbt.putBoolean("Kaiiju.Lobotomized", this.lobotomized.isLobotomized()); // Kaiiju
+ 
+     }
+ 
+@@ -115,6 +141,13 @@ public abstract class Animal extends AgeableMob {
+         super.readAdditionalSaveData(nbt);
+         this.inLove = nbt.getInt("InLove");
+         this.loveCause = nbt.hasUUID("LoveCause") ? nbt.getUUID("LoveCause") : null;
++        // Kaiiju start
++        boolean isLobotomized = nbt.getBoolean("Kaiiju.Lobotomized");
++        this.lobotomized.setLobotomized(isLobotomized);
++        if (isLobotomized) {
++            this.onGround = true;
++        }
++        // Kaiiju end
+     }
+ 
+     public static boolean checkAnimalSpawnRules(EntityType<? extends Animal> type, LevelAccessor world, MobSpawnType spawnReason, BlockPos pos, RandomSource random) {
+diff --git a/src/main/java/net/minecraft/world/entity/animal/Bee.java b/src/main/java/net/minecraft/world/entity/animal/Bee.java
+index 87bd7991a81a2e30ecfccb60e614d7f13acd3744..1c2db953155498606f1e052580e7aa9ca846a53c 100644
+--- a/src/main/java/net/minecraft/world/entity/animal/Bee.java
++++ b/src/main/java/net/minecraft/world/entity/animal/Bee.java
+@@ -1047,6 +1047,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
+ 
+         @Override
+         public boolean canBeeUse() {
++            if (Bee.this.isLobotomized()) return false; // Kaiiju
+             return Bee.this.remainingCooldownBeforeLocatingNewHive == 0 && !Bee.this.hasHive() && Bee.this.wantsToEnterHive();
+         }
+ 
+@@ -1113,6 +1114,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
+ 
+         @Override
+         public boolean canBeeUse() {
++            if (Bee.this.isLobotomized()) return false; // Kaiiju
+             return Bee.this.hivePos != null && !Bee.this.hasRestriction() && Bee.this.wantsToEnterHive() && !this.hasReachedTarget(Bee.this.hivePos) && Bee.this.level.getBlockState(Bee.this.hivePos).is(BlockTags.BEEHIVES);
+         }
+ 
+@@ -1229,6 +1231,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
+ 
+         @Override
+         public boolean canBeeUse() {
++            if (Bee.this.isLobotomized()) return false; // Kaiiju
+             return Bee.this.savedFlowerPos != null && !Bee.this.hasRestriction() && this.wantsToGoToKnownFlower() && Bee.this.isFlowerValid(Bee.this.savedFlowerPos) && !Bee.this.closerThan(Bee.this.savedFlowerPos, 2);
+         }
+ 
+@@ -1281,6 +1284,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
+ 
+         @Override
+         public boolean canBeeUse() {
++            if (Bee.this.isLobotomized()) return false; // Kaiiju
+             return Bee.this.getCropsGrownSincePollination() >= 10 ? false : (Bee.this.random.nextFloat() < 0.3F ? false : Bee.this.hasNectar() && Bee.this.isHiveValid());
+         }
+ 
+diff --git a/src/main/java/net/minecraft/world/entity/npc/Villager.java b/src/main/java/net/minecraft/world/entity/npc/Villager.java
+index aed1d9ccffe471b6c2a1d52d2d3d097f6431318b..8296220b84c35f4489f9f6059394998eb83165b8 100644
+--- a/src/main/java/net/minecraft/world/entity/npc/Villager.java
++++ b/src/main/java/net/minecraft/world/entity/npc/Villager.java
+@@ -139,7 +139,10 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+     }, MemoryModuleType.MEETING_POINT, (entityvillager, holder) -> {
+         return holder.is(PoiTypes.MEETING);
+     });
+-    private boolean isLobotomized = false; public boolean isLobotomized() { return this.isLobotomized; } // Purpur
++    // Kaiiju start
++    private final dev.kaiijumc.kaiiju.entity.Lobotomized lobotomized = new dev.kaiijumc.kaiiju.entity.Lobotomized();
++    private boolean isLobotomized = false; @Override public boolean isLobotomized() { return this.lobotomized.isLobotomized(); } // Purpur
++    // Kaiiju end
+     private int notLobotomizedCount = 0; // Purpur
+ 
+     public long nextGolemPanic = -1; // Pufferfish
+@@ -241,6 +244,23 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+     }
+     // Purpur end
+ 
++    // Kaiiju start
++    @Override
++    public void travel(net.minecraft.world.phys.Vec3 vec3) {
++        if (!this.isLobotomized() || net.minecraft.server.MinecraftServer.currentTick % 100 == 0) {
++            super.travel(vec3);
++        }
++    }
++
++    @Override
++    public boolean isCollidable(boolean ignoreClimbing) {
++        if (!this.isLobotomized() || net.minecraft.server.MinecraftServer.currentTick % 20 == 0) {
++            return super.isCollidable(ignoreClimbing);
++        }
++        return false;
++    }
++    // Kaiiju
++
+     @Override
+     public Brain<Villager> getBrain() {
+         return (Brain<Villager>) super.getBrain(); // CraftBukkit - decompile error
+@@ -339,7 +359,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+         // Purpur start
+         if (this.level.purpurConfig.villagerLobotomizeEnabled) {
+             // treat as inactive if lobotomized
+-            inactive = inactive || checkLobotomized();
++            inactive = this.lobotomized.checkLobotomized(this) || inactive; // Kaiiju
+         } else {
+             // clean up state for API
+             this.isLobotomized = false;
+@@ -352,7 +372,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+          }
+         // Pufferfish end
+         // Purpur start
+-        else if (this.isLobotomized && shouldRestock()) {
++        else if (this.lobotomized.isLobotomized() && shouldRestock()) {
+             // make sure we restock if needed when lobotomized
+             restock();
+         }
+@@ -647,6 +667,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+         if (this.assignProfessionWhenSpawned) {
+             nbt.putBoolean("AssignProfessionWhenSpawned", true);
+         }
++        nbt.putBoolean("Kaiiju.Lobotomized", this.lobotomized.isLobotomized()); // Kaiiju
+ 
+     }
+ 
+@@ -688,6 +709,13 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+             this.assignProfessionWhenSpawned = nbt.getBoolean("AssignProfessionWhenSpawned");
+         }
+ 
++        // Kaiiju start
++        boolean isLobotomized = nbt.getBoolean("Kaiiju.Lobotomized");
++        this.lobotomized.setLobotomized(isLobotomized);
++        if (isLobotomized) {
++            this.onGround = true;
++        }
++        // Kaiiju end
+     }
+ 
+     @Override
