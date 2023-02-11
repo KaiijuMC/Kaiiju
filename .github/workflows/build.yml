@@ -1,5 +1,8 @@
 name: Generate Jars
 on: [ push, pull_request ]
+env:
+  version: '1.19.3'
+  branch: ver/1.19.3
 jobs:
   paperclip:
     runs-on: ubuntu-latest
@@ -13,7 +16,9 @@ jobs:
           cache: 'gradle'
           distribution: 'temurin'
       - name: Configure Git User Details
-        run: git config --global user.email "actions@github.com" && git config --global user.name "Github Actions"
+        run: |
+            git config --global user.email "actions@github.com" && git config --global user.name "Github Actions"
+            echo "workflow=$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
       - name: Apply Patches
         run: ./gradlew applyPatches --stacktrace
       - name: Build Paperclip jar
@@ -23,3 +28,12 @@ jobs:
         with:
           name: kaiiju.jar
           path: build/libs/kaiiju-paperclip-*-reobf.jar
+      - name: Release Paperclip
+        if: github.ref_name == env.branch
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          title: "Build #${{ env.workflow }}"
+          automatic_release_tag: latest-${{ env.version }}
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          files: build/libs/kaiiju-paperclip-*-reobf.jar
+          prerelease: false
