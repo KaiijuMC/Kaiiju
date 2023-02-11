@@ -28,12 +28,21 @@ jobs:
         with:
           name: kaiiju.jar
           path: build/libs/kaiiju-paperclip-*-reobf.jar
-      - name: Release Paperclip
+      - name: Release Paperclip (latest)
         if: github.ref_name == env.branch
         uses: marvinpinto/action-automatic-releases@latest
         with:
           title: "Build #${{ env.workflow }}"
           automatic_release_tag: latest-${{ env.version }}
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          files: build/libs/kaiiju-paperclip-*-reobf.jar
+          prerelease: false
+      - name: Release Paperclip (History)
+        if: github.ref_name == env.branch
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          title: "Build #${{ env.workflow }}"
+          automatic_release_tag: build-${{ env.workflow }}
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           files: build/libs/kaiiju-paperclip-*-reobf.jar
           prerelease: false
