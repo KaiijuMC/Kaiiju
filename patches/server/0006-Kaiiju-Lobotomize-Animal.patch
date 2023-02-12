@@ -3,32 +3,35 @@ From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
 Date: Sat, 11 Feb 2023 06:29:15 +0200
 Subject: [PATCH] Kaiiju Lobotomize Animal
 
+Inspired by "Lobotomized animals" by @KioProject123
+Checks might be a nuisance to performance.
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index 437d7778c29553b454980b399e9243def4fc3c7a..770fd677e760476b670346038bdf357ed4a27300 100644
+index ac4440f8d2bd30e3e074ef797d5138b64996fcbb..64b6d49936f2a4cca00d78041a072d2c708bcc99 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-@@ -124,8 +124,14 @@ public class KaiijuWorldConfig {
+@@ -123,6 +123,15 @@ public class KaiijuWorldConfig {
+         return value.isEmpty() ? fallback : value;
      }
  
-     public boolean lobotomizeEnabled = false;
++    public boolean lobotomizeEnabled = false;
 +    public int lobotomizeCheckInterval = 100;
 +    public boolean lobotomizeLookAtPlayer = true;
 +    public boolean lobotomizeFloat = true;
- 
++
      private void lobotomizeSettings() {
-         lobotomizeEnabled = getBoolean("lobotomize.enabled", lobotomizeEnabled);
-+        lobotomizeCheckInterval = getInt("lobotomize.check-interval", lobotomizeCheckInterval);
++        lobotomizeEnabled = getBoolean("lobotomize.animal.enabled", lobotomizeEnabled);
++        lobotomizeCheckInterval = getInt("lobotomize.animal.check-interval", lobotomizeCheckInterval);
 +        lobotomizeLookAtPlayer = getBoolean("lobotomize.look-at-player", lobotomizeLookAtPlayer);
 +        lobotomizeFloat = getBoolean("lobotomize.float", lobotomizeFloat);
      }
  }
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/entity/Lobotomized.java b/src/main/java/dev/kaiijumc/kaiiju/entity/Lobotomized.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..97c2c61e3b71dd571a4186731898b375ae3ebf28
+index 0000000000000000000000000000000000000000..9b2b17c70adbb09cd66588a8d15dac02f8932f74
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/entity/Lobotomized.java
-@@ -0,0 +1,45 @@
+@@ -0,0 +1,56 @@
 +package dev.kaiijumc.kaiiju.entity;
 +
 +import net.minecraft.core.BlockPos;
@@ -38,6 +41,7 @@ index 0000000000000000000000000000000000000000..97c2c61e3b71dd571a4186731898b375
 +
 +public class Lobotomized {
 +    private boolean isLobotomized = false;
++    private int notLobotomizedCount = 0;
 +
 +    public boolean isLobotomized() {
 +        return this.isLobotomized;
@@ -50,8 +54,18 @@ index 0000000000000000000000000000000000000000..97c2c61e3b71dd571a4186731898b375
 +    public boolean checkLobotomized(LivingEntity livingEntity) {
 +        Level level = livingEntity.getLevel();
 +        int interval = level.kaiijuConfig.lobotomizeCheckInterval;
++        if (this.notLobotomizedCount > 3) {
++            // check half as often if not lobotomized for the last 3+ consecutive checks
++            interval *= 2;
++        }
 +        if ((livingEntity.getId() + livingEntity.tickCount) % interval == 0) {
 +            this.isLobotomized = livingEntity.isOnGround() && !canTravelFrom(new BlockPos(livingEntity.getX(), livingEntity.getY() + 0.5D, livingEntity.getZ()), level);
++
++            if (this.isLobotomized) {
++                this.notLobotomizedCount = 0;
++            } else {
++                this.notLobotomizedCount++;
++            }
 +        }
 +        return this.isLobotomized;
 +    }
@@ -314,83 +328,3 @@ index 87bd7991a81a2e30ecfccb60e614d7f13acd3744..1c2db953155498606f1e052580e7aa9c
              return Bee.this.getCropsGrownSincePollination() >= 10 ? false : (Bee.this.random.nextFloat() < 0.3F ? false : Bee.this.hasNectar() && Bee.this.isHiveValid());
          }
  
-diff --git a/src/main/java/net/minecraft/world/entity/npc/Villager.java b/src/main/java/net/minecraft/world/entity/npc/Villager.java
-index aed1d9ccffe471b6c2a1d52d2d3d097f6431318b..8296220b84c35f4489f9f6059394998eb83165b8 100644
---- a/src/main/java/net/minecraft/world/entity/npc/Villager.java
-+++ b/src/main/java/net/minecraft/world/entity/npc/Villager.java
-@@ -139,7 +139,10 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
-     }, MemoryModuleType.MEETING_POINT, (entityvillager, holder) -> {
-         return holder.is(PoiTypes.MEETING);
-     });
--    private boolean isLobotomized = false; public boolean isLobotomized() { return this.isLobotomized; } // Purpur
-+    // Kaiiju start
-+    private final dev.kaiijumc.kaiiju.entity.Lobotomized lobotomized = new dev.kaiijumc.kaiiju.entity.Lobotomized();
-+    private boolean isLobotomized = false; @Override public boolean isLobotomized() { return this.lobotomized.isLobotomized(); } // Purpur
-+    // Kaiiju end
-     private int notLobotomizedCount = 0; // Purpur
- 
-     public long nextGolemPanic = -1; // Pufferfish
-@@ -241,6 +244,23 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
-     }
-     // Purpur end
- 
-+    // Kaiiju start
-+    @Override
-+    public void travel(net.minecraft.world.phys.Vec3 vec3) {
-+        if (!this.isLobotomized() || net.minecraft.server.MinecraftServer.currentTick % 100 == 0) {
-+            super.travel(vec3);
-+        }
-+    }
-+
-+    @Override
-+    public boolean isCollidable(boolean ignoreClimbing) {
-+        if (!this.isLobotomized() || net.minecraft.server.MinecraftServer.currentTick % 20 == 0) {
-+            return super.isCollidable(ignoreClimbing);
-+        }
-+        return false;
-+    }
-+    // Kaiiju
-+
-     @Override
-     public Brain<Villager> getBrain() {
-         return (Brain<Villager>) super.getBrain(); // CraftBukkit - decompile error
-@@ -339,7 +359,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
-         // Purpur start
-         if (this.level.purpurConfig.villagerLobotomizeEnabled) {
-             // treat as inactive if lobotomized
--            inactive = inactive || checkLobotomized();
-+            inactive = this.lobotomized.checkLobotomized(this) || inactive; // Kaiiju
-         } else {
-             // clean up state for API
-             this.isLobotomized = false;
-@@ -352,7 +372,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
-          }
-         // Pufferfish end
-         // Purpur start
--        else if (this.isLobotomized && shouldRestock()) {
-+        else if (this.lobotomized.isLobotomized() && shouldRestock()) {
-             // make sure we restock if needed when lobotomized
-             restock();
-         }
-@@ -647,6 +667,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
-         if (this.assignProfessionWhenSpawned) {
-             nbt.putBoolean("AssignProfessionWhenSpawned", true);
-         }
-+        nbt.putBoolean("Kaiiju.Lobotomized", this.lobotomized.isLobotomized()); // Kaiiju
- 
-     }
- 
-@@ -688,6 +709,13 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
-             this.assignProfessionWhenSpawned = nbt.getBoolean("AssignProfessionWhenSpawned");
-         }
- 
-+        // Kaiiju start
-+        boolean isLobotomized = nbt.getBoolean("Kaiiju.Lobotomized");
-+        this.lobotomized.setLobotomized(isLobotomized);
-+        if (isLobotomized) {
-+            this.onGround = true;
-+        }
-+        // Kaiiju end
-     }
- 
-     @Override
