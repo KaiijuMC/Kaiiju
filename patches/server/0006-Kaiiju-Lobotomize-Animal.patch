@@ -7,7 +7,7 @@ Inspired by "Lobotomized animals" by @KioProject123
 Checks might be a nuisance to performance.
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index ac4440f8d2bd30e3e074ef797d5138b64996fcbb..9bc189c2528efb4ced0ea5b4a3597bf0e7f17ebb 100644
+index ac4440f8d2bd30e3e074ef797d5138b64996fcbb..c760ebaade1cbf7360c32c1ab1d9d54bb9212a57 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 @@ -123,6 +123,15 @@ public class KaiijuWorldConfig {
@@ -16,7 +16,7 @@ index ac4440f8d2bd30e3e074ef797d5138b64996fcbb..9bc189c2528efb4ced0ea5b4a3597bf0
  
 +    public boolean lobotomizeEnabled = false;
 +    public int lobotomizeCheckInterval = 100;
-+    public boolean lobotomizeLookAtPlayer = true;
++    public boolean lobotomizeLookAtPlayer = false;
 +    public boolean lobotomizeFloat = true;
 +
      private void lobotomizeSettings() {
