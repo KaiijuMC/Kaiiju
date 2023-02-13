@@ -28,15 +28,16 @@ index ac4440f8d2bd30e3e074ef797d5138b64996fcbb..64b6d49936f2a4cca00d78041a072d2c
  }
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/entity/Lobotomized.java b/src/main/java/dev/kaiijumc/kaiiju/entity/Lobotomized.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..9b2b17c70adbb09cd66588a8d15dac02f8932f74
+index 0000000000000000000000000000000000000000..5a1c3f6f34d2af83bfea10fc3d09817ede446ceb
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/entity/Lobotomized.java
-@@ -0,0 +1,56 @@
+@@ -0,0 +1,55 @@
 +package dev.kaiijumc.kaiiju.entity;
 +
 +import net.minecraft.core.BlockPos;
 +import net.minecraft.world.entity.LivingEntity;
 +import net.minecraft.world.level.Level;
++import net.minecraft.world.level.block.state.BlockState;
 +import net.minecraft.world.level.pathfinder.PathComputationType;
 +
 +public class Lobotomized {
@@ -78,14 +79,12 @@ index 0000000000000000000000000000000000000000..9b2b17c70adbb09cd66588a8d15dac02
 +    }
 +
 +    private boolean canTravelTo(BlockPos pos, Level level) {
-+        net.minecraft.world.level.block.state.BlockState bottom = level.getBlockStateIfLoaded(pos);
-+        if (bottom == null) {
-+            // chunk not loaded
-+            return false;
-+        }
-+        net.minecraft.world.level.block.state.BlockState top = level.getBlockState(pos.above());
-+        return bottom.isPathfindable(level, pos, PathComputationType.LAND)
-+               && top.isPathfindable(level, pos, PathComputationType.LAND);
++        BlockState bottom = level.getBlockStateIfLoaded(pos);
++        if (bottom == null) return false; // Chunk not loaded
++        if (!bottom.isPathfindable(level, pos, PathComputationType.LAND)) return false;
++        BlockState top = level.getBlockState(pos.above());
++        if (!top.isPathfindable(level, pos, PathComputationType.LAND)) return false;
++        return true;
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/world/entity/LivingEntity.java b/src/main/java/net/minecraft/world/entity/LivingEntity.java
