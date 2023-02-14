@@ -15,7 +15,7 @@
 
 ### Additions
 - **Xymb Linear Format**: Saves about 50% of disk space in OW and Nether and 95% in The End.
-- **Lobotomize**: Tweak villager lobotomization.
+- **Lobotomize**: Lobotomize mobs and villagers without breaking vanilla mechanics.
 
 ## Building
 In order to distribute and use this server software, you need a paperclip file:
