@@ -5,22 +5,13 @@ Subject: [PATCH] Kaiiju Lobotomize Villager
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index c760ebaade1cbf7360c32c1ab1d9d54bb9212a57..53d477f08dfc2b73e30e3e5bfdf5b7eeb8fdeba3 100644
+index dbbba258dbdc465b89c71508d76c5c596fd03bea..a213a3c447cd69b5dd88eefd48c2caa6d19f5abc 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-@@ -4,7 +4,7 @@ import org.apache.commons.lang.BooleanUtils;
- import org.bukkit.World;
- import org.bukkit.configuration.ConfigurationSection;
- 
--import java.util.List;
-+import java.util.Arrays;import java.util.List;
- import java.util.Map;
- import java.util.function.Predicate;
- 
 @@ -127,11 +127,21 @@ public class KaiijuWorldConfig {
-     public int lobotomizeCheckInterval = 100;
-     public boolean lobotomizeLookAtPlayer = false;
-     public boolean lobotomizeFloat = true;
+     public int lobotomizeAnimalCheckInterval = 100;
+     public boolean lobotomizeAnimalLookAtPlayer = false;
+     public boolean lobotomizeAnimalFloat = true;
 +    public boolean lobotomizeVillagerEnabled = false;
 +    public int lobotomizeVillagerCheckInterval = 100;
 +    public boolean lobotomizeVillagerCheckCanJump = true;
@@ -28,10 +19,10 @@ index c760ebaade1cbf7360c32c1ab1d9d54bb9212a57..53d477f08dfc2b73e30e3e5bfdf5b7ee
 +    public boolean lobotomizeVillagerCheckActionBlock = true;
  
      private void lobotomizeSettings() {
-         lobotomizeEnabled = getBoolean("lobotomize.animal.enabled", lobotomizeEnabled);
-         lobotomizeCheckInterval = getInt("lobotomize.animal.check-interval", lobotomizeCheckInterval);
-         lobotomizeLookAtPlayer = getBoolean("lobotomize.animal.look-at-player", lobotomizeLookAtPlayer);
-         lobotomizeFloat = getBoolean("lobotomize.animal.float", lobotomizeFloat);
+         lobotomizeAnimalEnabled = getBoolean("lobotomize.animal.enabled", lobotomizeAnimalEnabled);
+         lobotomizeAnimalCheckInterval = getInt("lobotomize.animal.check-interval", lobotomizeAnimalCheckInterval);
+         lobotomizeAnimalLookAtPlayer = getBoolean("lobotomize.animal.look-at-player", lobotomizeAnimalLookAtPlayer);
+         lobotomizeAnimalFloat = getBoolean("lobotomize.animal.float", lobotomizeAnimalFloat);
 +        lobotomizeVillagerEnabled = getBoolean("lobotomize.villager.enabled", lobotomizeVillagerEnabled);
 +        lobotomizeVillagerCheckInterval = getInt("lobotomize.villager.check-interval", lobotomizeVillagerCheckInterval);
 +        lobotomizeVillagerCheckCanJump = getBoolean("lobotomize.villager.check-can-jump", lobotomizeVillagerCheckCanJump);
@@ -40,10 +31,10 @@ index c760ebaade1cbf7360c32c1ab1d9d54bb9212a57..53d477f08dfc2b73e30e3e5bfdf5b7ee
      }
  }
 diff --git a/src/main/java/net/minecraft/world/entity/npc/Villager.java b/src/main/java/net/minecraft/world/entity/npc/Villager.java
-index aed1d9ccffe471b6c2a1d52d2d3d097f6431318b..7cde9736d8797f3c81c2e7d2508bfd5eb9b12017 100644
+index aed1d9ccffe471b6c2a1d52d2d3d097f6431318b..0227e8d4f810c6fb90779cb3d257ca04ec927b79 100644
 --- a/src/main/java/net/minecraft/world/entity/npc/Villager.java
 +++ b/src/main/java/net/minecraft/world/entity/npc/Villager.java
-@@ -200,15 +200,14 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+@@ -200,14 +200,14 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
      }
  
      private boolean checkLobotomized() {
@@ -57,26 +48,25 @@ index aed1d9ccffe471b6c2a1d52d2d3d097f6431318b..7cde9736d8797f3c81c2e7d2508bfd5e
 +        if ((this.getId() + this.tickCount) % interval == 0) { // Kaiiju - Avoid check lags
              // offset Y for short blocks like dirt_path/farmland
 -            this.isLobotomized = !canTravelFrom(new BlockPos(getX(), getY() + 0.0625D, getZ()));
--
 +            this.isLobotomized = needLobotomy(); // Kaiiju - Override
+ 
              if (this.isLobotomized) {
                  this.notLobotomizedCount = 0;
-             } else {
-@@ -219,9 +218,76 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+@@ -219,9 +219,76 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
      }
  
      private boolean canTravelFrom(BlockPos pos) {
 -        return canTravelTo(pos.east()) || canTravelTo(pos.west()) || canTravelTo(pos.north()) || canTravelTo(pos.south());
 +        return canInteractAt(pos.east()) || canInteractAt(pos.west()) || canInteractAt(pos.north()) || canInteractAt(pos.south()); // Kaiiju
-+    }
-+
+     }
+ 
 +    // Kaiiju start - Customize canTravelTo checks
 +    private boolean needLobotomy() {
 +        if (this.isSleeping()) return false;
 +        if (this.level.kaiijuConfig.lobotomizeVillagerCheckOnBed && isOnBed()) return false;
 +        return !canTravelFrom(new BlockPos(getX(), getY() + 0.5D, getZ()));
-     }
- 
++    }
++
 +    private boolean canInteractAt(BlockPos pos) {
 +        net.minecraft.world.level.block.state.BlockState top = null;
 +        // Check if mob can jump over block
@@ -140,7 +130,7 @@ index aed1d9ccffe471b6c2a1d52d2d3d097f6431318b..7cde9736d8797f3c81c2e7d2508bfd5e
      private boolean canTravelTo(BlockPos pos) {
          net.minecraft.world.level.block.state.BlockState state = this.level.getBlockStateIfLoaded(pos);
          if (state == null) {
-@@ -337,7 +403,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+@@ -337,7 +404,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
      protected void mobTick(boolean inactive) {
          //this.level.getProfiler().push("villagerBrain"); // Purpur
          // Purpur start
@@ -149,7 +139,7 @@ index aed1d9ccffe471b6c2a1d52d2d3d097f6431318b..7cde9736d8797f3c81c2e7d2508bfd5e
              // treat as inactive if lobotomized
              inactive = inactive || checkLobotomized();
          } else {
-@@ -647,6 +713,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+@@ -647,6 +714,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
          if (this.assignProfessionWhenSpawned) {
              nbt.putBoolean("AssignProfessionWhenSpawned", true);
          }
@@ -157,7 +147,7 @@ index aed1d9ccffe471b6c2a1d52d2d3d097f6431318b..7cde9736d8797f3c81c2e7d2508bfd5e
  
      }
  
-@@ -687,6 +754,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+@@ -687,6 +755,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
          if (nbt.contains("AssignProfessionWhenSpawned")) {
              this.assignProfessionWhenSpawned = nbt.getBoolean("AssignProfessionWhenSpawned");
          }

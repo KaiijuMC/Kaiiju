@@ -7,28 +7,28 @@ Inspired by "Lobotomized animals" by @KioProject123
 Checks might be a nuisance to performance.
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index ac4440f8d2bd30e3e074ef797d5138b64996fcbb..c760ebaade1cbf7360c32c1ab1d9d54bb9212a57 100644
+index ac4440f8d2bd30e3e074ef797d5138b64996fcbb..dbbba258dbdc465b89c71508d76c5c596fd03bea 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 @@ -123,6 +123,15 @@ public class KaiijuWorldConfig {
          return value.isEmpty() ? fallback : value;
      }
  
-+    public boolean lobotomizeEnabled = false;
-+    public int lobotomizeCheckInterval = 100;
-+    public boolean lobotomizeLookAtPlayer = false;
-+    public boolean lobotomizeFloat = true;
++    public boolean lobotomizeAnimalEnabled = false;
++    public int lobotomizeAnimalCheckInterval = 100;
++    public boolean lobotomizeAnimalLookAtPlayer = false;
++    public boolean lobotomizeAnimalFloat = true;
 +
      private void lobotomizeSettings() {
-+        lobotomizeEnabled = getBoolean("lobotomize.animal.enabled", lobotomizeEnabled);
-+        lobotomizeCheckInterval = getInt("lobotomize.animal.check-interval", lobotomizeCheckInterval);
-+        lobotomizeLookAtPlayer = getBoolean("lobotomize.animal.look-at-player", lobotomizeLookAtPlayer);
-+        lobotomizeFloat = getBoolean("lobotomize.animal.float", lobotomizeFloat);
++        lobotomizeAnimalEnabled = getBoolean("lobotomize.animal.enabled", lobotomizeAnimalEnabled);
++        lobotomizeAnimalCheckInterval = getInt("lobotomize.animal.check-interval", lobotomizeAnimalCheckInterval);
++        lobotomizeAnimalLookAtPlayer = getBoolean("lobotomize.animal.look-at-player", lobotomizeAnimalLookAtPlayer);
++        lobotomizeAnimalFloat = getBoolean("lobotomize.animal.float", lobotomizeAnimalFloat);
      }
  }
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/entity/Lobotomized.java b/src/main/java/dev/kaiijumc/kaiiju/entity/Lobotomized.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..b3ec45d02ff7d83e0fb3db04be8a3f14bf712a87
+index 0000000000000000000000000000000000000000..8912f25e94d5e7510d965aa02b73c87e0b75fb51
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/entity/Lobotomized.java
 @@ -0,0 +1,56 @@
@@ -54,7 +54,7 @@ index 0000000000000000000000000000000000000000..b3ec45d02ff7d83e0fb3db04be8a3f14
 +
 +    public boolean checkLobotomized(LivingEntity livingEntity) {
 +        Level level = livingEntity.getLevel();
-+        int interval = level.kaiijuConfig.lobotomizeCheckInterval;
++        int interval = level.kaiijuConfig.lobotomizeAnimalCheckInterval;
 +        if (this.notLobotomizedCount > 3) {
 +            // check half as often if not lobotomized for the last 3+ consecutive checks
 +            interval *= 2;
@@ -102,14 +102,14 @@ index b2e4b5c463ceb19356da18e7fc52d20801b674cd..32ea0b1542ef374db3290e01978d7965
  
      public Brain<?> getBrain() {
 diff --git a/src/main/java/net/minecraft/world/entity/ai/goal/FloatGoal.java b/src/main/java/net/minecraft/world/entity/ai/goal/FloatGoal.java
-index 7093c62be53fe99ed9880fc8ddaa07440fe4f715..aa4c72a47326bc50a9487d41d0fd5a1b1a980afd 100644
+index 7093c62be53fe99ed9880fc8ddaa07440fe4f715..2acbb26af2c24b2f4c569d55e8ba44a068fd9d86 100644
 --- a/src/main/java/net/minecraft/world/entity/ai/goal/FloatGoal.java
 +++ b/src/main/java/net/minecraft/world/entity/ai/goal/FloatGoal.java
 @@ -16,6 +16,7 @@ public class FloatGoal extends Goal {
  
      @Override
      public boolean canUse() {
-+        if (!this.mob.getLevel().kaiijuConfig.lobotomizeFloat && this.mob.isLobotomized()) return false; // Kaiiju
++        if (!this.mob.getLevel().kaiijuConfig.lobotomizeAnimalFloat && this.mob.isLobotomized()) return false; // Kaiiju
          return this.mob.isInWater() && this.mob.getFluidHeight(FluidTags.WATER) > this.mob.getFluidJumpThreshold() || this.mob.isInLava();
      }
  
@@ -134,14 +134,14 @@ index a668d5263586f955a5656ac66bcc7fe8cc51fe00..c195e60a7773f106775cded4f1c3ed51
              return false;
          } else if (!this.parent.isAlive()) {
 diff --git a/src/main/java/net/minecraft/world/entity/ai/goal/LookAtPlayerGoal.java b/src/main/java/net/minecraft/world/entity/ai/goal/LookAtPlayerGoal.java
-index 8b189d7587303263efa1790066e5a83edd45f9d7..3dcd309edfcd546ea464038404430a36127c84f7 100644
+index 8b189d7587303263efa1790066e5a83edd45f9d7..1304fc96834e4ce7156076fd893993a0aa75cbbc 100644
 --- a/src/main/java/net/minecraft/world/entity/ai/goal/LookAtPlayerGoal.java
 +++ b/src/main/java/net/minecraft/world/entity/ai/goal/LookAtPlayerGoal.java
 @@ -48,6 +48,7 @@ public class LookAtPlayerGoal extends Goal {
  
      @Override
      public boolean canUse() {
-+        if (!mob.getLevel().kaiijuConfig.lobotomizeLookAtPlayer && this.mob.isLobotomized()) return false; // Kaiiju
++        if (!mob.getLevel().kaiijuConfig.lobotomizeAnimalLookAtPlayer && this.mob.isLobotomized()) return false; // Kaiiju
          if (this.mob.getRandom().nextFloat() >= this.probability) {
              return false;
          } else {
@@ -226,10 +226,18 @@ index 2f2d9bb31194618ef5bba39cd1cbe7c4919e82c5..0d8f1f063b76357374022e4496ce0646
              this.path = null;
              return false;
 diff --git a/src/main/java/net/minecraft/world/entity/animal/Animal.java b/src/main/java/net/minecraft/world/entity/animal/Animal.java
-index 2ac88f06ebb79e515cd9934ac1e3e2c8003d9e3c..b1a80fb34359f28508f2bf473956781a55d70cf4 100644
+index 2ac88f06ebb79e515cd9934ac1e3e2c8003d9e3c..d89c0db4c4173d8558dc4f8b15ddb5815ef7c09e 100644
 --- a/src/main/java/net/minecraft/world/entity/animal/Animal.java
 +++ b/src/main/java/net/minecraft/world/entity/animal/Animal.java
-@@ -39,6 +39,7 @@ public abstract class Animal extends AgeableMob {
+@@ -13,7 +13,6 @@ import net.minecraft.tags.BlockTags;
+ import net.minecraft.util.RandomSource;
+ import net.minecraft.world.InteractionHand;
+ import net.minecraft.world.InteractionResult;
+-import net.minecraft.world.damagesource.DamageSource;
+ import net.minecraft.world.entity.AgeableMob;
+ import net.minecraft.world.entity.EntityType;
+ import net.minecraft.world.entity.ExperienceOrb;
+@@ -39,6 +38,7 @@ public abstract class Animal extends AgeableMob {
      @Nullable
      public UUID loveCause;
      public ItemStack breedItem; // CraftBukkit - Add breedItem variable
@@ -237,7 +245,7 @@ index 2ac88f06ebb79e515cd9934ac1e3e2c8003d9e3c..b1a80fb34359f28508f2bf473956781a
      public abstract int getPurpurBreedTime(); // Purpur
  
      protected Animal(EntityType<? extends Animal> type, Level world) {
-@@ -74,8 +75,32 @@ public abstract class Animal extends AgeableMob {
+@@ -74,8 +74,32 @@ public abstract class Animal extends AgeableMob {
              }
          }
  
@@ -262,7 +270,7 @@ index 2ac88f06ebb79e515cd9934ac1e3e2c8003d9e3c..b1a80fb34359f28508f2bf473956781a
 +
 +    @Override
 +    public boolean isLobotomized() {
-+        if (!this.level.kaiijuConfig.lobotomizeEnabled) return false;
++        if (!this.level.kaiijuConfig.lobotomizeAnimalEnabled) return false;
 +        return this.lobotomized.isLobotomized();
 +    }
 +    // Kaiiju end
@@ -270,7 +278,7 @@ index 2ac88f06ebb79e515cd9934ac1e3e2c8003d9e3c..b1a80fb34359f28508f2bf473956781a
      /* CraftBukkit start
      // Function disabled as it has no special function anymore after
      // setSitting is disabled.
-@@ -102,6 +127,7 @@ public abstract class Animal extends AgeableMob {
+@@ -102,6 +126,7 @@ public abstract class Animal extends AgeableMob {
          if (this.loveCause != null) {
              nbt.putUUID("LoveCause", this.loveCause);
          }
@@ -278,7 +286,7 @@ index 2ac88f06ebb79e515cd9934ac1e3e2c8003d9e3c..b1a80fb34359f28508f2bf473956781a
  
      }
  
-@@ -115,6 +141,13 @@ public abstract class Animal extends AgeableMob {
+@@ -115,6 +140,13 @@ public abstract class Animal extends AgeableMob {
          super.readAdditionalSaveData(nbt);
          this.inLove = nbt.getInt("InLove");
          this.loveCause = nbt.hasUUID("LoveCause") ? nbt.getUUID("LoveCause") : null;
