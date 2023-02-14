@@ -1,4 +1,4 @@
-name: Update Upstream
+name: Update Upstream (Purpur)
 
 on:
   schedule:
@@ -37,8 +37,8 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
         with:
-          commit-message: Update Upstream
+          commit-message: Update Upstream (Purpur)
           branch: update-upstream
           delete-branch: true
-          title: 'Update Upstream'
+          title: 'Update Upstream (Purpur)'
           body: ''
