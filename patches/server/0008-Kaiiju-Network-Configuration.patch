@@ -1,0 +1,19 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
+Date: Thu, 16 Feb 2023 01:38:59 +0200
+Subject: [PATCH] Kaiiju Network Configuration
+
+
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+index f5c9a42b98dceda2355a28591c59c383e7906421..3756ab4acf4487972fd065fe85ef7812605fda41 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+@@ -210,4 +210,7 @@ public class KaiijuConfig {
+             regionFormatLinearCompressionLevel = 1;
+         }
+     }
++
++    private static void networkSettings() {
++    }
+ }
+\ No newline at end of file
