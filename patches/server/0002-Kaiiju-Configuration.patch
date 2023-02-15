@@ -6,10 +6,10 @@ Subject: [PATCH] Kaiiju Configuration
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..da7e04a93664e20b9187292ddb7c1f935f5f2883
+index 0000000000000000000000000000000000000000..ef48d534d239fc5fcfd1b0500cc7868c1cf63142
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -0,0 +1,193 @@
+@@ -0,0 +1,194 @@
 +package dev.kaiijumc.kaiiju;
 +
 +import com.google.common.base.Throwables;
@@ -27,6 +27,7 @@ index 0000000000000000000000000000000000000000..da7e04a93664e20b9187292ddb7c1f93
 +import java.lang.reflect.InvocationTargetException;
 +import java.lang.reflect.Method;
 +import java.lang.reflect.Modifier;
++import java.util.Arrays;
 +import java.util.HashMap;
 +import java.util.List;
 +import java.util.Map;
