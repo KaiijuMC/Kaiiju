@@ -49,7 +49,7 @@ index 9713263c3bd34ab8a3bfc0a8797ba0b1b88ed733..0b95cd5305e4559d6dca59011869e5b2
                  metrics.addCustomChart(new Metrics.DrilldownPie("java_version", () -> {
                      Map<String, Map<String, Integer>> map = new HashMap<>();
 diff --git a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
-index fba5dbdb7bcbb55400ef18342c9b54612972a718..c94e00290e21e4bcfac5b137ded704c0848463cc 100644
+index fba5dbdb7bcbb55400ef18342c9b54612972a718..8aaa2942d35d6447655f8355106841a30429b653 100644
 --- a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
 +++ b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
 @@ -20,7 +20,7 @@ import java.util.stream.StreamSupport;
@@ -81,20 +81,23 @@ index fba5dbdb7bcbb55400ef18342c9b54612972a718..c94e00290e21e4bcfac5b137ded704c0
                  org.bukkit.Bukkit.getLogger().warning("Pattern: " + VER_PATTERN.toString());
                  org.bukkit.Bukkit.getLogger().warning("Version: " + org.bukkit.Bukkit.getBukkitVersion());
              }
-@@ -58,13 +58,15 @@ public class PaperVersionFetcher implements VersionFetcher {
+@@ -58,6 +58,8 @@ public class PaperVersionFetcher implements VersionFetcher {
  
      private static Component getUpdateStatusMessage(@Nonnull String repo, @Nonnull String branch, @Nonnull String versionInfo) {
          //int distance; // Purpur - use field
-+        /* // Kaiiju
++        // Kaiiju start - disable jenkins/api checking
++        /*
          try {
              int jenkinsBuild = Integer.parseInt(versionInfo);
              distance = fetchDistanceFromSiteApi(jenkinsBuild, getMinecraftVersion());
-         } catch (NumberFormatException ignored) {
-+        */ // Kaiiju
+@@ -65,6 +67,10 @@ public class PaperVersionFetcher implements VersionFetcher {
              versionInfo = versionInfo.replace("\"", "");
              distance = fetchDistanceFromGitHub(repo, branch, versionInfo);
--        }
-+        //} // Kaiiju
+         }
++        */
++        versionInfo = versionInfo.replace("\"", "");
++        distance = fetchDistanceFromGitHub(repo, branch, versionInfo);
++        // Kaiiju end
  
          switch (distance) {
              case -1:
