@@ -1,0 +1,66 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
+Date: Thu, 16 Feb 2023 01:49:54 +0200
+Subject: [PATCH] Purpur Network Send Null Entity Packets
+
+
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+index 3756ab4acf4487972fd065fe85ef7812605fda41..c213726efa4dd95e6e731e9c7e75fb23c3c4763f 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+@@ -211,6 +211,8 @@ public class KaiijuConfig {
+         }
+     }
+ 
++    public static boolean sendNullEntityPackets = true;
+     private static void networkSettings() {
++        sendNullEntityPackets = getBoolean("network.send-null-entity-packets", sendNullEntityPackets);
+     }
+ }
+\ No newline at end of file
+diff --git a/src/main/java/net/minecraft/server/level/ServerEntity.java b/src/main/java/net/minecraft/server/level/ServerEntity.java
+index 0f9a3a6c05fee59c29764f0c0d7a6cb8a2a861b1..afebfbd8f53cf3675d49bf3c43b2419ffa1ded5a 100644
+--- a/src/main/java/net/minecraft/server/level/ServerEntity.java
++++ b/src/main/java/net/minecraft/server/level/ServerEntity.java
+@@ -11,7 +11,7 @@ import java.util.Objects;
+ import java.util.Set;
+ import java.util.function.Consumer;
+ import javax.annotation.Nullable;
+-import net.minecraft.network.protocol.Packet;
++import dev.kaiijumc.kaiiju.KaiijuConfig;import net.minecraft.network.protocol.Packet;
+ import net.minecraft.network.protocol.game.ClientGamePacketListener;
+ import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket;
+ import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
+@@ -186,6 +186,11 @@ public class ServerEntity {
+                         this.teleportDelay = 0;
+                         packet1 = new ClientboundTeleportEntityPacket(this.entity);
+                     }
++                    // Kaiiju start - Don't send null move entity packets
++                    if (!KaiijuConfig.sendNullEntityPackets && isNullMovePacket(packet1)) {
++                        packet1 = null;
++                    }
++                    // Kaiiju end
+                 }
+ 
+                 if ((this.trackDelta || this.entity.hasImpulse || this.entity instanceof LivingEntity && ((LivingEntity) this.entity).isFallFlying()) && this.tickCount > 0) {
+@@ -252,6 +257,20 @@ public class ServerEntity {
+ 
+     }
+ 
++    // Kaiiju start - Don't send null move entity packets
++    private boolean isNullMovePacket(Packet<?> packet) {
++        if (packet instanceof ClientboundMoveEntityPacket move) {
++            if (packet instanceof ClientboundMoveEntityPacket.Pos)
++                return move.getXa() == 0 && move.getYa() == 0 && move.getZa() == 0;
++            if (packet instanceof ClientboundMoveEntityPacket.PosRot)
++                return move.getXa() == 0 && move.getYa() == 0 && move.getZa() == 0 && move.getyRot() == 0 && move.getxRot() == 0;
++            if (packet instanceof ClientboundMoveEntityPacket.Rot)
++                return move.getyRot() == 0 && move.getxRot() == 0;
++        }
++        return false;
++    }
++    // Kaiiju end
++    
+     public void removePairing(ServerPlayer player) {
+         this.entity.stopSeenByPlayer(player);
+         player.connection.send(new ClientboundRemoveEntitiesPacket(new int[]{this.entity.getId()}));
