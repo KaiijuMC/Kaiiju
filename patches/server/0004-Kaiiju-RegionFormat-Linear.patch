@@ -8,7 +8,7 @@ Copyright xymb@endcrystal.me
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index c6a4c48b14a8c927284720b79b93ee1aa9df7da6..2ea3d2f26d4547ea5094cc63d492ea1406ffbd44 100644
+index c6a4c48b14a8c927284720b79b93ee1aa9df7da6..cc727f183e0a2058c0b785efa9a95545b5ceb32a 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -13,6 +13,10 @@ dependencies {
@@ -16,7 +16,7 @@ index c6a4c48b14a8c927284720b79b93ee1aa9df7da6..2ea3d2f26d4547ea5094cc63d492ea14
      }
      // Pufferfish end
 +    // Kaiiju start - Linear format
-+    implementation("com.github.luben:zstd-jni:1.5.2-5")
++    implementation("com.github.luben:zstd-jni:1.5.4-1")
 +    implementation("org.lz4:lz4-java:1.8.0")
 +    // Kaiiju end
      // Paper start
@@ -38,18 +38,33 @@ index f2c27e0ac65be4b75c1d86ef6fd45fdb538d96ac..00724993d0448454d14a47652b039b88
          public static final class InProgressWrite {
              public long writeCounter;
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 66bbab7ebe1738cd937963b35fad9cdda763fa88..16ebf32e0c62025958c95216531f72cc418e8d14 100644
+index 328fbed775c26faa9a87171bfda68d8ee977a889..f5c9a42b98dceda2355a28591c59c383e7906421 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -192,7 +192,7 @@ public class KaiijuConfig {
+@@ -192,8 +192,9 @@ public class KaiijuConfig {
          return builder.build();
      }
  
 -    public static List<String> regionFormatList = Arrays.asList("ANVIL");
 +    public static List<String> regionFormatList = Arrays.asList("ANVIL", "LINEAR");
      public static String regionFormatName = "ANVIL";
++    public static int regionFormatLinearCompressionLevel = 1;
  
      private static void regionFormatSettings() {
+         regionFormatName = getString("region-format.format", regionFormatName).toUpperCase();
+@@ -202,5 +203,11 @@ public class KaiijuConfig {
+             Bukkit.getLogger().log(Level.SEVERE, "Falling back to ANVIL region file format.");
+             regionFormatName = "ANVIL";
+         }
++        regionFormatLinearCompressionLevel = getInt("region-format.linear.compression-level", regionFormatLinearCompressionLevel);
++        if (regionFormatLinearCompressionLevel > 23 || regionFormatLinearCompressionLevel < 1) {
++            Bukkit.getLogger().log(Level.SEVERE, "Linear region compression level should be between 1 and 22 in kaiiju.yml: " + regionFormatLinearCompressionLevel);
++            Bukkit.getLogger().log(Level.SEVERE, "Falling back to compression level 1.");
++            regionFormatLinearCompressionLevel = 1;
++        }
+     }
+ }
+\ No newline at end of file
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/region/AbstractRegionFile.java b/src/main/java/dev/kaiijumc/kaiiju/region/AbstractRegionFile.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..70d53d80f474eb80acc93275ad6bf1da98ea8ae7
@@ -134,15 +149,16 @@ index 0000000000000000000000000000000000000000..0b84b1aa4b822bdcb783285e8ea99a4f
 +}
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/region/LinearRegionFile.java b/src/main/java/dev/kaiijumc/kaiiju/region/LinearRegionFile.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..ba4910d564064a1367cb9d727e8fcc52573d1944
+index 0000000000000000000000000000000000000000..5902bc0cc13d1a77eb547efc7579fd493de2fcf5
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/region/LinearRegionFile.java
-@@ -0,0 +1,338 @@
+@@ -0,0 +1,339 @@
 +package dev.kaiijumc.kaiiju.region;
 +
 +import com.github.luben.zstd.ZstdInputStream;
 +import com.github.luben.zstd.ZstdOutputStream;
 +import com.mojang.logging.LogUtils;
++import dev.kaiijumc.kaiiju.KaiijuConfig;
 +import net.jpountz.lz4.LZ4Compressor;
 +import net.jpountz.lz4.LZ4Factory;
 +import net.jpountz.lz4.LZ4FastDecompressor;
@@ -173,7 +189,7 @@ index 0000000000000000000000000000000000000000..ba4910d564064a1367cb9d727e8fcc52
 +    private boolean close = false;
 +    public Path regionFile;
 +    public final ReentrantLock fileLock = new ReentrantLock(true);
-+    final byte COMPRESSION_LEVEL = 1;
++    final int COMPRESSION_LEVEL = KaiijuConfig.regionFormatLinearCompressionLevel;
 +
 +    public Path getRegionFile() {
 +        return this.regionFile;
@@ -903,7 +919,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..37242c6225795271e0ba6a853252f2da
              regionfile.flush();
          }
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-index b17bc6482d2bd97d2e48d3967dea72605cf13164..2a13629ffb60dc60706da446e6dc7f3683d0410b 100644
+index 9b5323edd99848b73ea0e34230e7bec8dc23be8c..619c7713d573e8f438ea23a3fcb185a98abf5100 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 @@ -552,7 +552,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
