@@ -49,7 +49,7 @@ index 9713263c3bd34ab8a3bfc0a8797ba0b1b88ed733..0b95cd5305e4559d6dca59011869e5b2
                  metrics.addCustomChart(new Metrics.DrilldownPie("java_version", () -> {
                      Map<String, Map<String, Integer>> map = new HashMap<>();
 diff --git a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
-index fba5dbdb7bcbb55400ef18342c9b54612972a718..892299d79bb8ef831825ef335614385bf1a50dc4 100644
+index fba5dbdb7bcbb55400ef18342c9b54612972a718..c94e00290e21e4bcfac5b137ded704c0848463cc 100644
 --- a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
 +++ b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
 @@ -20,7 +20,7 @@ import java.util.stream.StreamSupport;
@@ -81,6 +81,23 @@ index fba5dbdb7bcbb55400ef18342c9b54612972a718..892299d79bb8ef831825ef335614385b
                  org.bukkit.Bukkit.getLogger().warning("Pattern: " + VER_PATTERN.toString());
                  org.bukkit.Bukkit.getLogger().warning("Version: " + org.bukkit.Bukkit.getBukkitVersion());
              }
+@@ -58,13 +58,15 @@ public class PaperVersionFetcher implements VersionFetcher {
+ 
+     private static Component getUpdateStatusMessage(@Nonnull String repo, @Nonnull String branch, @Nonnull String versionInfo) {
+         //int distance; // Purpur - use field
++        /* // Kaiiju
+         try {
+             int jenkinsBuild = Integer.parseInt(versionInfo);
+             distance = fetchDistanceFromSiteApi(jenkinsBuild, getMinecraftVersion());
+         } catch (NumberFormatException ignored) {
++        */ // Kaiiju
+             versionInfo = versionInfo.replace("\"", "");
+             distance = fetchDistanceFromGitHub(repo, branch, versionInfo);
+-        }
++        //} // Kaiiju
+ 
+         switch (distance) {
+             case -1:
 diff --git a/src/main/java/com/destroystokyo/paper/console/PaperConsole.java b/src/main/java/com/destroystokyo/paper/console/PaperConsole.java
 index 3cb56595822799926a8141e60a42f5d1edfc6de5..7ae1c10ebfb8b61e7d0fa63c96ff2dee98294f4d 100644
 --- a/src/main/java/com/destroystokyo/paper/console/PaperConsole.java
