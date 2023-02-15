@@ -7,31 +7,33 @@ Inspired by "Lobotomized animals" by @KioProject123
 Checks might be a nuisance to performance.
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index ac4440f8d2bd30e3e074ef797d5138b64996fcbb..dbbba258dbdc465b89c71508d76c5c596fd03bea 100644
+index ac4440f8d2bd30e3e074ef797d5138b64996fcbb..d28f05943ef25aad1d5a0d4d3f72b991a3caaa5f 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-@@ -123,6 +123,15 @@ public class KaiijuWorldConfig {
+@@ -123,6 +123,17 @@ public class KaiijuWorldConfig {
          return value.isEmpty() ? fallback : value;
      }
  
 +    public boolean lobotomizeAnimalEnabled = false;
 +    public int lobotomizeAnimalCheckInterval = 100;
++    public boolean lobotomizeAnimalCheckCanJump = true;
 +    public boolean lobotomizeAnimalLookAtPlayer = false;
 +    public boolean lobotomizeAnimalFloat = true;
 +
      private void lobotomizeSettings() {
 +        lobotomizeAnimalEnabled = getBoolean("lobotomize.animal.enabled", lobotomizeAnimalEnabled);
 +        lobotomizeAnimalCheckInterval = getInt("lobotomize.animal.check-interval", lobotomizeAnimalCheckInterval);
++        lobotomizeAnimalCheckCanJump = getBoolean("lobotomize.animal.check-can-jump", lobotomizeAnimalCheckCanJump);
 +        lobotomizeAnimalLookAtPlayer = getBoolean("lobotomize.animal.look-at-player", lobotomizeAnimalLookAtPlayer);
 +        lobotomizeAnimalFloat = getBoolean("lobotomize.animal.float", lobotomizeAnimalFloat);
      }
  }
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/entity/Lobotomized.java b/src/main/java/dev/kaiijumc/kaiiju/entity/Lobotomized.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..8912f25e94d5e7510d965aa02b73c87e0b75fb51
+index 0000000000000000000000000000000000000000..805df3e27cfbbdf3525c96942afca12d50abc350
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/entity/Lobotomized.java
-@@ -0,0 +1,56 @@
+@@ -0,0 +1,73 @@
 +package dev.kaiijumc.kaiiju.entity;
 +
 +import net.minecraft.core.BlockPos;
@@ -52,15 +54,15 @@ index 0000000000000000000000000000000000000000..8912f25e94d5e7510d965aa02b73c87e
 +        this.isLobotomized = b;
 +    }
 +
-+    public boolean checkLobotomized(LivingEntity livingEntity) {
-+        Level level = livingEntity.getLevel();
++    public boolean checkLobotomized(LivingEntity entity) {
++        Level level = entity.getLevel();
 +        int interval = level.kaiijuConfig.lobotomizeAnimalCheckInterval;
 +        if (this.notLobotomizedCount > 3) {
 +            // check half as often if not lobotomized for the last 3+ consecutive checks
 +            interval *= 2;
 +        }
-+        if ((livingEntity.getId() + livingEntity.tickCount) % interval == 0) {
-+            this.isLobotomized = livingEntity.isOnGround() && !canTravelFrom(new BlockPos(livingEntity.getX(), livingEntity.getY() + 0.5D, livingEntity.getZ()), level, livingEntity.getBbHeight() <= 1.0F);
++        if ((entity.getId() + entity.tickCount) % interval == 0) {
++            this.isLobotomized = entity.isOnGround() && !canTravelFrom(entity, level, entity.getBbHeight() <= 1.0F);
 +
 +            if (this.isLobotomized) {
 +                this.notLobotomizedCount = 0;
@@ -71,21 +73,38 @@ index 0000000000000000000000000000000000000000..8912f25e94d5e7510d965aa02b73c87e
 +        return this.isLobotomized;
 +    }
 +
-+    private boolean canTravelFrom(BlockPos pos, Level level, boolean ignoreTop) {
-+        return canTravelTo(pos.east(), level, ignoreTop)
-+            || canTravelTo(pos.west(), level, ignoreTop)
-+            || canTravelTo(pos.north(), level, ignoreTop)
-+            || canTravelTo(pos.south(), level, ignoreTop);
++    private boolean canTravelFrom(LivingEntity entity, Level level, boolean ignoreTop) {
++        BlockPos pos = new BlockPos(entity.getX(), entity.getY() + 0.5D, entity.getZ());
++        return canTravelTo(entity, pos.east(), level, ignoreTop)
++            || canTravelTo(entity, pos.west(), level, ignoreTop)
++            || canTravelTo(entity, pos.north(), level, ignoreTop)
++            || canTravelTo(entity, pos.south(), level, ignoreTop);
 +    }
 +
-+    private boolean canTravelTo(BlockPos pos, Level level, boolean ignoreTop) {
++    private boolean canTravelTo(LivingEntity entity, BlockPos pos, Level level, boolean ignoreTop) {
++        BlockState top;
++        // Check if mob can jump over block
++        if (level.kaiijuConfig.lobotomizeAnimalCheckCanJump && canJump(entity, level, ignoreTop)) {
++            top = level.getBlockStateIfLoaded(pos.above());
++            if (top == null) return false;
++            if (top.isPathfindable(level, pos, net.minecraft.world.level.pathfinder.PathComputationType.LAND)) {
++                if (ignoreTop) return true;
++                net.minecraft.world.level.block.state.BlockState above = level.getBlockState(pos.above(2));
++                if (above.isPathfindable(level, pos, net.minecraft.world.level.pathfinder.PathComputationType.LAND)) return true;
++            }
++        }
 +        BlockState bottom = level.getBlockStateIfLoaded(pos);
 +        if (bottom == null) return false; // Chunk not loaded
 +        if (!bottom.isPathfindable(level, pos, PathComputationType.LAND)) return false;
 +        if (ignoreTop) return true;
-+        BlockState top = level.getBlockState(pos.above());
-+        if (!top.isPathfindable(level, pos, PathComputationType.LAND)) return false;
-+        return true;
++        top = level.getBlockState(pos.above());
++        return top.isPathfindable(level, pos, PathComputationType.LAND);
++    }
++
++    private boolean canJump(LivingEntity entity, Level level, boolean ignoreTop) {
++        BlockPos pos = new BlockPos(entity.getX(), entity.getY() + 2.5D, entity.getZ());
++        net.minecraft.world.level.block.Block above = level.getBlockIfLoaded(pos);
++        return !above.hasCollision;
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/world/entity/LivingEntity.java b/src/main/java/net/minecraft/world/entity/LivingEntity.java

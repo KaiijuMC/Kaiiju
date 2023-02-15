@@ -5,11 +5,11 @@ Subject: [PATCH] Kaiiju Lobotomize Villager
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index dbbba258dbdc465b89c71508d76c5c596fd03bea..a213a3c447cd69b5dd88eefd48c2caa6d19f5abc 100644
+index d28f05943ef25aad1d5a0d4d3f72b991a3caaa5f..91034f553193381c470544ff068d4d7cfb82cc50 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-@@ -127,11 +127,21 @@ public class KaiijuWorldConfig {
-     public int lobotomizeAnimalCheckInterval = 100;
+@@ -128,6 +128,11 @@ public class KaiijuWorldConfig {
+     public boolean lobotomizeAnimalCheckCanJump = true;
      public boolean lobotomizeAnimalLookAtPlayer = false;
      public boolean lobotomizeAnimalFloat = true;
 +    public boolean lobotomizeVillagerEnabled = false;
@@ -20,7 +20,8 @@ index dbbba258dbdc465b89c71508d76c5c596fd03bea..a213a3c447cd69b5dd88eefd48c2caa6
  
      private void lobotomizeSettings() {
          lobotomizeAnimalEnabled = getBoolean("lobotomize.animal.enabled", lobotomizeAnimalEnabled);
-         lobotomizeAnimalCheckInterval = getInt("lobotomize.animal.check-interval", lobotomizeAnimalCheckInterval);
+@@ -135,5 +140,10 @@ public class KaiijuWorldConfig {
+         lobotomizeAnimalCheckCanJump = getBoolean("lobotomize.animal.check-can-jump", lobotomizeAnimalCheckCanJump);
          lobotomizeAnimalLookAtPlayer = getBoolean("lobotomize.animal.look-at-player", lobotomizeAnimalLookAtPlayer);
          lobotomizeAnimalFloat = getBoolean("lobotomize.animal.float", lobotomizeAnimalFloat);
 +        lobotomizeVillagerEnabled = getBoolean("lobotomize.villager.enabled", lobotomizeVillagerEnabled);
