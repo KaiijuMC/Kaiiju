@@ -1,5 +1,5 @@
-name: Generate Jars
-on: [ push, pull_request ]
+name: Release Jars
+on: workflow_dispatch
 env:
   version: '1.19.3'
   branch: ver/1.19.3
@@ -28,3 +28,21 @@ jobs:
         with:
           name: kaiiju.jar
           path: build/libs/kaiiju-paperclip-*-reobf.jar
+      - name: Release Paperclip (latest)
+        if: github.ref_name == env.branch
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          title: "Build #${{ env.workflow }}"
+          automatic_release_tag: latest-${{ env.version }}
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          files: build/libs/kaiiju-paperclip-*-reobf.jar
+          prerelease: false
+      - name: Release Paperclip (History)
+        if: github.ref_name == env.branch
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          title: "Build #${{ env.workflow }}"
+          automatic_release_tag: build-${{ env.workflow }}
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          files: build/libs/kaiiju-paperclip-*-reobf.jar
+          prerelease: false
