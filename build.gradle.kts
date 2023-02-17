@@ -7,10 +7,24 @@ plugins {
     id("io.papermc.paperweight.patcher") version "1.5.1"
 }
 
+allprojects {
+    apply(plugin = "java")
+
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(17))
+        }
+    }
+}
+
+val paperMavenPublicUrl = "https://repo.papermc.io/repository/maven-public/"
+
 repositories {
     mavenCentral()
-    maven("https://papermc.io/repo/repository/maven-public/") {
-        content { onlyForConfigurations(PAPERCLIP_CONFIG) }
+    maven(paperMavenPublicUrl) {
+        content {
+            onlyForConfigurations(PAPERCLIP_CONFIG)
+        }
     }
 }
 
@@ -20,19 +34,8 @@ dependencies {
     paperclip("io.papermc:paperclip:3.0.2")
 }
 
-allprojects {
-    apply(plugin = "java")
-    apply(plugin = "maven-publish")
-
-    java {
-        toolchain {
-            languageVersion.set(JavaLanguageVersion.of(17))
-        }
-    }
-}
-
 subprojects {
-    tasks.withType<JavaCompile> {
+    tasks.withType<JavaCompile>().configureEach {
         options.encoding = Charsets.UTF_8.name()
         options.release.set(17)
     }
@@ -42,15 +45,9 @@ subprojects {
     tasks.withType<ProcessResources> {
         filteringCharset = Charsets.UTF_8.name()
     }
-
     repositories {
         mavenCentral()
-        maven("https://oss.sonatype.org/content/groups/public/")
-        maven("https://papermc.io/repo/repository/maven-public/")
-        maven("https://ci.emc.gs/nexus/content/groups/aikar/")
-        maven("https://repo.aikar.co/content/groups/aikar")
-        maven("https://repo.md-5.net/content/repositories/releases/")
-        maven("https://hub.spigotmc.org/nexus/content/groups/public/")
+        maven(paperMavenPublicUrl)
         maven("https://jitpack.io")
     }
 }
@@ -58,8 +55,8 @@ subprojects {
 paperweight {
     serverProject.set(project(":kaiiju-server"))
 
-    remapRepo.set("https://maven.quiltmc.org/")
-    decompileRepo.set("https://maven.quiltmc.org")
+    remapRepo.set(paperMavenPublicUrl)
+    decompileRepo.set(paperMavenPublicUrl)
 
     useStandardUpstream("Purpur") {
         url.set(github("PurpurMC", "Purpur"))
