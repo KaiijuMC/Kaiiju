@@ -4,7 +4,7 @@ import io.papermc.paperweight.util.constants.*
 plugins {
     java
     id("com.github.johnrengelman.shadow") version "7.1.2"
-    id("io.papermc.paperweight.patcher") version "1.5.0"
+    id("io.papermc.paperweight.patcher") version "1.5.1"
 }
 
 repositories {
@@ -58,7 +58,7 @@ subprojects {
 paperweight {
     serverProject.set(project(":kaiiju-server"))
 
-    remapRepo.set("https://maven.fabricmc.net/")
+    remapRepo.set("https://maven.quiltmc.org/")
     decompileRepo.set("https://maven.quiltmc.org")
 
     useStandardUpstream("Purpur") {
@@ -77,7 +77,7 @@ paperweight {
     }
 
     tasks.register("purpurRefLatest") {
-        // Update the paperRef in gradle.properties to be the latest commit.3
+        // Update the purpurRef in gradle.properties to be the latest commit.
         val tempDir = layout.cacheDir("purpurRefLatest");
         val file = "gradle.properties";
         
