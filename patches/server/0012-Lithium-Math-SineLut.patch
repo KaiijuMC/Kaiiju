@@ -7,10 +7,10 @@ Author: JellySquid
 Licence: LGPL-3.0
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index ff45fefd7058673f0c79875854accd041bc0c3a1..8105e2747ee784ba9dde2ddeb7bf7a29639337ee 100644
+index 9020f9d2ce1a0612f21fb0ba25c07c752475bb5a..dca9c796317b988ae5963dd2d452c2b8162a2249 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -218,8 +218,10 @@ public class KaiijuConfig {
+@@ -219,8 +219,10 @@ public class KaiijuConfig {
  
      public static boolean lithiumEnable = true;
      public static boolean lithiumMathFastUtil = true;
@@ -21,7 +21,6 @@ index ff45fefd7058673f0c79875854accd041bc0c3a1..8105e2747ee784ba9dde2ddeb7bf7a29
 +        lithiumMathSineLut = getBoolean("lithium.math.sine-lut", lithiumMathSineLut) && lithiumEnable;
      }
  }
-\ No newline at end of file
 diff --git a/src/main/java/me/jellysquid/mods/lithium/common/util/math/CompactSineLUT.java b/src/main/java/me/jellysquid/mods/lithium/common/util/math/CompactSineLUT.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..ccb45e94ea6d1a627df786fb88baec7edd1f2427

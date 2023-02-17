@@ -7,10 +7,10 @@ Author: JellySquid
 Licence: LGPL-3.0
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index e1fc127ac3fb47f3a4ad84d4b3f3ec25f40389f8..ff45fefd7058673f0c79875854accd041bc0c3a1 100644
+index 0f214dc5f4c585911953c4aaaa54cf43f340e4eb..9020f9d2ce1a0612f21fb0ba25c07c752475bb5a 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -217,7 +217,9 @@ public class KaiijuConfig {
+@@ -218,7 +218,9 @@ public class KaiijuConfig {
      }
  
      public static boolean lithiumEnable = true;
@@ -20,7 +20,6 @@ index e1fc127ac3fb47f3a4ad84d4b3f3ec25f40389f8..ff45fefd7058673f0c79875854accd04
 +        lithiumMathFastUtil = getBoolean("lithium.math.fast-util", lithiumMathFastUtil) && lithiumEnable;
      }
  }
-\ No newline at end of file
 diff --git a/src/main/java/net/minecraft/core/AxisCycle.java b/src/main/java/net/minecraft/core/AxisCycle.java
 index b5d8a60dc78a76c0a55bfc30cc49d26857bd914a..dd8d98acf21bb676e86f9befb45fd09e1b14a01d 100644
 --- a/src/main/java/net/minecraft/core/AxisCycle.java

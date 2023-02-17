@@ -5,10 +5,10 @@ Subject: [PATCH] Kaiiju RegionFormat Configuration
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index ef48d534d239fc5fcfd1b0500cc7868c1cf63142..328fbed775c26faa9a87171bfda68d8ee977a889 100644
+index 7da7e0aeb5eac9ac73a3570e716f1ceb11fd7027..09fb7dcc56d5e266c8a1719c696653f644e0cfc1 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -191,4 +191,16 @@ public class KaiijuConfig {
+@@ -192,4 +192,16 @@ public class KaiijuConfig {
          }
          return builder.build();
      }
@@ -25,7 +25,6 @@ index ef48d534d239fc5fcfd1b0500cc7868c1cf63142..328fbed775c26faa9a87171bfda68d8e
 +        }
 +    }
  }
-\ No newline at end of file
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
 index 40b4bd2f1a61c2d9a59c9c09b72713401969460b..b9998c288c4e8b6a244722915e44250b6550fd7e 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java

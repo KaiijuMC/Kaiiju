@@ -6,10 +6,10 @@ Subject: [PATCH] Kaiiju Configuration
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..ef48d534d239fc5fcfd1b0500cc7868c1cf63142
+index 0000000000000000000000000000000000000000..7da7e0aeb5eac9ac73a3570e716f1ceb11fd7027
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -0,0 +1,194 @@
+@@ -0,0 +1,195 @@
 +package dev.kaiijumc.kaiiju;
 +
 +import com.google.common.base.Throwables;
@@ -38,7 +38,8 @@ index 0000000000000000000000000000000000000000..ef48d534d239fc5fcfd1b0500cc7868c
 +    protected static final String HEADER = "This is the main configuration file for Kaiiju.\n"
 +            + "Some options may impact gameplay, so use with caution.\n"
 +            + "If you need help or have any questions related to Kaiiju,\n"
-+            + "Join our Discord server: https://discord.com/invite/qagZRAepb7";
++            + "Join our Discord server: https://discord.com/invite/qagZRAepb7\n"
++            + "Documentation: https://github.com/KaiijuMC/Kaiiju/wiki/Configuration";
 +    protected static File CONFIG_FILE;
 +    public static YamlConfiguration config;
 +
@@ -204,7 +205,6 @@ index 0000000000000000000000000000000000000000..ef48d534d239fc5fcfd1b0500cc7868c
 +        return builder.build();
 +    }
 +}
-\ No newline at end of file
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..dd4c3ca77acb3aeefc69b8eb948b8b202ff87a19
@@ -453,7 +453,7 @@ index a9289072b048095330ea32d7c965e8dda61a36fc..bffd82b3d89e12f2c3d6a7e89f5a8ecd
          this.generator = gen;
          this.world = new CraftWorld((ServerLevel) this, gen, biomeProvider, env);
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index caf1237491649205f7b3c7ea4fe1d31d567bbafe..5fd8e45d9a982e4f6aad06440110bc3c9d00bd99 100644
+index 23f4edebbfa045716f956128703b58baced58f49..575df8eafbcd28df941810a0662f8f32005e6422 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -1032,6 +1032,7 @@ public final class CraftServer implements Server {

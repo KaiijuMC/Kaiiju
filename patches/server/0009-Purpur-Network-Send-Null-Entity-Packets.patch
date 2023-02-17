@@ -5,10 +5,10 @@ Subject: [PATCH] Purpur Network Send Null Entity Packets
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 3756ab4acf4487972fd065fe85ef7812605fda41..c213726efa4dd95e6e731e9c7e75fb23c3c4763f 100644
+index 1fb42e9ead32ddd964b22cb1778ccf1bd8e43dbc..ea963a1d75c11e0e01b04adaea261a63b7a9a430 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -211,6 +211,8 @@ public class KaiijuConfig {
+@@ -212,6 +212,8 @@ public class KaiijuConfig {
          }
      }
  
@@ -17,7 +17,6 @@ index 3756ab4acf4487972fd065fe85ef7812605fda41..c213726efa4dd95e6e731e9c7e75fb23
 +        sendNullEntityPackets = getBoolean("network.send-null-entity-packets", sendNullEntityPackets);
      }
  }
-\ No newline at end of file
 diff --git a/src/main/java/net/minecraft/server/level/ServerEntity.java b/src/main/java/net/minecraft/server/level/ServerEntity.java
 index 0f9a3a6c05fee59c29764f0c0d7a6cb8a2a861b1..9d0a52bf600583ecbf80c2233a01ff43e609266f 100644
 --- a/src/main/java/net/minecraft/server/level/ServerEntity.java

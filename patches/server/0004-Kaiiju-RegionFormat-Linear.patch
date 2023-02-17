@@ -8,7 +8,7 @@ Copyright xymb@endcrystal.me
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index c6a4c48b14a8c927284720b79b93ee1aa9df7da6..cc727f183e0a2058c0b785efa9a95545b5ceb32a 100644
+index 7f1f4988a25a5ebac36c25c045c51eefecab6862..09f9a12da1807dd72a95378b4824d9a09f7ccbfe 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -13,6 +13,10 @@ dependencies {
@@ -38,10 +38,10 @@ index f2c27e0ac65be4b75c1d86ef6fd45fdb538d96ac..00724993d0448454d14a47652b039b88
          public static final class InProgressWrite {
              public long writeCounter;
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 328fbed775c26faa9a87171bfda68d8ee977a889..f5c9a42b98dceda2355a28591c59c383e7906421 100644
+index 09fb7dcc56d5e266c8a1719c696653f644e0cfc1..2ae67b36a08688c3041635c2db04b05e295c4eea 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -192,8 +192,9 @@ public class KaiijuConfig {
+@@ -193,8 +193,9 @@ public class KaiijuConfig {
          return builder.build();
      }
  
@@ -52,7 +52,7 @@ index 328fbed775c26faa9a87171bfda68d8ee977a889..f5c9a42b98dceda2355a28591c59c383
  
      private static void regionFormatSettings() {
          regionFormatName = getString("region-format.format", regionFormatName).toUpperCase();
-@@ -202,5 +203,11 @@ public class KaiijuConfig {
+@@ -203,5 +204,11 @@ public class KaiijuConfig {
              Bukkit.getLogger().log(Level.SEVERE, "Falling back to ANVIL region file format.");
              regionFormatName = "ANVIL";
          }
@@ -64,7 +64,6 @@ index 328fbed775c26faa9a87171bfda68d8ee977a889..f5c9a42b98dceda2355a28591c59c383
 +        }
      }
  }
-\ No newline at end of file
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/region/AbstractRegionFile.java b/src/main/java/dev/kaiijumc/kaiiju/region/AbstractRegionFile.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..70d53d80f474eb80acc93275ad6bf1da98ea8ae7

@@ -5,10 +5,10 @@ Subject: [PATCH] Kaiiju Network Configuration
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index f5c9a42b98dceda2355a28591c59c383e7906421..3756ab4acf4487972fd065fe85ef7812605fda41 100644
+index 2ae67b36a08688c3041635c2db04b05e295c4eea..1fb42e9ead32ddd964b22cb1778ccf1bd8e43dbc 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -210,4 +210,7 @@ public class KaiijuConfig {
+@@ -211,4 +211,7 @@ public class KaiijuConfig {
              regionFormatLinearCompressionLevel = 1;
          }
      }
@@ -16,4 +16,3 @@ index f5c9a42b98dceda2355a28591c59c383e7906421..3756ab4acf4487972fd065fe85ef7812
 +    private static void networkSettings() {
 +    }
  }
-\ No newline at end of file
