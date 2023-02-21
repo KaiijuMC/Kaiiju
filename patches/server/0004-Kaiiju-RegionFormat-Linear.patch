@@ -66,10 +66,10 @@ index 09fb7dcc56d5e266c8a1719c696653f644e0cfc1..2ae67b36a08688c3041635c2db04b05e
  }
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/region/AbstractRegionFile.java b/src/main/java/dev/kaiijumc/kaiiju/region/AbstractRegionFile.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..70d53d80f474eb80acc93275ad6bf1da98ea8ae7
+index 0000000000000000000000000000000000000000..249303116d3cfadd078ebf0ae6e44bf99eed6a47
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/region/AbstractRegionFile.java
-@@ -0,0 +1,32 @@
+@@ -0,0 +1,31 @@
 +package dev.kaiijumc.kaiiju.region;
 +
 +import net.minecraft.nbt.CompoundTag;
@@ -83,31 +83,30 @@ index 0000000000000000000000000000000000000000..70d53d80f474eb80acc93275ad6bf1da
 +import java.util.concurrent.locks.ReentrantLock;
 +
 +public interface AbstractRegionFile {
-+    boolean doesChunkExist(ChunkPos pos) throws Exception;
 +    void flush() throws IOException;
-+    void setStatus(int x, int z, ChunkStatus status);
 +    void clear(ChunkPos pos) throws IOException;
-+    boolean hasChunk(ChunkPos pos);
 +    void close() throws IOException;
++    void setStatus(int x, int z, ChunkStatus status);
++    void setOversized(int x, int z, boolean b) throws IOException;
++
++    boolean hasChunk(ChunkPos pos);
++    boolean doesChunkExist(ChunkPos pos) throws Exception;
++    boolean isOversized(int x, int z);
++    boolean recalculateHeader() throws IOException;
 +
 +    DataOutputStream getChunkDataOutputStream(ChunkPos pos) throws IOException;
 +    DataInputStream getChunkDataInputStream(ChunkPos pos) throws IOException;
-+    ChunkStatus getStatusIfCached(int x, int z);
-+
-+    Path getRegionFile();
-+    ReentrantLock getFileLock();
-+
-+    void setOversized(int x, int z, boolean b) throws IOException;
 +    CompoundTag getOversizedData(int x, int z) throws IOException;
-+    boolean isOversized(int x, int z);
-+    boolean recalculateHeader() throws IOException;
++    ChunkStatus getStatusIfCached(int x, int z);
++    ReentrantLock getFileLock();
++    Path getRegionFile();
 +}
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/region/AbstractRegionFileFactory.java b/src/main/java/dev/kaiijumc/kaiiju/region/AbstractRegionFileFactory.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..0b84b1aa4b822bdcb783285e8ea99a4f25dbbaa3
+index 0000000000000000000000000000000000000000..730c9e7a4a41f616185543252926f4304c92d7e4
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/region/AbstractRegionFileFactory.java
-@@ -0,0 +1,38 @@
+@@ -0,0 +1,30 @@
 +package dev.kaiijumc.kaiiju.region;
 +
 +import net.minecraft.world.level.chunk.storage.RegionFile;
@@ -126,21 +125,13 @@ index 0000000000000000000000000000000000000000..0b84b1aa4b822bdcb783285e8ea99a4f
 +        return getAbstractRegionFile(file, directory, RegionFileVersion.VERSION_DEFLATE, dsync, canRecalcHeader);
 +    }
 +
-+    public static AbstractRegionFile getAbstractRegionFile(File file, File directory, boolean dsync) throws IOException {
-+        return getAbstractRegionFile(file.toPath(), directory.toPath(), RegionFileVersion.VERSION_DEFLATE, dsync);
-+    }
-+
-+    public static AbstractRegionFile getAbstractRegionFile(File file, File directory, boolean dsync, boolean canRecalcHeader) throws IOException {
-+        return getAbstractRegionFile(file.toPath(), directory.toPath(), RegionFileVersion.VERSION_DEFLATE, dsync, canRecalcHeader);
-+    }
-+
 +    public static AbstractRegionFile getAbstractRegionFile(Path file, Path directory, RegionFileVersion outputChunkStreamVersion, boolean dsync) throws IOException {
 +        return getAbstractRegionFile(file, directory, outputChunkStreamVersion, dsync, false);
 +    }
 +
 +    public static AbstractRegionFile getAbstractRegionFile(Path file, Path directory, RegionFileVersion outputChunkStreamVersion, boolean dsync, boolean canRecalcHeader) throws IOException {
 +        if (dev.kaiijumc.kaiiju.KaiijuConfig.regionFormatName.equals("LINEAR")) {
-+            return new LinearRegionFile(file, directory, outputChunkStreamVersion, dsync, canRecalcHeader);
++            return new LinearRegionFile(file);
 +        } else {
 +            return new RegionFile(file, directory, outputChunkStreamVersion, dsync, canRecalcHeader);
 +        }
@@ -148,10 +139,10 @@ index 0000000000000000000000000000000000000000..0b84b1aa4b822bdcb783285e8ea99a4f
 +}
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/region/LinearRegionFile.java b/src/main/java/dev/kaiijumc/kaiiju/region/LinearRegionFile.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..5902bc0cc13d1a77eb547efc7579fd493de2fcf5
+index 0000000000000000000000000000000000000000..e2a82e1e33524cf99dccc39bfc458db6488af4e2
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/region/LinearRegionFile.java
-@@ -0,0 +1,339 @@
+@@ -0,0 +1,341 @@
 +package dev.kaiijumc.kaiiju.region;
 +
 +import com.github.luben.zstd.ZstdInputStream;
@@ -165,7 +156,6 @@ index 0000000000000000000000000000000000000000..5902bc0cc13d1a77eb547efc7579fd49
 +import net.minecraft.nbt.CompoundTag;
 +import net.minecraft.world.level.ChunkPos;
 +import net.minecraft.world.level.chunk.ChunkStatus;
-+import net.minecraft.world.level.chunk.storage.RegionFileVersion;
 +import org.slf4j.Logger;
 +
 +import javax.annotation.Nullable;
@@ -182,13 +172,16 @@ index 0000000000000000000000000000000000000000..5902bc0cc13d1a77eb547efc7579fd49
 +    private final byte[][] buffer = new byte[32*32][];
 +    private final int[] bufferUncompressedSize = new int[32*32];
 +
-+    private final ChunkStatus[] statuses = new ChunkStatus[32 * 32];
-+    private boolean markedToSave = false;
 +    private final Object markedToSaveLock = new Object();
++    private final ChunkStatus[] statuses = new ChunkStatus[32 * 32];
++
++    private boolean markedToSave = false;
 +    private boolean close = false;
-+    public Path regionFile;
++
 +    public final ReentrantLock fileLock = new ReentrantLock(true);
-+    final int COMPRESSION_LEVEL = KaiijuConfig.regionFormatLinearCompressionLevel;
++    public Path regionFile;
++
++    private final int COMPRESSION_LEVEL = KaiijuConfig.regionFormatLinearCompressionLevel;
 +
 +    public Path getRegionFile() {
 +        return this.regionFile;
@@ -198,7 +191,7 @@ index 0000000000000000000000000000000000000000..5902bc0cc13d1a77eb547efc7579fd49
 +        return this.fileLock;
 +    }
 +
-+    public LinearRegionFile(Path file, Path directory, RegionFileVersion outputChunkStreamVersion, boolean dsync, boolean canRecalcHeader) throws IOException {
++    public LinearRegionFile(Path file) throws IOException {
 +        this.regionFile = file;
 +        File regionFile = new File(this.regionFile.toString());
 +
@@ -220,7 +213,7 @@ index 0000000000000000000000000000000000000000..5902bc0cc13d1a77eb547efc7579fd49
 +            long superBlock = rawDataStream.readLong();
 +
 +            if (superBlock != SUPERBLOCK) {
-+                System.out.println(file.toString());
++                System.out.println(file);
 +                System.out.println("SUPERBLOCK INVALID!");
 +                return;
 +            }
@@ -228,7 +221,7 @@ index 0000000000000000000000000000000000000000..5902bc0cc13d1a77eb547efc7579fd49
 +            byte version = rawDataStream.readByte();
 +
 +            if (version != VERSION) {
-+                System.out.println(file.toString());
++                System.out.println(file);
 +                System.out.println("VERSION INVALID!");
 +                return;
 +            }
@@ -239,7 +232,7 @@ index 0000000000000000000000000000000000000000..5902bc0cc13d1a77eb547efc7579fd49
 +            int dataCount = rawDataStream.readInt();
 +
 +            if (fileLength != HEADER_SIZE + dataCount + FOOTER_SIZE) {
-+                throw new IOException("File length invalid " + this.regionFile + " " + String.valueOf(fileLength) + " " + String.valueOf(HEADER_SIZE + dataCount + FOOTER_SIZE));
++                throw new IOException("File length invalid " + this.regionFile + " " + fileLength + " " + (HEADER_SIZE + dataCount + FOOTER_SIZE));
 +            }
 +
 +            rawDataStream.readLong(); // Data Hash
@@ -346,7 +339,7 @@ index 0000000000000000000000000000000000000000..5902bc0cc13d1a77eb547efc7579fd49
 +
 +        LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
 +
-+        ArrayList<byte[]> byteBuffers = new ArrayList<byte[]>();
++        ArrayList<byte[]> byteBuffers = new ArrayList<>();
 +        for(int i = 0 ; i < 32 * 32 ; i++) {
 +            if(this.bufferUncompressedSize[i] != 0) {
 +                chunkCount += 1;
@@ -401,13 +394,13 @@ index 0000000000000000000000000000000000000000..5902bc0cc13d1a77eb547efc7579fd49
 +            this.buffer[getChunkIndex(pos.x, pos.z)] = b;
 +            this.bufferUncompressedSize[getChunkIndex(pos.x, pos.z)] = uncompressedSize;
 +        } catch (IOException e) {
-+            LOGGER.error("Chunk write IOException " + e.toString() + " " + this.regionFile);
++            LOGGER.error("Chunk write IOException " + e + " " + this.regionFile);
 +        }
 +
 +        markToSave();
 +    }
 +
-+    public DataOutputStream getChunkDataOutputStream(ChunkPos pos) throws IOException {
++    public DataOutputStream getChunkDataOutputStream(ChunkPos pos) {
 +        return new DataOutputStream(new BufferedOutputStream(new LinearRegionFile.ChunkBuffer(pos)));
 +    }
 +
@@ -439,7 +432,7 @@ index 0000000000000000000000000000000000000000..5902bc0cc13d1a77eb547efc7579fd49
 +    }
 +
 +    @Nullable
-+    public synchronized DataInputStream getChunkDataInputStream(ChunkPos pos) throws IOException {
++    public synchronized DataInputStream getChunkDataInputStream(ChunkPos pos) {
 +        if(this.bufferUncompressedSize[getChunkIndex(pos.x, pos.z)] != 0) {
 +            LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
 +            byte[] content = new byte[bufferUncompressedSize[getChunkIndex(pos.x, pos.z)]];
@@ -469,7 +462,7 @@ index 0000000000000000000000000000000000000000..5902bc0cc13d1a77eb547efc7579fd49
 +        try {
 +            flush();
 +        } catch(IOException e) {
-+            throw new IOException("Region flush IOException " + e.toString() + " " + this.regionFile);
++            throw new IOException("Region flush IOException " + e + " " + this.regionFile);
 +        }
 +    }
 +
@@ -477,7 +470,7 @@ index 0000000000000000000000000000000000000000..5902bc0cc13d1a77eb547efc7579fd49
 +        return (x & 31) + (z & 31) * 32;
 +    }
 +
-+    public boolean recalculateHeader() throws IOException {
++    public boolean recalculateHeader() {
 +        return false;
 +    }
 +
