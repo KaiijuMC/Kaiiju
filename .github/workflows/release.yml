@@ -1,5 +1,5 @@
 name: Release Jars
-on: workflow_dispatch
+on: [push, workflow_dispatch]
 env:
   version: '1.19.3'
   branch: ver/1.19.3
