@@ -38,32 +38,75 @@ index f2c27e0ac65be4b75c1d86ef6fd45fdb538d96ac..00724993d0448454d14a47652b039b88
          public static final class InProgressWrite {
              public long writeCounter;
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 09fb7dcc56d5e266c8a1719c696653f644e0cfc1..2ae67b36a08688c3041635c2db04b05e295c4eea 100644
+index 09fb7dcc56d5e266c8a1719c696653f644e0cfc1..e245178e510a4229860120ced945146a8a21cc32 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -193,8 +193,9 @@ public class KaiijuConfig {
+@@ -15,7 +15,6 @@ import java.io.IOException;
+ import java.lang.reflect.InvocationTargetException;
+ import java.lang.reflect.Method;
+ import java.lang.reflect.Modifier;
+-import java.util.Arrays;
+ import java.util.HashMap;
+ import java.util.List;
+ import java.util.Map;
+@@ -192,16 +191,4 @@ public class KaiijuConfig {
+         }
          return builder.build();
      }
- 
+-
 -    public static List<String> regionFormatList = Arrays.asList("ANVIL");
-+    public static List<String> regionFormatList = Arrays.asList("ANVIL", "LINEAR");
-     public static String regionFormatName = "ANVIL";
-+    public static int regionFormatLinearCompressionLevel = 1;
+-    public static String regionFormatName = "ANVIL";
+-
+-    private static void regionFormatSettings() {
+-        regionFormatName = getString("region-format.format", regionFormatName).toUpperCase();
+-        if (!regionFormatList.contains(regionFormatName)) {
+-            Bukkit.getLogger().log(Level.SEVERE, "Unknown region format in kaiiju.yml: " + regionFormatName);
+-            Bukkit.getLogger().log(Level.SEVERE, "Falling back to ANVIL region file format.");
+-            regionFormatName = "ANVIL";
+-        }
+-    }
+ }
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
+index dd4c3ca77acb3aeefc69b8eb948b8b202ff87a19..e77b6d86f651dc93f5c9dc28eda1e00a6af7ac8d 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
+@@ -4,9 +4,9 @@ import org.apache.commons.lang.BooleanUtils;
+ import org.bukkit.World;
+ import org.bukkit.configuration.ConfigurationSection;
  
-     private static void regionFormatSettings() {
-         regionFormatName = getString("region-format.format", regionFormatName).toUpperCase();
-@@ -203,5 +204,11 @@ public class KaiijuConfig {
-             Bukkit.getLogger().log(Level.SEVERE, "Falling back to ANVIL region file format.");
-             regionFormatName = "ANVIL";
-         }
+-import java.util.List;
++import java.util.Arrays;import java.util.List;
+ import java.util.Map;
+-import java.util.function.Predicate;
++import java.util.function.Predicate;import java.util.logging.Level;
+ 
+ import static dev.kaiijumc.kaiiju.KaiijuConfig.log;
+ 
+@@ -122,4 +122,23 @@ public class KaiijuWorldConfig {
+         final Map<String, Object> value = getMap("world-settings." + worldName + "." + path, null);
+         return value.isEmpty() ? fallback : value;
+     }
++
++    public List<String> regionFormatList = Arrays.asList("ANVIL", "LINEAR");
++    public String regionFormatName = "ANVIL";
++    public int regionFormatLinearCompressionLevel = 1;
++
++    private void regionFormatSettings() {
++        regionFormatName = getString("region-format.format", regionFormatName).toUpperCase();
++        if (!regionFormatList.contains(regionFormatName)) {
++            log(Level.SEVERE, "Unknown region format in kaiiju.yml: " + regionFormatName);
++            log(Level.SEVERE, "Falling back to ANVIL region file format.");
++            regionFormatName = "ANVIL";
++        }
 +        regionFormatLinearCompressionLevel = getInt("region-format.linear.compression-level", regionFormatLinearCompressionLevel);
 +        if (regionFormatLinearCompressionLevel > 23 || regionFormatLinearCompressionLevel < 1) {
-+            Bukkit.getLogger().log(Level.SEVERE, "Linear region compression level should be between 1 and 22 in kaiiju.yml: " + regionFormatLinearCompressionLevel);
-+            Bukkit.getLogger().log(Level.SEVERE, "Falling back to compression level 1.");
++            log(Level.SEVERE, "Linear region compression level should be between 1 and 22 in kaiiju.yml: " + regionFormatLinearCompressionLevel);
++            log(Level.SEVERE, "Falling back to compression level 1.");
 +            regionFormatLinearCompressionLevel = 1;
 +        }
-     }
++    }
  }
+\ No newline at end of file
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/region/AbstractRegionFile.java b/src/main/java/dev/kaiijumc/kaiiju/region/AbstractRegionFile.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..249303116d3cfadd078ebf0ae6e44bf99eed6a47
@@ -103,10 +146,10 @@ index 0000000000000000000000000000000000000000..249303116d3cfadd078ebf0ae6e44bf9
 +}
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/region/AbstractRegionFileFactory.java b/src/main/java/dev/kaiijumc/kaiiju/region/AbstractRegionFileFactory.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..730c9e7a4a41f616185543252926f4304c92d7e4
+index 0000000000000000000000000000000000000000..a470609b107f46ffc3bb7b121525ca8b803b4322
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/region/AbstractRegionFileFactory.java
-@@ -0,0 +1,30 @@
+@@ -0,0 +1,46 @@
 +package dev.kaiijumc.kaiiju.region;
 +
 +import net.minecraft.world.level.chunk.storage.RegionFile;
@@ -130,8 +173,24 @@ index 0000000000000000000000000000000000000000..730c9e7a4a41f616185543252926f430
 +    }
 +
 +    public static AbstractRegionFile getAbstractRegionFile(Path file, Path directory, RegionFileVersion outputChunkStreamVersion, boolean dsync, boolean canRecalcHeader) throws IOException {
-+        if (dev.kaiijumc.kaiiju.KaiijuConfig.regionFormatName.equals("LINEAR")) {
-+            return new LinearRegionFile(file);
++        return getAbstractRegionFile(1, file, directory, outputChunkStreamVersion, dsync, canRecalcHeader);
++    }
++
++    public static AbstractRegionFile getAbstractRegionFile(int linearCompression, Path file, Path directory, boolean dsync) throws IOException {
++        return getAbstractRegionFile(linearCompression, file, directory, RegionFileVersion.VERSION_DEFLATE, dsync);
++    }
++
++    public static AbstractRegionFile getAbstractRegionFile(int linearCompression, Path file, Path directory, boolean dsync, boolean canRecalcHeader) throws IOException {
++        return getAbstractRegionFile(linearCompression, file, directory, RegionFileVersion.VERSION_DEFLATE, dsync, canRecalcHeader);
++    }
++
++    public static AbstractRegionFile getAbstractRegionFile(int linearCompression, Path file, Path directory, RegionFileVersion outputChunkStreamVersion, boolean dsync) throws IOException {
++        return getAbstractRegionFile(linearCompression, file, directory, outputChunkStreamVersion, dsync, false);
++    }
++
++    public static AbstractRegionFile getAbstractRegionFile(int linearCompression, Path file, Path directory, RegionFileVersion outputChunkStreamVersion, boolean dsync, boolean canRecalcHeader) throws IOException {
++        if (file.toString().endsWith(".linear")) {
++            return new LinearRegionFile(file, linearCompression);
 +        } else {
 +            return new RegionFile(file, directory, outputChunkStreamVersion, dsync, canRecalcHeader);
 +        }
@@ -139,10 +198,10 @@ index 0000000000000000000000000000000000000000..730c9e7a4a41f616185543252926f430
 +}
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/region/LinearRegionFile.java b/src/main/java/dev/kaiijumc/kaiiju/region/LinearRegionFile.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..e2a82e1e33524cf99dccc39bfc458db6488af4e2
+index 0000000000000000000000000000000000000000..2e0d10ded886e82c09700a1c6602cd1bb9d1967e
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/region/LinearRegionFile.java
-@@ -0,0 +1,341 @@
+@@ -0,0 +1,342 @@
 +package dev.kaiijumc.kaiiju.region;
 +
 +import com.github.luben.zstd.ZstdInputStream;
@@ -181,7 +240,7 @@ index 0000000000000000000000000000000000000000..e2a82e1e33524cf99dccc39bfc458db6
 +    public final ReentrantLock fileLock = new ReentrantLock(true);
 +    public Path regionFile;
 +
-+    private final int COMPRESSION_LEVEL = KaiijuConfig.regionFormatLinearCompressionLevel;
++    private final int compressionLevel;
 +
 +    public Path getRegionFile() {
 +        return this.regionFile;
@@ -191,13 +250,14 @@ index 0000000000000000000000000000000000000000..e2a82e1e33524cf99dccc39bfc458db6
 +        return this.fileLock;
 +    }
 +
-+    public LinearRegionFile(Path file) throws IOException {
++    public LinearRegionFile(Path file, int compression) throws IOException {
 +        this.regionFile = file;
++        this.compressionLevel = compression;
 +        File regionFile = new File(this.regionFile.toString());
 +
 +        LZ4Compressor compressor = LZ4Factory.fastestInstance().fastCompressor();
 +
-+        for (int i = 0 ; i < 32 * 32 ; i++)
++        for (int i = 0; i < 32 * 32; i++)
 +            this.bufferUncompressedSize[i] = 0;
 +
 +        if(regionFile.canRead()) {
@@ -327,7 +387,7 @@ index 0000000000000000000000000000000000000000..e2a82e1e33524cf99dccc39bfc458db6
 +        FileOutputStream fileStream = new FileOutputStream(tempFile);
 +
 +        ByteArrayOutputStream zstdByteArray = new ByteArrayOutputStream();
-+        ZstdOutputStream zstdStream = new ZstdOutputStream(zstdByteArray, COMPRESSION_LEVEL);
++        ZstdOutputStream zstdStream = new ZstdOutputStream(zstdByteArray, this.compressionLevel);
 +        zstdStream.setChecksum(true);
 +        DataOutputStream zstdDataStream = new DataOutputStream(zstdStream);
 +        DataOutputStream dataStream = new DataOutputStream(fileStream);
@@ -335,7 +395,7 @@ index 0000000000000000000000000000000000000000..e2a82e1e33524cf99dccc39bfc458db6
 +        dataStream.writeLong(SUPERBLOCK);
 +        dataStream.writeByte(VERSION);
 +        dataStream.writeLong(timestamp);
-+        dataStream.writeByte(COMPRESSION_LEVEL);
++        dataStream.writeByte(this.compressionLevel);
 +
 +        LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
 +
@@ -485,7 +545,7 @@ index 0000000000000000000000000000000000000000..e2a82e1e33524cf99dccc39bfc458db6
 +    }
 +}
 diff --git a/src/main/java/io/papermc/paper/chunk/system/io/RegionFileIOThread.java b/src/main/java/io/papermc/paper/chunk/system/io/RegionFileIOThread.java
-index a08cde4eefe879adcee7c4118bc38f98c5097ed0..77ce70697f2a634927fd02f2a103c91a7bf09d2a 100644
+index a08cde4eefe879adcee7c4118bc38f98c5097ed0..1cfc20b7496f93aff1d6c2387dc5bb8bacab8dc8 100644
 --- a/src/main/java/io/papermc/paper/chunk/system/io/RegionFileIOThread.java
 +++ b/src/main/java/io/papermc/paper/chunk/system/io/RegionFileIOThread.java
 @@ -811,7 +811,7 @@ public final class RegionFileIOThread extends PrioritisedQueueExecutorThread {
@@ -551,31 +611,48 @@ index a08cde4eefe879adcee7c4118bc38f98c5097ed0..77ce70697f2a634927fd02f2a103c91a
                  }
              }
          }
-@@ -1287,6 +1287,12 @@ public final class RegionFileIOThread extends PrioritisedQueueExecutorThread {
-                 } catch (final ThreadDeath thr) {
-                     throw thr;
-                 } catch (final Throwable thr) {
-+                    // Kaiiju start - Linear region format
-+                    if (dev.kaiijumc.kaiiju.KaiijuConfig.regionFormatName.equals("LINEAR")) {
-+                        failedWrite = thr instanceof IOException;
-+                        LOGGER.error("Failed to write chunk data for task: " + this.toString(), thr);
-+                    } else {
-+                    // Kaiiju end
-                     if (thr instanceof RegionFileStorage.RegionFileSizeException) {
-                         final int maxSize = RegionFile.MAX_CHUNK_SIZE / (1024 * 1024);
-                         LOGGER.error("Chunk at (" + this.chunkX + "," + this.chunkZ + ") in '" + this.world.getWorld().getName() + "' exceeds max size of " + maxSize + "MiB, it has been deleted from disk.");
-@@ -1294,6 +1300,7 @@ public final class RegionFileIOThread extends PrioritisedQueueExecutorThread {
-                         failedWrite = thr instanceof IOException;
-                         LOGGER.error("Failed to write chunk data for task: " + this.toString(), thr);
-                     }
-+                    } // Kaiiju
-                 }
+diff --git a/src/main/java/io/papermc/paper/world/ThreadedWorldUpgrader.java b/src/main/java/io/papermc/paper/world/ThreadedWorldUpgrader.java
+index 95cac7edae8ac64811fc6a2f6b97dd4a0fceb0b0..d21077fdcdeb14860ef6f05b7586650051f6d44b 100644
+--- a/src/main/java/io/papermc/paper/world/ThreadedWorldUpgrader.java
++++ b/src/main/java/io/papermc/paper/world/ThreadedWorldUpgrader.java
+@@ -83,9 +83,13 @@ public class ThreadedWorldUpgrader {
+         }
+         LOGGER.info("Found " + regionFiles.length + " regionfiles to convert");
+         LOGGER.info("Starting conversion now for world " + this.worldName);
+-
++        // Kaiiju start
++        String formatName = ((org.bukkit.craftbukkit.CraftWorld) org.bukkit.Bukkit.getWorld(worldName)).getHandle().kaiijuConfig.regionFormatName;
++        int linearCompression = ((org.bukkit.craftbukkit.CraftWorld) org.bukkit.Bukkit.getWorld(worldName)).getHandle().kaiijuConfig.regionFormatLinearCompressionLevel;
++        LOGGER.info("Using format " + formatName + " (" + linearCompression + ")");
++        // Kaiiju end
+         final WorldInfo info = new WorldInfo(() -> worldPersistentData,
+-                new ChunkStorage(regionFolder.toPath(), this.dataFixer, false), this.removeCaches, this.dimensionType, this.generatorKey);
++                new ChunkStorage(formatName, linearCompression, regionFolder.toPath(), this.dataFixer, false), this.removeCaches, this.dimensionType, this.generatorKey); // Kaiiju
  
-                 final boolean finalFailWrite = failedWrite;
+         long expectedChunks = (long)regionFiles.length * (32L * 32L);
+ 
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index 75965afd7b4bed23a5ecf618c7f91ff5e7ffd92f..2158c576aa47ef618b7602c2f4e351b7beb023b3 100644
+index 75965afd7b4bed23a5ecf618c7f91ff5e7ffd92f..4f4a94f60c60eb8bf4214bfcfe6f963e16b39c98 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
+@@ -291,7 +291,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+     // Paper end
+ 
+     public ChunkMap(ServerLevel world, LevelStorageSource.LevelStorageAccess session, DataFixer dataFixer, StructureTemplateManager structureTemplateManager, Executor executor, BlockableEventLoop<Runnable> mainThreadExecutor, LightChunkGetter chunkProvider, ChunkGenerator chunkGenerator, ChunkProgressListener worldGenerationProgressListener, ChunkStatusUpdateListener chunkStatusChangeListener, Supplier<DimensionDataStorage> persistentStateManagerFactory, int viewDistance, boolean dsync) {
+-        super(session.getDimensionPath(world.dimension()).resolve("region"), dataFixer, dsync);
++        super(world.getLevel().kaiijuConfig.regionFormatName, world.getLevel().kaiijuConfig.regionFormatLinearCompressionLevel, session.getDimensionPath(world.dimension()).resolve("region"), dataFixer, dsync); // Kaiiju
+         // Paper - rewrite chunk system
+         this.tickingGenerated = new AtomicInteger();
+         this.playerMap = new PlayerMap();
+@@ -336,7 +336,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+         this.lightEngine = new ThreadedLevelLightEngine(chunkProvider, this, this.level.dimensionType().hasSkyLight(), null, null); // Paper - rewrite chunk system
+         this.distanceManager = new ChunkMap.ChunkDistanceManager(executor, mainThreadExecutor);
+         this.overworldDataStorage = persistentStateManagerFactory;
+-        this.poiManager = new PoiManager(path.resolve("poi"), dataFixer, dsync, iregistrycustom, world);
++        this.poiManager = new PoiManager(this.level.kaiijuConfig.regionFormatName, this.level.kaiijuConfig.regionFormatLinearCompressionLevel, path.resolve("poi"), dataFixer, dsync, iregistrycustom, world); // Kaiiju
+         this.setViewDistance(viewDistance);
+         // Paper start
+         this.dataRegionManager = new io.papermc.paper.chunk.SingleThreadChunkRegionManager(this.level, 2, (1.0 / 3.0), 1, 6, "Data", DataRegionData::new, DataRegionSectionData::new);
 @@ -950,13 +950,13 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
  
      // Paper start - chunk status cache "api"
@@ -601,42 +678,77 @@ index 75965afd7b4bed23a5ecf618c7f91ff5e7ffd92f..2158c576aa47ef618b7602c2f4e351b7
  
          regionFile.setStatus(chunkPos.x, chunkPos.z, ChunkSerializer.getStatus(compound));
      }
+diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
+index b396a329e753f42b3878736b6b14bafda02d3744..906d394bbb80b9069645d01a319a9fab24c42288 100644
+--- a/src/main/java/net/minecraft/server/level/ServerLevel.java
++++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
+@@ -390,9 +390,8 @@ public class ServerLevel extends Level implements WorldGenLevel {
+     private final EntityRegionFileStorage entityStorage;
+ 
+     private static final class EntityRegionFileStorage extends net.minecraft.world.level.chunk.storage.RegionFileStorage {
+-
+-        public EntityRegionFileStorage(Path directory, boolean dsync) {
+-            super(directory, dsync);
++        public EntityRegionFileStorage(String format, int linearCompression, Path directory, boolean dsync) { // Kaiiju
++            super(format, linearCompression, directory, dsync); // Kaiiju
+         }
+ 
+         protected void write(ChunkPos pos, net.minecraft.nbt.CompoundTag nbt) throws IOException {
+@@ -583,7 +582,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+         // CraftBukkit end
+         boolean flag2 = minecraftserver.forceSynchronousWrites();
+         DataFixer datafixer = minecraftserver.getFixerUpper();
+-        this.entityStorage = new EntityRegionFileStorage(convertable_conversionsession.getDimensionPath(resourcekey).resolve("entities"), flag2); // Paper - rewrite chunk system  //EntityPersistentStorage<Entity> entitypersistentstorage = new EntityStorage(this, convertable_conversionsession.getDimensionPath(resourcekey).resolve("entities"), datafixer, flag2, minecraftserver);
++        this.entityStorage = new EntityRegionFileStorage(this.getLevel().kaiijuConfig.regionFormatName, this.getLevel().kaiijuConfig.regionFormatLinearCompressionLevel, convertable_conversionsession.getDimensionPath(resourcekey).resolve("entities"), flag2); // Paper - rewrite chunk system  //EntityPersistentStorage<Entity> entitypersistentstorage = new EntityStorage(this, convertable_conversionsession.getDimensionPath(resourcekey).resolve("entities"), datafixer, flag2, minecraftserver); // Kaiiju
+ 
+         // this.entityManager = new PersistentEntitySectionManager<>(Entity.class, new ServerLevel.EntityCallbacks(), entitypersistentstorage, this.entitySliceManager); // Paper // Paper - rewrite chunk system
+         StructureTemplateManager structuretemplatemanager = minecraftserver.getStructureManager();
 diff --git a/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java b/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
-index 759b125cc1251b9b4f1f443c9f70c482ef5b32f8..aca60733c87f7f95b5719ded24eb8cf697f9d83e 100644
+index 759b125cc1251b9b4f1f443c9f70c482ef5b32f8..74bc03e43096c865bba36b15aa248b9dc3481828 100644
 --- a/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
 +++ b/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
-@@ -61,10 +61,17 @@ public class WorldUpgrader {
+@@ -41,7 +41,7 @@ import net.minecraft.world.level.chunk.storage.RegionFile;
+ import net.minecraft.world.level.dimension.LevelStem;
+ import net.minecraft.world.level.storage.DimensionDataStorage;
+ import net.minecraft.world.level.storage.LevelStorageSource;
+-import org.slf4j.Logger;
++import org.bukkit.Bukkit;import org.bukkit.craftbukkit.CraftWorld;import org.slf4j.Logger;
+ 
+ public class WorldUpgrader {
+ 
+@@ -61,7 +61,7 @@ public class WorldUpgrader {
      private volatile int skipped;
      private final Object2FloatMap<ResourceKey<LevelStem>> progressMap = Object2FloatMaps.synchronize(new Object2FloatOpenCustomHashMap(Util.identityStrategy())); // CraftBukkit
      private volatile Component status = Component.translatable("optimizeWorld.stage.counting");
 -    public static final Pattern REGEX = Pattern.compile("^r\\.(-?[0-9]+)\\.(-?[0-9]+)\\.mca$");
-+    public static Pattern REGEX; // Kaiiju
++    public static Pattern REGEX = Pattern.compile("^r\\.(-?[0-9]+)\\.(-?[0-9]+)\\.(linear | mca)$"); // Kaiiju
      private final DimensionDataStorage overworldDataStorage;
  
      public WorldUpgrader(LevelStorageSource.LevelStorageAccess session, DataFixer dataFixer, Registry<LevelStem> dimensionOptionsRegistry, boolean eraseCache) {
-+        // Kaiiju start
-+        if (dev.kaiijumc.kaiiju.KaiijuConfig.regionFormatName.equals("LINEAR")) {
-+            this.REGEX = Pattern.compile("^r\\.(-?[0-9]+)\\.(-?[0-9]+)\\.linear$");
-+        } else {
-+            this.REGEX = Pattern.compile("^r\\.(-?[0-9]+)\\.(-?[0-9]+)\\.mca$");
-+        }
-+        // Kaiiju end
-         this.dimensions = dimensionOptionsRegistry;
-         this.levels = (Set) dimensionOptionsRegistry.registryKeySet().stream().collect(Collectors.toUnmodifiableSet()); // CraftBukkit
-         this.eraseCache = eraseCache;
-@@ -235,6 +242,11 @@ public class WorldUpgrader {
+@@ -115,8 +115,11 @@ public class WorldUpgrader {
+             while (iterator1.hasNext()) {
+                 ResourceKey<LevelStem> resourcekey1 = (ResourceKey) iterator1.next(); // CraftBukkit
+                 Path path = this.levelStorage.getDimensionPath((ResourceKey) null); // CraftBukkit
+-
+-                builder1.put(resourcekey1, new ChunkStorage(path.resolve("region"), this.dataFixer, true));
++                // Kaiiju start
++                String worldName = this.levelStorage.getLevelId();
++                String formatName = ((CraftWorld) Bukkit.getWorld(worldName)).getHandle().kaiijuConfig.regionFormatName;
++                builder1.put(resourcekey1, new ChunkStorage(formatName, 6, path.resolve("region"), this.dataFixer, true));
++                // Kaiiju end
+             }
+ 
+             ImmutableMap<ResourceKey<LevelStem>, ChunkStorage> immutablemap1 = builder1.build(); // CraftBukkit
+@@ -235,7 +238,7 @@ public class WorldUpgrader {
          File file = this.levelStorage.getDimensionPath((ResourceKey) null).toFile(); // CraftBukkit
          File file1 = new File(file, "region");
          File[] afile = file1.listFiles((file2, s) -> {
-+            // Kaiiju start
-+            if (dev.kaiijumc.kaiiju.KaiijuConfig.regionFormatName.equals("LINEAR")) {
-+                return s.endsWith(".linear");
-+            }
-+            // Kaiiju end
-             return s.endsWith(".mca");
+-            return s.endsWith(".mca");
++            return s.endsWith(".mca") || s.endsWith(".linear"); // Kaiiju
          });
  
-@@ -254,7 +266,7 @@ public class WorldUpgrader {
+         if (afile == null) {
+@@ -254,7 +257,7 @@ public class WorldUpgrader {
                      int l = Integer.parseInt(matcher.group(2)) << 5;
  
                      try {
@@ -645,6 +757,40 @@ index 759b125cc1251b9b4f1f443c9f70c482ef5b32f8..aca60733c87f7f95b5719ded24eb8cf6
  
                          try {
                              for (int i1 = 0; i1 < 32; ++i1) {
+diff --git a/src/main/java/net/minecraft/world/entity/ai/village/poi/PoiManager.java b/src/main/java/net/minecraft/world/entity/ai/village/poi/PoiManager.java
+index 8950b220b9a3512cd4667beb7bdec0e82e07edc6..71b38521fd2039bb2ddfdc5dc89341282869ce30 100644
+--- a/src/main/java/net/minecraft/world/entity/ai/village/poi/PoiManager.java
++++ b/src/main/java/net/minecraft/world/entity/ai/village/poi/PoiManager.java
+@@ -57,8 +57,8 @@ public class PoiManager extends SectionStorage<PoiSection> {
+     // Paper end - rewrite chunk system
+ 
+ 
+-    public PoiManager(Path path, DataFixer dataFixer, boolean dsync, RegistryAccess registryManager, LevelHeightAccessor world) {
+-        super(path, PoiSection::codec, PoiSection::new, dataFixer, DataFixTypes.POI_CHUNK, dsync, registryManager, world);
++    public PoiManager(String formatName, int linearCompression, Path path, DataFixer dataFixer, boolean dsync, RegistryAccess registryManager, LevelHeightAccessor world) { // Kaiiju
++        super(formatName, linearCompression, path, PoiSection::codec, PoiSection::new, dataFixer, DataFixTypes.POI_CHUNK, dsync, registryManager, world); // Kaiiju
+         this.world = (net.minecraft.server.level.ServerLevel)world; // Paper - rewrite chunk system
+     }
+ 
+diff --git a/src/main/java/net/minecraft/world/level/chunk/storage/ChunkStorage.java b/src/main/java/net/minecraft/world/level/chunk/storage/ChunkStorage.java
+index 5a425be023d77f0370d102dfb52427147849ac1a..5396d6944cee6c3075fcfd030510254461569120 100644
+--- a/src/main/java/net/minecraft/world/level/chunk/storage/ChunkStorage.java
++++ b/src/main/java/net/minecraft/world/level/chunk/storage/ChunkStorage.java
+@@ -37,11 +37,12 @@ public class ChunkStorage implements AutoCloseable {
+     public final RegionFileStorage regionFileCache;
+     // Paper end - async chunk loading
+ 
+-    public ChunkStorage(Path directory, DataFixer dataFixer, boolean dsync) {
++    public ChunkStorage(String format, int linearCompression, Path directory, DataFixer dataFixer, boolean dsync) { // Kaiiju
+         this.fixerUpper = dataFixer;
++
+         // Paper start - async chunk io
+         // remove IO worker
+-        this.regionFileCache = new RegionFileStorage(directory, dsync, true); // Paper - nuke IOWorker // Paper
++        this.regionFileCache = new RegionFileStorage(format, linearCompression, directory, dsync, true); // Paper - nuke IOWorker // Paper
+         // Paper end - async chunk io
+     }
+ 
 diff --git a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFile.java b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFile.java
 index dcfe090c269d4cbcc2eb1b6f85392848bb34656c..d42c320179ae055b8675d1ce6ce1788ecafb8e9d 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFile.java
@@ -707,39 +853,49 @@ index dcfe090c269d4cbcc2eb1b6f85392848bb34656c..d42c320179ae055b8675d1ce6ce1788e
          try (DataInputStream out = new DataInputStream(new java.io.BufferedInputStream(new InflaterInputStream(Files.newInputStream(file))))) {
              return NbtIo.read((java.io.DataInput) out);
 diff --git a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
-index bd502ca721de0cab438d995efa00ad0554c0d2fe..37242c6225795271e0ba6a853252f2da747cf30c 100644
+index bd502ca721de0cab438d995efa00ad0554c0d2fe..f69a0cf400c8b6dd9bd9199586e790583ac0e240 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
-@@ -21,8 +21,9 @@ import net.minecraft.world.level.ChunkPos;
- public class RegionFileStorage implements AutoCloseable {
+@@ -22,17 +22,25 @@ public class RegionFileStorage implements AutoCloseable {
  
      public static final String ANVIL_EXTENSION = ".mca";
-+    public static final String LINEAR_EXTENSION = ".linear"; // Kaiiju
      private static final int MAX_CACHE_SIZE = 256;
 -    public final Long2ObjectLinkedOpenHashMap<RegionFile> regionCache = new Long2ObjectLinkedOpenHashMap();
 +    public final Long2ObjectLinkedOpenHashMap<dev.kaiijumc.kaiiju.region.AbstractRegionFile> regionCache = new Long2ObjectLinkedOpenHashMap(); // Kaiiju
      private final Path folder;
      private final boolean sync;
++    // Kaiiju start - Per world chunk format
++    public final String format;
++    public final int linearCompression;
++    // Kaiiju end
  
-@@ -42,9 +43,17 @@ public class RegionFileStorage implements AutoCloseable {
+     private final boolean isChunkData; // Paper
+ 
+-    protected RegionFileStorage(Path directory, boolean dsync) { // Paper - protected constructor
++    protected RegionFileStorage(String format, int linearCompression, Path directory, boolean dsync) { // Paper - protected constructor
+         // Paper start - add isChunkData param
+-        this(directory, dsync, false);
++        this(format, linearCompression, directory, dsync, false);
+     }
+-    RegionFileStorage(Path directory, boolean dsync, boolean isChunkData) {
++    RegionFileStorage(String format, int linearCompression, Path directory, boolean dsync, boolean isChunkData) { // Kaiiju
++        // Kaiiju start
++        this.format = format;
++        this.linearCompression = linearCompression;
++        // Kaiiju end
+         this.isChunkData = isChunkData;
+         // Paper end - add isChunkData param
+         this.folder = directory;
+@@ -42,7 +50,7 @@ public class RegionFileStorage implements AutoCloseable {
      // Paper start
      public static @Nullable ChunkPos getRegionFileCoordinates(Path file) {
          String fileName = file.getFileName().toString();
-+        // Kaiiju start
-+        if (dev.kaiijumc.kaiiju.KaiijuConfig.regionFormatName.equals("LINEAR")) {
-+            if (!fileName.startsWith("r.") || !fileName.endsWith(".linear")) {
-+                return null;
-+            }
-+        } else {
-+        // Kaiiju end
-         if (!fileName.startsWith("r.") || !fileName.endsWith(".mca")) {
+-        if (!fileName.startsWith("r.") || !fileName.endsWith(".mca")) {
++        if (!fileName.startsWith("r.") || !fileName.endsWith(".mca") || !fileName.endsWith(".linear")) { // Kaiiju
              return null;
          }
-+        } // Kaiiju
  
-         String[] split = fileName.split("\\.");
- 
-@@ -62,49 +71,57 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -62,49 +70,55 @@ public class RegionFileStorage implements AutoCloseable {
          }
      }
  
@@ -785,18 +941,16 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..37242c6225795271e0ba6a853252f2da
              Path path = this.folder;
              int j = chunkcoordintpair.getRegionX();
 -            Path path1 = path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + ".mca"); // Paper - diff on change
++            //Path path1 = path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + ".mca"); // Paper - diff on change // Kaiiju
 +            // Kaiiju start
-+            //Path path1 = path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + ".mca"); // Paper - diff on change
-+            Path path1;
-+            if (dev.kaiijumc.kaiiju.KaiijuConfig.regionFormatName.equals("LINEAR")) {
-+                path1 = path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + ".linear");
-+            } else {
-+                path1 = path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + ".mca");
-+            }
++            Path path1 = switch (this.format) {
++                case "LINEAR" -> path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + ".linear");
++                default -> path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + ".mca");
++            };
 +            // Kaiiju end
              if (existingOnly && !java.nio.file.Files.exists(path1)) return null; // CraftBukkit
 -            RegionFile regionfile1 = new RegionFile(path1, this.folder, this.sync, this.isChunkData); // Paper - allow for chunk regionfiles to regen header
-+            dev.kaiijumc.kaiiju.region.AbstractRegionFile regionfile1 = dev.kaiijumc.kaiiju.region.AbstractRegionFileFactory.getAbstractRegionFile(path1, this.folder, this.sync, this.isChunkData); // Paper - allow for chunk regionfiles to regen header // Kaiiju
++            dev.kaiijumc.kaiiju.region.AbstractRegionFile regionfile1 = dev.kaiijumc.kaiiju.region.AbstractRegionFileFactory.getAbstractRegionFile(this.linearCompression, path1, this.folder, this.sync, this.isChunkData); // Paper - allow for chunk regionfiles to regen header // Kaiiju
  
              this.regionCache.putAndMoveToFirst(i, regionfile1);
              // Paper start
@@ -807,7 +961,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..37242c6225795271e0ba6a853252f2da
              }
              // Paper end
              return regionfile1;
-@@ -132,7 +149,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -132,7 +146,7 @@ public class RegionFileStorage implements AutoCloseable {
      }
  
  
@@ -816,7 +970,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..37242c6225795271e0ba6a853252f2da
          synchronized (regionfile) {
              try (DataInputStream datainputstream = regionfile.getChunkDataInputStream(chunkCoordinate)) {
                  CompoundTag oversizedData = regionfile.getOversizedData(chunkCoordinate.x, chunkCoordinate.z);
-@@ -179,14 +196,14 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -179,14 +193,14 @@ public class RegionFileStorage implements AutoCloseable {
      @Nullable
      public CompoundTag read(ChunkPos pos) throws IOException {
          // CraftBukkit start - SPIGOT-5680: There's no good reason to preemptively create files on read, save that for writing
@@ -833,7 +987,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..37242c6225795271e0ba6a853252f2da
          // We add the regionfile parameter to avoid the potential deadlock (on fileLock) if we went back to obtain a regionfile
          // if we decide to re-read
          // Paper end
-@@ -196,7 +213,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -196,7 +210,7 @@ public class RegionFileStorage implements AutoCloseable {
  
          // Paper start
          if (regionfile.isOversized(pos.x, pos.z)) {
@@ -842,7 +996,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..37242c6225795271e0ba6a853252f2da
              return readOversizedChunk(regionfile, pos);
          }
          // Paper end
-@@ -210,12 +227,12 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -210,12 +224,12 @@ public class RegionFileStorage implements AutoCloseable {
                      if (this.isChunkData) {
                          ChunkPos chunkPos = ChunkSerializer.getChunkCoordinate(nbttagcompound);
                          if (!chunkPos.equals(pos)) {
@@ -858,7 +1012,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..37242c6225795271e0ba6a853252f2da
                              return null;
                          }
                      }
-@@ -249,13 +266,13 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -249,13 +263,13 @@ public class RegionFileStorage implements AutoCloseable {
  
          return nbttagcompound;
          } finally { // Paper start
@@ -874,7 +1028,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..37242c6225795271e0ba6a853252f2da
          if (regionfile == null) {
              return;
          }
-@@ -285,7 +302,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -285,7 +299,7 @@ public class RegionFileStorage implements AutoCloseable {
      }
  
      protected void write(ChunkPos pos, @Nullable CompoundTag nbt) throws IOException {
@@ -883,7 +1037,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..37242c6225795271e0ba6a853252f2da
          if (nbt == null && regionfile == null) {
              return;
          }
-@@ -335,7 +352,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -335,7 +349,7 @@ public class RegionFileStorage implements AutoCloseable {
          }
          // Paper end
          } finally { // Paper start
@@ -892,7 +1046,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..37242c6225795271e0ba6a853252f2da
          } // Paper end
      }
  
-@@ -344,7 +361,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -344,7 +358,7 @@ public class RegionFileStorage implements AutoCloseable {
          ObjectIterator objectiterator = this.regionCache.values().iterator();
  
          while (objectiterator.hasNext()) {
@@ -901,7 +1055,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..37242c6225795271e0ba6a853252f2da
  
              try {
                  regionfile.close();
-@@ -360,7 +377,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -360,7 +374,7 @@ public class RegionFileStorage implements AutoCloseable {
          ObjectIterator objectiterator = this.regionCache.values().iterator();
  
          while (objectiterator.hasNext()) {
@@ -910,6 +1064,21 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..37242c6225795271e0ba6a853252f2da
  
              regionfile.flush();
          }
+diff --git a/src/main/java/net/minecraft/world/level/chunk/storage/SectionStorage.java b/src/main/java/net/minecraft/world/level/chunk/storage/SectionStorage.java
+index d783072bc964e45c308197e6f79874eb4a09f871..261613054a4ba0e78ad1aec819d743eaaae01cf2 100644
+--- a/src/main/java/net/minecraft/world/level/chunk/storage/SectionStorage.java
++++ b/src/main/java/net/minecraft/world/level/chunk/storage/SectionStorage.java
+@@ -47,8 +47,8 @@ public class SectionStorage<R> extends RegionFileStorage implements AutoCloseabl
+     public final RegistryAccess registryAccess; // Paper - rewrite chunk system
+     protected final LevelHeightAccessor levelHeightAccessor;
+ 
+-    public SectionStorage(Path path, Function<Runnable, Codec<R>> codecFactory, Function<Runnable, R> factory, DataFixer dataFixer, DataFixTypes dataFixTypes, boolean dsync, RegistryAccess dynamicRegistryManager, LevelHeightAccessor world) {
+-        super(path, dsync); // Paper - remove mojang I/O thread
++    public SectionStorage(String format, int linearCompression, Path path, Function<Runnable, Codec<R>> codecFactory, Function<Runnable, R> factory, DataFixer dataFixer, DataFixTypes dataFixTypes, boolean dsync, RegistryAccess dynamicRegistryManager, LevelHeightAccessor world) { // Kaiiju
++        super(format, linearCompression, path, dsync); // Paper - remove mojang I/O thread // Kaiiju
+         this.codec = codecFactory;
+         this.factory = factory;
+         this.fixerUpper = dataFixer;
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 index 9b5323edd99848b73ea0e34230e7bec8dc23be8c..619c7713d573e8f438ea23a3fcb185a98abf5100 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java

@@ -7,11 +7,11 @@ Inspired by "Lobotomized animals" by @KioProject123
 Checks might be a nuisance to performance.
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index ac4440f8d2bd30e3e074ef797d5138b64996fcbb..d28f05943ef25aad1d5a0d4d3f72b991a3caaa5f 100644
+index 6e17f49999da4cd6d690b38e3541223050d126b2..d82be030b164fd05c402ad8cebab1e863e92517d 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-@@ -123,6 +123,17 @@ public class KaiijuWorldConfig {
-         return value.isEmpty() ? fallback : value;
+@@ -142,6 +142,17 @@ public class KaiijuWorldConfig {
+         }
      }
  
 +    public boolean lobotomizeAnimalEnabled = false;
@@ -28,6 +28,7 @@ index ac4440f8d2bd30e3e074ef797d5138b64996fcbb..d28f05943ef25aad1d5a0d4d3f72b991
 +        lobotomizeAnimalFloat = getBoolean("lobotomize.animal.float", lobotomizeAnimalFloat);
      }
  }
+\ No newline at end of file
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/entity/Lobotomized.java b/src/main/java/dev/kaiijumc/kaiiju/entity/Lobotomized.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..805df3e27cfbbdf3525c96942afca12d50abc350

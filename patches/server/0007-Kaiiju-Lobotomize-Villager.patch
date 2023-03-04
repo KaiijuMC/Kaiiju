@@ -5,10 +5,10 @@ Subject: [PATCH] Kaiiju Lobotomize Villager
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index d28f05943ef25aad1d5a0d4d3f72b991a3caaa5f..af0db4449ae7b3b12cc3351f94878ef68edb21bc 100644
+index d82be030b164fd05c402ad8cebab1e863e92517d..96184639559618609e11b1428017a610fac2da14 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-@@ -128,6 +128,13 @@ public class KaiijuWorldConfig {
+@@ -147,6 +147,13 @@ public class KaiijuWorldConfig {
      public boolean lobotomizeAnimalCheckCanJump = true;
      public boolean lobotomizeAnimalLookAtPlayer = false;
      public boolean lobotomizeAnimalFloat = true;
@@ -22,7 +22,7 @@ index d28f05943ef25aad1d5a0d4d3f72b991a3caaa5f..af0db4449ae7b3b12cc3351f94878ef6
  
      private void lobotomizeSettings() {
          lobotomizeAnimalEnabled = getBoolean("lobotomize.animal.enabled", lobotomizeAnimalEnabled);
-@@ -135,5 +142,12 @@ public class KaiijuWorldConfig {
+@@ -154,5 +161,12 @@ public class KaiijuWorldConfig {
          lobotomizeAnimalCheckCanJump = getBoolean("lobotomize.animal.check-can-jump", lobotomizeAnimalCheckCanJump);
          lobotomizeAnimalLookAtPlayer = getBoolean("lobotomize.animal.look-at-player", lobotomizeAnimalLookAtPlayer);
          lobotomizeAnimalFloat = getBoolean("lobotomize.animal.float", lobotomizeAnimalFloat);
@@ -35,6 +35,7 @@ index d28f05943ef25aad1d5a0d4d3f72b991a3caaa5f..af0db4449ae7b3b12cc3351f94878ef6
 +        lobotomizeVillagerCheckBedNearby = getBoolean("lobotomize.villager.check-bed-nearby", lobotomizeVillagerCheckBedNearby);
      }
  }
+\ No newline at end of file
 diff --git a/src/main/java/net/minecraft/world/entity/npc/Villager.java b/src/main/java/net/minecraft/world/entity/npc/Villager.java
 index aed1d9ccffe471b6c2a1d52d2d3d097f6431318b..f1a66bda9949eff5f8e420d28d23f47aec3d4587 100644
 --- a/src/main/java/net/minecraft/world/entity/npc/Villager.java
