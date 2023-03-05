@@ -5,16 +5,15 @@ Subject: [PATCH] Kaiiju Lobotomize Configuration
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index dd4c3ca77acb3aeefc69b8eb948b8b202ff87a19..ac4440f8d2bd30e3e074ef797d5138b64996fcbb 100644
+index b194f4dbebcbbf5bb4e026a0169e2d24806b46ec..907fdfb368c87bfe7b4374bb0b5f49d5ff095339 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-@@ -122,4 +122,7 @@ public class KaiijuWorldConfig {
-         final Map<String, Object> value = getMap("world-settings." + worldName + "." + path, null);
-         return value.isEmpty() ? fallback : value;
+@@ -143,4 +143,7 @@ public class KaiijuWorldConfig {
+             regionFormatLinearCompressionLevel = 1;
+         }
      }
--}
-\ No newline at end of file
 +
 +    private void lobotomizeSettings() {
 +    }
-+}
+ }
+\ No newline at end of file

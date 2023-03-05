@@ -17,6 +17,11 @@
 - **Xymb Linear Format**: Saves about 50% of disk space in OW and Nether and 95% in The End.
 - **Lobotomize**: Lobotomize mobs and villagers without breaking vanilla mechanics.
 
+### Roadmap
+- **Lithium**: Full implementation of Lithium.
+- **C2ME**: Full implementation of C2ME.
+- **VMP**: Full implementation of VMP.
+
 ## Building
 In order to distribute and use this server software, you need a paperclip file:
 
