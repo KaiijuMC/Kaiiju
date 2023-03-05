@@ -37,76 +37,6 @@ index f2c27e0ac65be4b75c1d86ef6fd45fdb538d96ac..00724993d0448454d14a47652b039b88
  
          public static final class InProgressWrite {
              public long writeCounter;
-diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 09fb7dcc56d5e266c8a1719c696653f644e0cfc1..e245178e510a4229860120ced945146a8a21cc32 100644
---- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-+++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -15,7 +15,6 @@ import java.io.IOException;
- import java.lang.reflect.InvocationTargetException;
- import java.lang.reflect.Method;
- import java.lang.reflect.Modifier;
--import java.util.Arrays;
- import java.util.HashMap;
- import java.util.List;
- import java.util.Map;
-@@ -192,16 +191,4 @@ public class KaiijuConfig {
-         }
-         return builder.build();
-     }
--
--    public static List<String> regionFormatList = Arrays.asList("ANVIL");
--    public static String regionFormatName = "ANVIL";
--
--    private static void regionFormatSettings() {
--        regionFormatName = getString("region-format.format", regionFormatName).toUpperCase();
--        if (!regionFormatList.contains(regionFormatName)) {
--            Bukkit.getLogger().log(Level.SEVERE, "Unknown region format in kaiiju.yml: " + regionFormatName);
--            Bukkit.getLogger().log(Level.SEVERE, "Falling back to ANVIL region file format.");
--            regionFormatName = "ANVIL";
--        }
--    }
- }
-diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index dd4c3ca77acb3aeefc69b8eb948b8b202ff87a19..e77b6d86f651dc93f5c9dc28eda1e00a6af7ac8d 100644
---- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-+++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-@@ -4,9 +4,9 @@ import org.apache.commons.lang.BooleanUtils;
- import org.bukkit.World;
- import org.bukkit.configuration.ConfigurationSection;
- 
--import java.util.List;
-+import java.util.Arrays;import java.util.List;
- import java.util.Map;
--import java.util.function.Predicate;
-+import java.util.function.Predicate;import java.util.logging.Level;
- 
- import static dev.kaiijumc.kaiiju.KaiijuConfig.log;
- 
-@@ -122,4 +122,23 @@ public class KaiijuWorldConfig {
-         final Map<String, Object> value = getMap("world-settings." + worldName + "." + path, null);
-         return value.isEmpty() ? fallback : value;
-     }
-+
-+    public List<String> regionFormatList = Arrays.asList("ANVIL", "LINEAR");
-+    public String regionFormatName = "ANVIL";
-+    public int regionFormatLinearCompressionLevel = 1;
-+
-+    private void regionFormatSettings() {
-+        regionFormatName = getString("region-format.format", regionFormatName).toUpperCase();
-+        if (!regionFormatList.contains(regionFormatName)) {
-+            log(Level.SEVERE, "Unknown region format in kaiiju.yml: " + regionFormatName);
-+            log(Level.SEVERE, "Falling back to ANVIL region file format.");
-+            regionFormatName = "ANVIL";
-+        }
-+        regionFormatLinearCompressionLevel = getInt("region-format.linear.compression-level", regionFormatLinearCompressionLevel);
-+        if (regionFormatLinearCompressionLevel > 23 || regionFormatLinearCompressionLevel < 1) {
-+            log(Level.SEVERE, "Linear region compression level should be between 1 and 22 in kaiiju.yml: " + regionFormatLinearCompressionLevel);
-+            log(Level.SEVERE, "Falling back to compression level 1.");
-+            regionFormatLinearCompressionLevel = 1;
-+        }
-+    }
- }
-\ No newline at end of file
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/region/AbstractRegionFile.java b/src/main/java/dev/kaiijumc/kaiiju/region/AbstractRegionFile.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..249303116d3cfadd078ebf0ae6e44bf99eed6a47
@@ -853,7 +783,7 @@ index dcfe090c269d4cbcc2eb1b6f85392848bb34656c..d42c320179ae055b8675d1ce6ce1788e
          try (DataInputStream out = new DataInputStream(new java.io.BufferedInputStream(new InflaterInputStream(Files.newInputStream(file))))) {
              return NbtIo.read((java.io.DataInput) out);
 diff --git a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
-index bd502ca721de0cab438d995efa00ad0554c0d2fe..f69a0cf400c8b6dd9bd9199586e790583ac0e240 100644
+index bd502ca721de0cab438d995efa00ad0554c0d2fe..ee4005cd62da567d5701d59ddceb212f65a2188d 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 @@ -22,17 +22,25 @@ public class RegionFileStorage implements AutoCloseable {
@@ -895,7 +825,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..f69a0cf400c8b6dd9bd9199586e79058
              return null;
          }
  
-@@ -62,49 +70,55 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -62,49 +70,66 @@ public class RegionFileStorage implements AutoCloseable {
          }
      }
  
@@ -941,15 +871,27 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..f69a0cf400c8b6dd9bd9199586e79058
              Path path = this.folder;
              int j = chunkcoordintpair.getRegionX();
 -            Path path1 = path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + ".mca"); // Paper - diff on change
-+            //Path path1 = path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + ".mca"); // Paper - diff on change // Kaiiju
-+            // Kaiiju start
-+            Path path1 = switch (this.format) {
-+                case "LINEAR" -> path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + ".linear");
-+                default -> path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + ".mca");
-+            };
-+            // Kaiiju end
-             if (existingOnly && !java.nio.file.Files.exists(path1)) return null; // CraftBukkit
+-            if (existingOnly && !java.nio.file.Files.exists(path1)) return null; // CraftBukkit
 -            RegionFile regionfile1 = new RegionFile(path1, this.folder, this.sync, this.isChunkData); // Paper - allow for chunk regionfiles to regen header
++            // Kaiiju start - Polyglot
++            //Path path1 = path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + ".mca"); // Paper - diff on change
++            Path path1;
++            if (existingOnly) {
++                Path anvil = path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + ".mca");
++                Path linear = path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + ".linear");
++                if (java.nio.file.Files.exists(anvil)) path1 = anvil;
++                else if (java.nio.file.Files.exists(linear)) path1 = linear;
++                else return null;
++            } else {
++                String extension = switch (this.format) {
++                    case "LINEAR" -> "linear";
++                    default -> "mca";
++                };
++                path1 = path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + "." + extension);
++            }
++            //if (existingOnly && !java.nio.file.Files.exists(path1)) return null; // CraftBukkit
++            // Kaiiju end
++
 +            dev.kaiijumc.kaiiju.region.AbstractRegionFile regionfile1 = dev.kaiijumc.kaiiju.region.AbstractRegionFileFactory.getAbstractRegionFile(this.linearCompression, path1, this.folder, this.sync, this.isChunkData); // Paper - allow for chunk regionfiles to regen header // Kaiiju
  
              this.regionCache.putAndMoveToFirst(i, regionfile1);
@@ -961,7 +903,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..f69a0cf400c8b6dd9bd9199586e79058
              }
              // Paper end
              return regionfile1;
-@@ -132,7 +146,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -132,7 +157,7 @@ public class RegionFileStorage implements AutoCloseable {
      }
  
  
@@ -970,7 +912,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..f69a0cf400c8b6dd9bd9199586e79058
          synchronized (regionfile) {
              try (DataInputStream datainputstream = regionfile.getChunkDataInputStream(chunkCoordinate)) {
                  CompoundTag oversizedData = regionfile.getOversizedData(chunkCoordinate.x, chunkCoordinate.z);
-@@ -179,14 +193,14 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -179,14 +204,14 @@ public class RegionFileStorage implements AutoCloseable {
      @Nullable
      public CompoundTag read(ChunkPos pos) throws IOException {
          // CraftBukkit start - SPIGOT-5680: There's no good reason to preemptively create files on read, save that for writing
@@ -987,7 +929,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..f69a0cf400c8b6dd9bd9199586e79058
          // We add the regionfile parameter to avoid the potential deadlock (on fileLock) if we went back to obtain a regionfile
          // if we decide to re-read
          // Paper end
-@@ -196,7 +210,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -196,7 +221,7 @@ public class RegionFileStorage implements AutoCloseable {
  
          // Paper start
          if (regionfile.isOversized(pos.x, pos.z)) {
@@ -996,7 +938,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..f69a0cf400c8b6dd9bd9199586e79058
              return readOversizedChunk(regionfile, pos);
          }
          // Paper end
-@@ -210,12 +224,12 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -210,12 +235,12 @@ public class RegionFileStorage implements AutoCloseable {
                      if (this.isChunkData) {
                          ChunkPos chunkPos = ChunkSerializer.getChunkCoordinate(nbttagcompound);
                          if (!chunkPos.equals(pos)) {
@@ -1012,7 +954,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..f69a0cf400c8b6dd9bd9199586e79058
                              return null;
                          }
                      }
-@@ -249,13 +263,13 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -249,13 +274,13 @@ public class RegionFileStorage implements AutoCloseable {
  
          return nbttagcompound;
          } finally { // Paper start
@@ -1028,7 +970,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..f69a0cf400c8b6dd9bd9199586e79058
          if (regionfile == null) {
              return;
          }
-@@ -285,7 +299,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -285,7 +310,7 @@ public class RegionFileStorage implements AutoCloseable {
      }
  
      protected void write(ChunkPos pos, @Nullable CompoundTag nbt) throws IOException {
@@ -1037,7 +979,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..f69a0cf400c8b6dd9bd9199586e79058
          if (nbt == null && regionfile == null) {
              return;
          }
-@@ -335,7 +349,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -335,7 +360,7 @@ public class RegionFileStorage implements AutoCloseable {
          }
          // Paper end
          } finally { // Paper start
@@ -1046,7 +988,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..f69a0cf400c8b6dd9bd9199586e79058
          } // Paper end
      }
  
-@@ -344,7 +358,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -344,7 +369,7 @@ public class RegionFileStorage implements AutoCloseable {
          ObjectIterator objectiterator = this.regionCache.values().iterator();
  
          while (objectiterator.hasNext()) {
@@ -1055,7 +997,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..f69a0cf400c8b6dd9bd9199586e79058
  
              try {
                  regionfile.close();
-@@ -360,7 +374,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -360,7 +385,7 @@ public class RegionFileStorage implements AutoCloseable {
          ObjectIterator objectiterator = this.regionCache.values().iterator();
  
          while (objectiterator.hasNext()) {

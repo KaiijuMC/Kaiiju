@@ -5,10 +5,10 @@ Subject: [PATCH] Kaiiju Network Configuration
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index e245178e510a4229860120ced945146a8a21cc32..1449a8f73f3f4766cebb99c33df9a8b77f5d3994 100644
+index 7da7e0aeb5eac9ac73a3570e716f1ceb11fd7027..2791fe6cc78cc13d969a903134c08e992a6ecdca 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -191,4 +191,7 @@ public class KaiijuConfig {
+@@ -192,4 +192,7 @@ public class KaiijuConfig {
          }
          return builder.build();
      }

@@ -5,10 +5,10 @@ Subject: [PATCH] Purpur Network Send Null Entity Packets
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 1449a8f73f3f4766cebb99c33df9a8b77f5d3994..fe4f8647558ea58a521eff2a693060598c82a88c 100644
+index 2791fe6cc78cc13d969a903134c08e992a6ecdca..276c0e2936dfd3ca752deb65c80565c477f65e7f 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -192,6 +192,8 @@ public class KaiijuConfig {
+@@ -193,6 +193,8 @@ public class KaiijuConfig {
          return builder.build();
      }
  

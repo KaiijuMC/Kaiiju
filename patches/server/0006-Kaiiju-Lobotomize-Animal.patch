@@ -7,10 +7,10 @@ Inspired by "Lobotomized animals" by @KioProject123
 Checks might be a nuisance to performance.
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index 6e17f49999da4cd6d690b38e3541223050d126b2..d82be030b164fd05c402ad8cebab1e863e92517d 100644
+index 907fdfb368c87bfe7b4374bb0b5f49d5ff095339..b99b438b92587f23c77c5321d5d23e76dc5450de 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-@@ -142,6 +142,17 @@ public class KaiijuWorldConfig {
+@@ -144,6 +144,17 @@ public class KaiijuWorldConfig {
          }
      }
  
