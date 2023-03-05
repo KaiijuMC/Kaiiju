@@ -5,10 +5,10 @@ Subject: [PATCH] Kaiiju Lithium Configuration
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index ea963a1d75c11e0e01b04adaea261a63b7a9a430..0f214dc5f4c585911953c4aaaa54cf43f340e4eb 100644
+index 276c0e2936dfd3ca752deb65c80565c477f65e7f..98c11996a4f052e4e8f1b2782e214817a7999677 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -216,4 +216,9 @@ public class KaiijuConfig {
+@@ -197,4 +197,9 @@ public class KaiijuConfig {
      private static void networkSettings() {
          sendNullEntityPackets = getBoolean("network.send-null-entity-packets", sendNullEntityPackets);
      }
