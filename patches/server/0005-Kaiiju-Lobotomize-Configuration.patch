@@ -5,10 +5,10 @@ Subject: [PATCH] Kaiiju Lobotomize Configuration
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index b194f4dbebcbbf5bb4e026a0169e2d24806b46ec..907fdfb368c87bfe7b4374bb0b5f49d5ff095339 100644
+index 1b180af49adee16c2d8305d01cf213322c4d721b..daa81b36696e82ba7bbd6eefd746362d7c2ba2f1 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-@@ -143,4 +143,7 @@ public class KaiijuWorldConfig {
+@@ -150,4 +150,7 @@ public class KaiijuWorldConfig {
              regionFormatLinearCompressionLevel = 1;
          }
      }

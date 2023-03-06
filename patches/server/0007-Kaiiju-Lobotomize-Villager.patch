@@ -5,10 +5,10 @@ Subject: [PATCH] Kaiiju Lobotomize Villager
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index b99b438b92587f23c77c5321d5d23e76dc5450de..104f19cced8fb3b692e3a4772360d9eba3bdd6f2 100644
+index f4af17136437cff7052827b027e3d2a75801b6eb..fc715266abdd604bf6c2403b758dcd22440adcbe 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-@@ -149,6 +149,13 @@ public class KaiijuWorldConfig {
+@@ -156,6 +156,13 @@ public class KaiijuWorldConfig {
      public boolean lobotomizeAnimalCheckCanJump = true;
      public boolean lobotomizeAnimalLookAtPlayer = false;
      public boolean lobotomizeAnimalFloat = true;
@@ -22,7 +22,7 @@ index b99b438b92587f23c77c5321d5d23e76dc5450de..104f19cced8fb3b692e3a4772360d9eb
  
      private void lobotomizeSettings() {
          lobotomizeAnimalEnabled = getBoolean("lobotomize.animal.enabled", lobotomizeAnimalEnabled);
-@@ -156,5 +163,12 @@ public class KaiijuWorldConfig {
+@@ -163,5 +170,12 @@ public class KaiijuWorldConfig {
          lobotomizeAnimalCheckCanJump = getBoolean("lobotomize.animal.check-can-jump", lobotomizeAnimalCheckCanJump);
          lobotomizeAnimalLookAtPlayer = getBoolean("lobotomize.animal.look-at-player", lobotomizeAnimalLookAtPlayer);
          lobotomizeAnimalFloat = getBoolean("lobotomize.animal.float", lobotomizeAnimalFloat);

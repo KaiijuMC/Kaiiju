@@ -5,7 +5,7 @@ Subject: [PATCH] Kaiiju RegionFormat Configuration
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index dd4c3ca77acb3aeefc69b8eb948b8b202ff87a19..b194f4dbebcbbf5bb4e026a0169e2d24806b46ec 100644
+index dd4c3ca77acb3aeefc69b8eb948b8b202ff87a19..1b180af49adee16c2d8305d01cf213322c4d721b 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 @@ -4,9 +4,11 @@ import org.apache.commons.lang.BooleanUtils;
@@ -20,7 +20,7 @@ index dd4c3ca77acb3aeefc69b8eb948b8b202ff87a19..b194f4dbebcbbf5bb4e026a0169e2d24
  
  import static dev.kaiijumc.kaiiju.KaiijuConfig.log;
  
-@@ -122,4 +124,23 @@ public class KaiijuWorldConfig {
+@@ -122,4 +124,30 @@ public class KaiijuWorldConfig {
          final Map<String, Object> value = getMap("world-settings." + worldName + "." + path, null);
          return value.isEmpty() ? fallback : value;
      }
@@ -28,6 +28,7 @@ index dd4c3ca77acb3aeefc69b8eb948b8b202ff87a19..b194f4dbebcbbf5bb4e026a0169e2d24
 +    public List<String> regionFormatList = Arrays.asList("ANVIL", "LINEAR");
 +    public String regionFormatName = "ANVIL";
 +    public int regionFormatLinearCompressionLevel = 1;
++    public int regionFormatLinearInternalCompressionLevel = 1;
 +
 +    private void regionFormatSettings() {
 +        regionFormatName = getString("region-format.format", regionFormatName).toUpperCase();
@@ -37,7 +38,13 @@ index dd4c3ca77acb3aeefc69b8eb948b8b202ff87a19..b194f4dbebcbbf5bb4e026a0169e2d24
 +            regionFormatName = "ANVIL";
 +        }
 +        regionFormatLinearCompressionLevel = getInt("region-format.linear.compression-level", regionFormatLinearCompressionLevel);
++        regionFormatLinearInternalCompressionLevel = getInt("region-format.linear.internal-compression-level", regionFormatLinearInternalCompressionLevel);
 +        if (regionFormatLinearCompressionLevel > 23 || regionFormatLinearCompressionLevel < 1) {
++            log(Level.SEVERE, "Linear region compression level should be between 1 and 22 in kaiiju.yml: " + regionFormatLinearCompressionLevel);
++            log(Level.SEVERE, "Falling back to compression level 1.");
++            regionFormatLinearCompressionLevel = 1;
++        }
++        if (regionFormatLinearInternalCompressionLevel > 23 || regionFormatLinearInternalCompressionLevel < 1) {
 +            log(Level.SEVERE, "Linear region compression level should be between 1 and 22 in kaiiju.yml: " + regionFormatLinearCompressionLevel);
 +            log(Level.SEVERE, "Falling back to compression level 1.");
 +            regionFormatLinearCompressionLevel = 1;
@@ -46,7 +53,7 @@ index dd4c3ca77acb3aeefc69b8eb948b8b202ff87a19..b194f4dbebcbbf5bb4e026a0169e2d24
  }
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 40b4bd2f1a61c2d9a59c9c09b72713401969460b..b9998c288c4e8b6a244722915e44250b6550fd7e 100644
+index c1b88ae704b3d2b8ebbad28c0291a4ad12e6d5d9..ae4dd7db4e4e32fe8100309d770307fccf31110d 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -855,7 +855,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
