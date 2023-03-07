@@ -754,7 +754,7 @@ index dcfe090c269d4cbcc2eb1b6f85392848bb34656c..d42c320179ae055b8675d1ce6ce1788e
          try (DataInputStream out = new DataInputStream(new java.io.BufferedInputStream(new InflaterInputStream(Files.newInputStream(file))))) {
              return NbtIo.read((java.io.DataInput) out);
 diff --git a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
-index bd502ca721de0cab438d995efa00ad0554c0d2fe..ee4005cd62da567d5701d59ddceb212f65a2188d 100644
+index bd502ca721de0cab438d995efa00ad0554c0d2fe..04420204eef868d35491b61e95c04d6d2ce3cbad 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 @@ -22,17 +22,25 @@ public class RegionFileStorage implements AutoCloseable {
@@ -796,7 +796,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..ee4005cd62da567d5701d59ddceb212f
              return null;
          }
  
-@@ -62,49 +70,66 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -62,49 +70,68 @@ public class RegionFileStorage implements AutoCloseable {
          }
      }
  
@@ -860,6 +860,8 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..ee4005cd62da567d5701d59ddceb212f
 +                };
 +                path1 = path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + "." + extension);
 +            }
++            if (dev.kaiijumc.kaiiju.KaiijuConfig.regionFormatDebug)
++                org.bukkit.Bukkit.getLogger().info("[Region File Storage] Opening file " + path1 + " with format " + this.format + " (existingOnly = " + existingOnly + " )");
 +            //if (existingOnly && !java.nio.file.Files.exists(path1)) return null; // CraftBukkit
 +            // Kaiiju end
 +
@@ -874,7 +876,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..ee4005cd62da567d5701d59ddceb212f
              }
              // Paper end
              return regionfile1;
-@@ -132,7 +157,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -132,7 +159,7 @@ public class RegionFileStorage implements AutoCloseable {
      }
  
  
@@ -883,7 +885,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..ee4005cd62da567d5701d59ddceb212f
          synchronized (regionfile) {
              try (DataInputStream datainputstream = regionfile.getChunkDataInputStream(chunkCoordinate)) {
                  CompoundTag oversizedData = regionfile.getOversizedData(chunkCoordinate.x, chunkCoordinate.z);
-@@ -179,14 +204,14 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -179,14 +206,14 @@ public class RegionFileStorage implements AutoCloseable {
      @Nullable
      public CompoundTag read(ChunkPos pos) throws IOException {
          // CraftBukkit start - SPIGOT-5680: There's no good reason to preemptively create files on read, save that for writing
@@ -900,7 +902,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..ee4005cd62da567d5701d59ddceb212f
          // We add the regionfile parameter to avoid the potential deadlock (on fileLock) if we went back to obtain a regionfile
          // if we decide to re-read
          // Paper end
-@@ -196,7 +221,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -196,7 +223,7 @@ public class RegionFileStorage implements AutoCloseable {
  
          // Paper start
          if (regionfile.isOversized(pos.x, pos.z)) {
@@ -909,7 +911,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..ee4005cd62da567d5701d59ddceb212f
              return readOversizedChunk(regionfile, pos);
          }
          // Paper end
-@@ -210,12 +235,12 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -210,12 +237,12 @@ public class RegionFileStorage implements AutoCloseable {
                      if (this.isChunkData) {
                          ChunkPos chunkPos = ChunkSerializer.getChunkCoordinate(nbttagcompound);
                          if (!chunkPos.equals(pos)) {
@@ -925,7 +927,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..ee4005cd62da567d5701d59ddceb212f
                              return null;
                          }
                      }
-@@ -249,13 +274,13 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -249,13 +276,13 @@ public class RegionFileStorage implements AutoCloseable {
  
          return nbttagcompound;
          } finally { // Paper start
@@ -941,7 +943,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..ee4005cd62da567d5701d59ddceb212f
          if (regionfile == null) {
              return;
          }
-@@ -285,7 +310,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -285,7 +312,7 @@ public class RegionFileStorage implements AutoCloseable {
      }
  
      protected void write(ChunkPos pos, @Nullable CompoundTag nbt) throws IOException {
@@ -950,7 +952,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..ee4005cd62da567d5701d59ddceb212f
          if (nbt == null && regionfile == null) {
              return;
          }
-@@ -335,7 +360,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -335,7 +362,7 @@ public class RegionFileStorage implements AutoCloseable {
          }
          // Paper end
          } finally { // Paper start
@@ -959,7 +961,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..ee4005cd62da567d5701d59ddceb212f
          } // Paper end
      }
  
-@@ -344,7 +369,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -344,7 +371,7 @@ public class RegionFileStorage implements AutoCloseable {
          ObjectIterator objectiterator = this.regionCache.values().iterator();
  
          while (objectiterator.hasNext()) {
@@ -968,7 +970,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..ee4005cd62da567d5701d59ddceb212f
  
              try {
                  regionfile.close();
-@@ -360,7 +385,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -360,7 +387,7 @@ public class RegionFileStorage implements AutoCloseable {
          ObjectIterator objectiterator = this.regionCache.values().iterator();
  
          while (objectiterator.hasNext()) {

@@ -4,6 +4,21 @@ Date: Fri, 10 Feb 2023 20:03:58 +0200
 Subject: [PATCH] Kaiiju RegionFormat Configuration
 
 
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+index 7da7e0aeb5eac9ac73a3570e716f1ceb11fd7027..b86c90cc3601e666998cfa12f44515f605bb53eb 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+@@ -192,4 +192,10 @@ public class KaiijuConfig {
+         }
+         return builder.build();
+     }
++
++    public static boolean regionFormatDebug = false;
++
++    private static void regionFormatSettings() {
++        regionFormatDebug = getBoolean("region-format.debug", regionFormatDebug);
++    }
+ }
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 index dd4c3ca77acb3aeefc69b8eb948b8b202ff87a19..b194f4dbebcbbf5bb4e026a0169e2d24806b46ec 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
@@ -46,7 +61,7 @@ index dd4c3ca77acb3aeefc69b8eb948b8b202ff87a19..b194f4dbebcbbf5bb4e026a0169e2d24
  }
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 40b4bd2f1a61c2d9a59c9c09b72713401969460b..b9998c288c4e8b6a244722915e44250b6550fd7e 100644
+index c1b88ae704b3d2b8ebbad28c0291a4ad12e6d5d9..ae4dd7db4e4e32fe8100309d770307fccf31110d 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -855,7 +855,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa

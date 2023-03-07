@@ -5,14 +5,16 @@ Subject: [PATCH] Purpur Network Send Null Entity Packets
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 2791fe6cc78cc13d969a903134c08e992a6ecdca..276c0e2936dfd3ca752deb65c80565c477f65e7f 100644
+index 7c6d43d8a360530344ef296f4477750c8a298607..ab08e11f13921163b8ff1ff51ff9e9b86d2b47c7 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -193,6 +193,8 @@ public class KaiijuConfig {
-         return builder.build();
+@@ -198,7 +198,10 @@ public class KaiijuConfig {
+     private static void regionFormatSettings() {
+         regionFormatDebug = getBoolean("region-format.debug", regionFormatDebug);
      }
- 
++    
 +    public static boolean sendNullEntityPackets = true;
+ 
      private static void networkSettings() {
 +        sendNullEntityPackets = getBoolean("network.send-null-entity-packets", sendNullEntityPackets);
      }
