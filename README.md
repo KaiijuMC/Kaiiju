@@ -2,8 +2,7 @@
 <div align="center">
   <img src="https://github.com/kugge/Kaiiju/blob/ver/1.19.3/logo.png?" width="32%" height="32%"/>
   <h1>Kaiiju</h1>
-  <h3>A Server Software Designed For Anarchy</h3>
-  <h4>❗ [ Warning ] Work in progress, contributions are welcome ❗</h4>
+  <h3>Designed for vanilla/anarchy servers</h3>
 
   [![License](https://img.shields.io/github/license/kugge/Kaiiju?style=for-the-badge&logo=github)](LICENSE)
   [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/kugge/Kaiiju/build.yml?style=for-the-badge)](https://github.com/kugge/Kaiiju/actions)
@@ -18,12 +17,11 @@
 - **Lobotomize**: Lobotomize mobs and villagers without breaking vanilla mechanics.
 
 ### Roadmap
-- **Lithium**: Full implementation of Lithium.
-- **C2ME**: Full implementation of C2ME.
-- **VMP**: Full implementation of VMP.
+- **Lithium**: Implementation of Lithium server mixins.
+- **C2ME**: Implementation of C2ME server mixins.
+- **VMP**: Implementation of VMP server mixins.
 
 ## Building
-In order to distribute and use this server software, you need a paperclip file:
 
 ```bash
 ./gradlew applyPatches # Apply Kaiiju patches
@@ -31,7 +29,6 @@ In order to distribute and use this server software, you need a paperclip file:
 ```
 
 ## License
-Patches are licensed under GPL-3.0.  
-All other files are licensed under MIT.
+Original patches are licensed under GPL-3.0.
 
 Made with <span style="color: #e25555;">&#9829;</span> on Earth.
