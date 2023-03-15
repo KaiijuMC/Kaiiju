@@ -5,7 +5,7 @@ Subject: [PATCH] Kaiiju Rebranding
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index f25c0557cf984b97e0ab361f579eccbf46f82170..7f1f4988a25a5ebac36c25c045c51eefecab6862 100644
+index 0435c1eb5c1fa6f9180ee8dc36a61afbac0f952e..e1cb77d8b5fdbd3f97a9e2f0c257d98db03d71ef 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -7,7 +7,7 @@ plugins {
@@ -17,7 +17,7 @@ index f25c0557cf984b97e0ab361f579eccbf46f82170..7f1f4988a25a5ebac36c25c045c51eef
      // Pufferfish start
      implementation("io.papermc.paper:paper-mojangapi:1.19.3-R0.1-SNAPSHOT") {
          exclude("io.papermc.paper", "paper-api")
-@@ -84,7 +84,7 @@ tasks.jar {
+@@ -85,7 +85,7 @@ tasks.jar {
          attributes(
              "Main-Class" to "org.bukkit.craftbukkit.Main",
              "Implementation-Title" to "CraftBukkit",
@@ -128,7 +128,7 @@ index b5b6657e52e4f7a630229bd3ba433438af293e22..afda0d4198398de29a62159fae701b22
          stringbuilder.append("// ");
          stringbuilder.append(CrashReport.getErrorComment());
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index cea4447aad2d64db56a76e4ba180dc7326d2e13b..40b4bd2f1a61c2d9a59c9c09b72713401969460b 100644
+index 1772800c123353207e3563a7e2c2b70431aec097..c1b88ae704b3d2b8ebbad28c0291a4ad12e6d5d9 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -927,7 +927,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -141,7 +141,7 @@ index cea4447aad2d64db56a76e4ba180dc7326d2e13b..40b4bd2f1a61c2d9a59c9c09b7271340
                  this.getRunningThread().stop();
                  try {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index c32e32005968b46d1f7d5162ab15c61e36f398f5..23f4edebbfa045716f956128703b58baced58f49 100644
+index 584596c8849b4dd7f955216f313eefb3229b375c..e9cc9ff401233f50279bbc622050fd0894968ae1 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -261,7 +261,7 @@ import javax.annotation.Nullable; // Paper
@@ -193,7 +193,7 @@ index fb87620c742ff7912f5e8ccd2a7930dd605576d9..0f56013165cd61023b4f30a4da424b70
  
          if (stream != null) {
 diff --git a/src/main/java/org/purpurmc/purpur/PurpurConfig.java b/src/main/java/org/purpurmc/purpur/PurpurConfig.java
-index c7c0ed8dfe58c841faf684a1fe228eeda6cd57b7..410ce2dc98c48871d2ddfb0195f2885adc18cba8 100644
+index 3e6d3b71931a18263eff11841cb4e916ba44e1b8..ac3178e66b97d3c521ea8926a3a167cb835f9d98 100644
 --- a/src/main/java/org/purpurmc/purpur/PurpurConfig.java
 +++ b/src/main/java/org/purpurmc/purpur/PurpurConfig.java
 @@ -227,7 +227,7 @@ public class PurpurConfig {
