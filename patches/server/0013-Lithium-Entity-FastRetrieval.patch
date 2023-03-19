@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: kugge <sofiane.djerbi38@gmail.com>
+Date: Fri, 17 Feb 2023 19:43:55 +0100
+Subject: [PATCH] Lithium Entity FastRetrieval
+
+
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+index 1fe1435b1cfe547ddbfccca01de580b8f0e59888..fd50b949135178a777abed362a0516591f5b9c98 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+@@ -208,9 +208,11 @@ public class KaiijuConfig {
+     public static boolean lithiumEnable = true;
+     public static boolean lithiumMathFastUtil = true;
+     public static boolean lithiumMathSineLut = true;
++    public static boolean lithiumEntityFastRetrieval = true;
+     private static void lithiumSettings() {
+         lithiumEnable = getBoolean("lithium.enable", lithiumEnable);
+         lithiumMathFastUtil = getBoolean("lithium.math.fast-util", lithiumMathFastUtil) && lithiumEnable;
+         lithiumMathSineLut = getBoolean("lithium.math.sine-lut", lithiumMathSineLut) && lithiumEnable;
++        lithiumEntityFastRetrieval = getBoolean("lithium.entity.fast-retrieval", lithiumEntityFastRetrieval) && lithiumEnable;
+     }
+ }
