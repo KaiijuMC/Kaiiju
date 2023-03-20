@@ -31,7 +31,7 @@ index 907fdfb368c87bfe7b4374bb0b5f49d5ff095339..b99b438b92587f23c77c5321d5d23e76
 \ No newline at end of file
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/entity/Lobotomized.java b/src/main/java/dev/kaiijumc/kaiiju/entity/Lobotomized.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..805df3e27cfbbdf3525c96942afca12d50abc350
+index 0000000000000000000000000000000000000000..14f085e75295882f52634622b40676295cd78d5f
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/entity/Lobotomized.java
 @@ -0,0 +1,73 @@
@@ -75,7 +75,7 @@ index 0000000000000000000000000000000000000000..805df3e27cfbbdf3525c96942afca12d
 +    }
 +
 +    private boolean canTravelFrom(LivingEntity entity, Level level, boolean ignoreTop) {
-+        BlockPos pos = new BlockPos(entity.getX(), entity.getY() + 0.5D, entity.getZ());
++        BlockPos pos = new BlockPos(entity.getBlockX(), (int) (entity.getY() + 0.5D), entity.getBlockZ());
 +        return canTravelTo(entity, pos.east(), level, ignoreTop)
 +            || canTravelTo(entity, pos.west(), level, ignoreTop)
 +            || canTravelTo(entity, pos.north(), level, ignoreTop)
@@ -103,7 +103,7 @@ index 0000000000000000000000000000000000000000..805df3e27cfbbdf3525c96942afca12d
 +    }
 +
 +    private boolean canJump(LivingEntity entity, Level level, boolean ignoreTop) {
-+        BlockPos pos = new BlockPos(entity.getX(), entity.getY() + 2.5D, entity.getZ());
++        BlockPos pos = new BlockPos(entity.getBlockX(), (int) (entity.getY() + 2.5D), entity.getBlockZ());
 +        net.minecraft.world.level.block.Block above = level.getBlockIfLoaded(pos);
 +        return !above.hasCollision;
 +    }

@@ -37,7 +37,7 @@ index b99b438b92587f23c77c5321d5d23e76dc5450de..104f19cced8fb3b692e3a4772360d9eb
  }
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/world/entity/npc/Villager.java b/src/main/java/net/minecraft/world/entity/npc/Villager.java
-index 9d19f6701acd9b5e430263347ee8a9925b9c49c2..e991edd36e339be55d43d459b28b2da5e5d5e1c4 100644
+index 9d19f6701acd9b5e430263347ee8a9925b9c49c2..9fce2f1a9621f6bd59b08747e48e7ab4852afde6 100644
 --- a/src/main/java/net/minecraft/world/entity/npc/Villager.java
 +++ b/src/main/java/net/minecraft/world/entity/npc/Villager.java
 @@ -198,14 +198,14 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
@@ -71,7 +71,7 @@ index 9d19f6701acd9b5e430263347ee8a9925b9c49c2..e991edd36e339be55d43d459b28b2da5
 +    private boolean needLobotomy() {
 +        if (this.isSleeping()) return false;
 +        if (this.level.kaiijuConfig.lobotomizeVillagerCheckOnBed && isOnBed()) return false;
-+        return !canTravelFrom(this.getBlockPosBelowThatAffectsMyMovement());
++        return !canTravelFrom(new BlockPos(this.getBlockX(), (int) (this.getY() + 0.5D), this.getBlockZ()));
 +    }
 +
 +    private boolean canInteractAt(BlockPos pos) {
@@ -99,13 +99,13 @@ index 9d19f6701acd9b5e430263347ee8a9925b9c49c2..e991edd36e339be55d43d459b28b2da5
 +    }
 +
 +    private boolean canJump() {
-+        BlockPos pos = new BlockPos(getX(), getY() + 2.5D, getZ());
++        BlockPos pos = new BlockPos(this.getBlockX(), (int) (this.getY() + 2.5D), this.getBlockZ());
 +        net.minecraft.world.level.block.Block above = this.level.getBlockIfLoaded(pos);
 +        return !above.hasCollision;
 +    }
 +
 +    private boolean isOnBed() {
-+        BlockPos pos = new BlockPos(getX(), getY() - 0.5D, getZ());
++        BlockPos pos = new BlockPos(this.getBlockX(), (int) (this.getY() - 0.5D), this.getBlockZ());
 +        net.minecraft.world.level.block.Block below = this.level.getBlockIfLoaded(pos);
 +        return isBed(below);
 +    }
