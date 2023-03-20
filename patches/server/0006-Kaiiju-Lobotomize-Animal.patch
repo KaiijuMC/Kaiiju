@@ -109,10 +109,10 @@ index 0000000000000000000000000000000000000000..805df3e27cfbbdf3525c96942afca12d
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/world/entity/LivingEntity.java b/src/main/java/net/minecraft/world/entity/LivingEntity.java
-index b2e4b5c463ceb19356da18e7fc52d20801b674cd..32ea0b1542ef374db3290e01978d7965715b9de6 100644
+index 70b52346a42daaa82a56d324ad3290971692da6d..978830d6d830deeaf1e300f060ec659de76ef5b3 100644
 --- a/src/main/java/net/minecraft/world/entity/LivingEntity.java
 +++ b/src/main/java/net/minecraft/world/entity/LivingEntity.java
-@@ -308,6 +308,8 @@ public abstract class LivingEntity extends Entity {
+@@ -304,6 +304,8 @@ public abstract class LivingEntity extends Entity implements Attackable {
          this.brain = this.makeBrain(new Dynamic(dynamicopsnbt, (Tag) dynamicopsnbt.createMap((Map) ImmutableMap.of(dynamicopsnbt.createString("memories"), (Tag) dynamicopsnbt.emptyMap()))));
      }
  
@@ -226,10 +226,10 @@ index 2cbc9adc8e417def48be03d08174a5833068ec65..3234d5bf3b9ae01dbe8e26a0a3f21ff8
              if (this.mob.distanceToSqr((Entity) this.player) < 36.0D) {
                  if (this.player.distanceToSqr(this.px, this.py, this.pz) > 0.010000000000000002D) {
 diff --git a/src/main/java/net/minecraft/world/entity/ai/navigation/PathNavigation.java b/src/main/java/net/minecraft/world/entity/ai/navigation/PathNavigation.java
-index 2f2d9bb31194618ef5bba39cd1cbe7c4919e82c5..0d8f1f063b76357374022e4496ce0646757b150e 100644
+index 6d127ed3da899851ca95b2be6792e2abca1aca12..31f98654389dc030b70ab38530d4a7be31686279 100644
 --- a/src/main/java/net/minecraft/world/entity/ai/navigation/PathNavigation.java
 +++ b/src/main/java/net/minecraft/world/entity/ai/navigation/PathNavigation.java
-@@ -197,6 +197,7 @@ public abstract class PathNavigation {
+@@ -198,6 +198,7 @@ public abstract class PathNavigation {
      // Paper end
  
      public boolean moveTo(Entity entity, double speed) {
@@ -237,7 +237,7 @@ index 2f2d9bb31194618ef5bba39cd1cbe7c4919e82c5..0d8f1f063b76357374022e4496ce0646
          // Paper start - Pathfinding optimizations
          if (this.pathfindFailures > 10 && this.path == null && net.minecraft.server.MinecraftServer.currentTick < this.lastFailure + 40) {
              return false;
-@@ -217,6 +218,7 @@ public abstract class PathNavigation {
+@@ -218,6 +219,7 @@ public abstract class PathNavigation {
      }
  
      public boolean moveTo(@Nullable Path path, double speed) {
@@ -321,10 +321,10 @@ index 2ac88f06ebb79e515cd9934ac1e3e2c8003d9e3c..d89c0db4c4173d8558dc4f8b15ddb581
  
      public static boolean checkAnimalSpawnRules(EntityType<? extends Animal> type, LevelAccessor world, MobSpawnType spawnReason, BlockPos pos, RandomSource random) {
 diff --git a/src/main/java/net/minecraft/world/entity/animal/Bee.java b/src/main/java/net/minecraft/world/entity/animal/Bee.java
-index 87bd7991a81a2e30ecfccb60e614d7f13acd3744..1c2db953155498606f1e052580e7aa9ca846a53c 100644
+index 41598e4ed94fb07e6a4a9aae6156bce4498594d5..d9e8f9b90dfe947e57ddbb9f2fc2be0ef46a46d1 100644
 --- a/src/main/java/net/minecraft/world/entity/animal/Bee.java
 +++ b/src/main/java/net/minecraft/world/entity/animal/Bee.java
-@@ -1047,6 +1047,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
+@@ -1042,6 +1042,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
  
          @Override
          public boolean canBeeUse() {
@@ -332,7 +332,7 @@ index 87bd7991a81a2e30ecfccb60e614d7f13acd3744..1c2db953155498606f1e052580e7aa9c
              return Bee.this.remainingCooldownBeforeLocatingNewHive == 0 && !Bee.this.hasHive() && Bee.this.wantsToEnterHive();
          }
  
-@@ -1113,6 +1114,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
+@@ -1108,6 +1109,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
  
          @Override
          public boolean canBeeUse() {
@@ -340,7 +340,7 @@ index 87bd7991a81a2e30ecfccb60e614d7f13acd3744..1c2db953155498606f1e052580e7aa9c
              return Bee.this.hivePos != null && !Bee.this.hasRestriction() && Bee.this.wantsToEnterHive() && !this.hasReachedTarget(Bee.this.hivePos) && Bee.this.level.getBlockState(Bee.this.hivePos).is(BlockTags.BEEHIVES);
          }
  
-@@ -1229,6 +1231,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
+@@ -1224,6 +1226,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
  
          @Override
          public boolean canBeeUse() {
@@ -348,7 +348,7 @@ index 87bd7991a81a2e30ecfccb60e614d7f13acd3744..1c2db953155498606f1e052580e7aa9c
              return Bee.this.savedFlowerPos != null && !Bee.this.hasRestriction() && this.wantsToGoToKnownFlower() && Bee.this.isFlowerValid(Bee.this.savedFlowerPos) && !Bee.this.closerThan(Bee.this.savedFlowerPos, 2);
          }
  
-@@ -1281,6 +1284,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
+@@ -1276,6 +1279,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
  
          @Override
          public boolean canBeeUse() {

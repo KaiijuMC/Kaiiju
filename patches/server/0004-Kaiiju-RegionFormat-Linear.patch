@@ -8,7 +8,7 @@ Copyright xymb@endcrystal.me
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index abfd4d5faf23511284b4efac771ef79da0ef72da..0a6549d0f545e81ae95527797333f2e2da85e1f1 100644
+index d4f74093cb1bf46eb94e8a47c2fd6e8ee06980f0..9ff2d0cc6d1c6f17f656f0d46dbaf593032844c8 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -13,6 +13,10 @@ dependencies {
@@ -517,7 +517,7 @@ index a08cde4eefe879adcee7c4118bc38f98c5097ed0..1cfc20b7496f93aff1d6c2387dc5bb8b
              }
          }
 diff --git a/src/main/java/io/papermc/paper/world/ThreadedWorldUpgrader.java b/src/main/java/io/papermc/paper/world/ThreadedWorldUpgrader.java
-index 95cac7edae8ac64811fc6a2f6b97dd4a0fceb0b0..d21077fdcdeb14860ef6f05b7586650051f6d44b 100644
+index 513833c2ea23df5b079d157bc5cb89d5c9754c0b..a62a1b281bd0b6ad7d59b45b9470d84f496f6539 100644
 --- a/src/main/java/io/papermc/paper/world/ThreadedWorldUpgrader.java
 +++ b/src/main/java/io/papermc/paper/world/ThreadedWorldUpgrader.java
 @@ -83,9 +83,13 @@ public class ThreadedWorldUpgrader {
@@ -537,10 +537,10 @@ index 95cac7edae8ac64811fc6a2f6b97dd4a0fceb0b0..d21077fdcdeb14860ef6f05b75866500
          long expectedChunks = (long)regionFiles.length * (32L * 32L);
  
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index 75965afd7b4bed23a5ecf618c7f91ff5e7ffd92f..4f4a94f60c60eb8bf4214bfcfe6f963e16b39c98 100644
+index 5d330c938aa0d707460b740ecf5c51d001c89c49..86dc7e23fb53f6ba8baff1aa0309af78b248844b 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
-@@ -291,7 +291,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -294,7 +294,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
      // Paper end
  
      public ChunkMap(ServerLevel world, LevelStorageSource.LevelStorageAccess session, DataFixer dataFixer, StructureTemplateManager structureTemplateManager, Executor executor, BlockableEventLoop<Runnable> mainThreadExecutor, LightChunkGetter chunkProvider, ChunkGenerator chunkGenerator, ChunkProgressListener worldGenerationProgressListener, ChunkStatusUpdateListener chunkStatusChangeListener, Supplier<DimensionDataStorage> persistentStateManagerFactory, int viewDistance, boolean dsync) {
@@ -549,7 +549,7 @@ index 75965afd7b4bed23a5ecf618c7f91ff5e7ffd92f..4f4a94f60c60eb8bf4214bfcfe6f963e
          // Paper - rewrite chunk system
          this.tickingGenerated = new AtomicInteger();
          this.playerMap = new PlayerMap();
-@@ -336,7 +336,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -339,7 +339,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
          this.lightEngine = new ThreadedLevelLightEngine(chunkProvider, this, this.level.dimensionType().hasSkyLight(), null, null); // Paper - rewrite chunk system
          this.distanceManager = new ChunkMap.ChunkDistanceManager(executor, mainThreadExecutor);
          this.overworldDataStorage = persistentStateManagerFactory;
@@ -558,7 +558,7 @@ index 75965afd7b4bed23a5ecf618c7f91ff5e7ffd92f..4f4a94f60c60eb8bf4214bfcfe6f963e
          this.setViewDistance(viewDistance);
          // Paper start
          this.dataRegionManager = new io.papermc.paper.chunk.SingleThreadChunkRegionManager(this.level, 2, (1.0 / 3.0), 1, 6, "Data", DataRegionData::new, DataRegionSectionData::new);
-@@ -950,13 +950,13 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -953,13 +953,13 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
  
      // Paper start - chunk status cache "api"
      public ChunkStatus getChunkStatusOnDiskIfCached(ChunkPos chunkPos) {
@@ -574,7 +574,7 @@ index 75965afd7b4bed23a5ecf618c7f91ff5e7ffd92f..4f4a94f60c60eb8bf4214bfcfe6f963e
  
          if (regionFile == null || !regionFileCache.chunkExists(chunkPos)) {
              return null;
-@@ -974,7 +974,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -977,7 +977,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
      }
  
      public void updateChunkStatusOnDisk(ChunkPos chunkPos, @Nullable CompoundTag compound) throws IOException {
@@ -584,10 +584,10 @@ index 75965afd7b4bed23a5ecf618c7f91ff5e7ffd92f..4f4a94f60c60eb8bf4214bfcfe6f963e
          regionFile.setStatus(chunkPos.x, chunkPos.z, ChunkSerializer.getStatus(compound));
      }
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index a5655ebb233f1e1e1dd7f79fdd948020478928fc..9510de3b100f217e3d24e93a9f2aef601ea03fac 100644
+index 69ba84de4880a579c400b6daefdb98b44e9e28e8..83126ee9d737cf695c34e239c204fe8c4d02c243 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
-@@ -390,9 +390,8 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -388,9 +388,8 @@ public class ServerLevel extends Level implements WorldGenLevel {
      private final EntityRegionFileStorage entityStorage;
  
      private static final class EntityRegionFileStorage extends net.minecraft.world.level.chunk.storage.RegionFileStorage {
@@ -609,7 +609,7 @@ index a5655ebb233f1e1e1dd7f79fdd948020478928fc..9510de3b100f217e3d24e93a9f2aef60
          // this.entityManager = new PersistentEntitySectionManager<>(Entity.class, new ServerLevel.EntityCallbacks(), entitypersistentstorage, this.entitySliceManager); // Paper // Paper - rewrite chunk system
          StructureTemplateManager structuretemplatemanager = minecraftserver.getStructureManager();
 diff --git a/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java b/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
-index 759b125cc1251b9b4f1f443c9f70c482ef5b32f8..728198d0584ab8d6ae80853850cf67ac262ef93a 100644
+index e0bfeebeaac1aaea64bc07cdfdf7790e3e43ca7b..469802b9c454c5e98c0a55ba89559d9d8ba0c4c0 100644
 --- a/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
 +++ b/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
 @@ -61,7 +61,7 @@ public class WorldUpgrader {
@@ -674,7 +674,7 @@ index 8950b220b9a3512cd4667beb7bdec0e82e07edc6..71b38521fd2039bb2ddfdc5dc8934128
      }
  
 diff --git a/src/main/java/net/minecraft/world/level/chunk/storage/ChunkStorage.java b/src/main/java/net/minecraft/world/level/chunk/storage/ChunkStorage.java
-index 5a425be023d77f0370d102dfb52427147849ac1a..5396d6944cee6c3075fcfd030510254461569120 100644
+index 29facbdcbad17ce38bf785f7f3f8346d81cbc32f..52c2e0fe73a5af18535a2b0b9a506919e3f93003 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/storage/ChunkStorage.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/storage/ChunkStorage.java
 @@ -37,11 +37,12 @@ public class ChunkStorage implements AutoCloseable {
@@ -980,7 +980,7 @@ index bd502ca721de0cab438d995efa00ad0554c0d2fe..254bc0d853770ef36ff10bce92be37f0
              regionfile.flush();
          }
 diff --git a/src/main/java/net/minecraft/world/level/chunk/storage/SectionStorage.java b/src/main/java/net/minecraft/world/level/chunk/storage/SectionStorage.java
-index d783072bc964e45c308197e6f79874eb4a09f871..261613054a4ba0e78ad1aec819d743eaaae01cf2 100644
+index 5561b8499a0503b850974b1dc309edfb80219549..414aa3ae00c2d28e754235e3e93b6b623d4fd180 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/storage/SectionStorage.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/storage/SectionStorage.java
 @@ -47,8 +47,8 @@ public class SectionStorage<R> extends RegionFileStorage implements AutoCloseabl
@@ -995,7 +995,7 @@ index d783072bc964e45c308197e6f79874eb4a09f871..261613054a4ba0e78ad1aec819d743ea
          this.factory = factory;
          this.fixerUpper = dataFixer;
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-index 6a327616cd590b70170f8441c003a2109640201d..2ef0a41fd9ee60bc0866cf5c678498c68250689c 100644
+index c6a3b59c65466f9f2b16cefe0059a6e5dd84044c..e9cca721fb065fe6ac715bbeef65343f528d0a42 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 @@ -552,7 +552,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {

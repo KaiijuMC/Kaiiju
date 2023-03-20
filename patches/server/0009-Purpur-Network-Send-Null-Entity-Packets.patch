@@ -20,12 +20,12 @@ index 7c6d43d8a360530344ef296f4477750c8a298607..ab08e11f13921163b8ff1ff51ff9e9b8
      }
  }
 diff --git a/src/main/java/net/minecraft/server/level/ServerEntity.java b/src/main/java/net/minecraft/server/level/ServerEntity.java
-index 0f9a3a6c05fee59c29764f0c0d7a6cb8a2a861b1..9d0a52bf600583ecbf80c2233a01ff43e609266f 100644
+index 11d7aef930ca283950f7b353b033f3ec5fe41efb..f64093e34cb5bbfdffff9aa04bcb0757beb14cbe 100644
 --- a/src/main/java/net/minecraft/server/level/ServerEntity.java
 +++ b/src/main/java/net/minecraft/server/level/ServerEntity.java
-@@ -186,6 +186,11 @@ public class ServerEntity {
-                         this.teleportDelay = 0;
-                         packet1 = new ClientboundTeleportEntityPacket(this.entity);
+@@ -205,6 +205,11 @@ public class ServerEntity {
+                         flag4 = true;
+                         flag5 = true;
                      }
 +                    // Kaiiju start - Don't send null move entity packets
 +                    if (!dev.kaiijumc.kaiiju.KaiijuConfig.sendNullEntityPackets && isNullMovePacket(packet1)) {
@@ -35,8 +35,8 @@ index 0f9a3a6c05fee59c29764f0c0d7a6cb8a2a861b1..9d0a52bf600583ecbf80c2233a01ff43
                  }
  
                  if ((this.trackDelta || this.entity.hasImpulse || this.entity instanceof LivingEntity && ((LivingEntity) this.entity).isFallFlying()) && this.tickCount > 0) {
-@@ -252,6 +257,20 @@ public class ServerEntity {
- 
+@@ -279,6 +284,20 @@ public class ServerEntity {
+         }));
      }
  
 +    // Kaiiju start - Don't send null move entity packets
@@ -52,7 +52,7 @@ index 0f9a3a6c05fee59c29764f0c0d7a6cb8a2a861b1..9d0a52bf600583ecbf80c2233a01ff43
 +        return false;
 +    }
 +    // Kaiiju end
-+    
++
      public void removePairing(ServerPlayer player) {
          this.entity.stopSeenByPlayer(player);
          player.connection.send(new ClientboundRemoveEntitiesPacket(new int[]{this.entity.getId()}));

@@ -7,7 +7,7 @@ Author: JellySquid
 Licence: LGPL-3.0
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 913f2f26b1d022e8a812af7caa5dfca5fa548782..95742b2ec27156071867a9467669b350f3ad4280 100644
+index 3a59a816fe35a0f329fbbde871dcb1933015990d..c044fc55f106e521bacf58424d1284069730bbf3 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 @@ -206,7 +206,9 @@ public class KaiijuConfig {
@@ -63,10 +63,10 @@ index b5d8a60dc78a76c0a55bfc30cc49d26857bd914a..dd8d98acf21bb676e86f9befb45fd09e
          }
  
 diff --git a/src/main/java/net/minecraft/core/Direction.java b/src/main/java/net/minecraft/core/Direction.java
-index a4dc96b1a3bf309584657e3a1e7dfaea967f9425..09c1989dc3b12d9488b8869e71f2a4890656cc36 100644
+index eaa620ad86abfb151b43f697973cbc731e2e5e92..e64a6f0d1b03c164d68ca8429d9f87c2dc90870a 100644
 --- a/src/main/java/net/minecraft/core/Direction.java
 +++ b/src/main/java/net/minecraft/core/Direction.java
-@@ -191,6 +191,7 @@ public enum Direction implements StringRepresentable {
+@@ -192,6 +192,7 @@ public enum Direction implements StringRepresentable {
      }
  
      public Direction getOpposite() {
@@ -74,7 +74,7 @@ index a4dc96b1a3bf309584657e3a1e7dfaea967f9425..09c1989dc3b12d9488b8869e71f2a489
          return from3DDataValue(this.oppositeIndex);
      }
  
-@@ -453,6 +454,7 @@ public enum Direction implements StringRepresentable {
+@@ -454,6 +455,7 @@ public enum Direction implements StringRepresentable {
      }
  
      public static Direction getRandom(RandomSource random) {
@@ -83,7 +83,7 @@ index a4dc96b1a3bf309584657e3a1e7dfaea967f9425..09c1989dc3b12d9488b8869e71f2a489
      }
  
 diff --git a/src/main/java/net/minecraft/world/phys/AABB.java b/src/main/java/net/minecraft/world/phys/AABB.java
-index cfb2e46b34b2982d6724f18214557fc80cf4adfa..4fae201f57dc23ed0e25f17739f97133a7f7534c 100644
+index 5b98d42b5d6bc07265fbb017e51a6281c148436a..e307429919ea4719dec89d7c7b54b888dd12b030 100644
 --- a/src/main/java/net/minecraft/world/phys/AABB.java
 +++ b/src/main/java/net/minecraft/world/phys/AABB.java
 @@ -81,10 +81,36 @@ public class AABB {

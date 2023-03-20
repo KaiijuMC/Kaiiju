@@ -7,7 +7,7 @@ Author: JellySquid
 Licence: LGPL-3.0
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 95742b2ec27156071867a9467669b350f3ad4280..8c713b71156375f248d97e2b117d22826eccdcca 100644
+index c044fc55f106e521bacf58424d1284069730bbf3..1fe1435b1cfe547ddbfccca01de580b8f0e59888 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 @@ -207,8 +207,10 @@ public class KaiijuConfig {
@@ -119,13 +119,18 @@ index 0000000000000000000000000000000000000000..ccb45e94ea6d1a627df786fb88baec7e
 +}
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/util/Mth.java b/src/main/java/net/minecraft/util/Mth.java
-index 618f19d70a61062ed5989ec6cf0c036f2e047466..dd320f3a3f2b51a723a2fcc65d477a22c0901455 100644
+index a378a2ddd96e76925fa3409282d9606a86c72334..19531bb7e37d13bdffd43aebb6de105268119d2d 100644
 --- a/src/main/java/net/minecraft/util/Mth.java
 +++ b/src/main/java/net/minecraft/util/Mth.java
-@@ -45,11 +45,19 @@ public class Mth {
-         return (float)((int)(value * f)) / f;
-     }
+@@ -38,11 +38,24 @@ public class Mth {
+     private static final double[] ASIN_TAB = new double[257];
+     private static final double[] COS_TAB = new double[257];
  
++    public static float truncate(float value, float digits) {
++        float f = (float)Math.pow(10.0D, (double)digits);
++        return (float)((int)(value * f)) / f;
++    }
++
 +    // Kaiiju start
 +    public static float[] getSinTable() {
 +        return SIN;
