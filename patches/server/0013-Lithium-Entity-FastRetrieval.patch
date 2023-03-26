@@ -20,3 +20,83 @@ index 1fe1435b1cfe547ddbfccca01de580b8f0e59888..fd50b949135178a777abed362a051659
 +        lithiumEntityFastRetrieval = getBoolean("lithium.entity.fast-retrieval", lithiumEntityFastRetrieval) && lithiumEnable;
      }
  }
+diff --git a/src/main/java/net/minecraft/world/level/entity/EntitySectionStorage.java b/src/main/java/net/minecraft/world/level/entity/EntitySectionStorage.java
+index ee692b49c62f36287bf9d008861f5d47e0e42c00..e2f0aefb59864ef88cce22dde33f8a72a18fe829 100644
+--- a/src/main/java/net/minecraft/world/level/entity/EntitySectionStorage.java
++++ b/src/main/java/net/minecraft/world/level/entity/EntitySectionStorage.java
+@@ -41,6 +41,43 @@ public class EntitySectionStorage<T extends EntityAccess> {
+         int n = SectionPos.posToSectionCoord(box.maxY + 0.0D);
+         int o = SectionPos.posToSectionCoord(box.maxZ + 2.0D);
+ 
++        // Kaiiju start
++        if (dev.kaiijumc.kaiiju.KaiijuConfig.lithiumEntityFastRetrieval) {
++            if (m >= j + 4 || o >= l + 4) {
++                // Vanilla is likely more optimized when shooting entities with TNT cannons over huge distances.
++                // Choosing a cutoff of 4 chunk size, as it becomes more likely that these entity sections do not exist when
++                // they are far away from the shot entity (player despawn range, position maybe not on the ground, etc.)
++                this.forEachAccessibleNonEmptySectionVanilla(j, k, l, m, n, o, consumer);
++            } else {
++                // Vanilla order of the AVL long set is sorting by ascending long value. The x, y, z positions are packed into
++                // a long with the x position's lowest 22 bits placed at the MSB.
++                // Therefore, the long is negative iff the 22nd bit of the x position is set, which happens iff the x position
++                // is negative. A positive x position will never have its 22nd bit set, as these big coordinates are far outside
++                // the world. y and z positions are treated as unsigned when sorting by ascending long value, as their sign bits
++                // are placed somewhere inside the packed long
++                for (int x = j; x <= m; x++) {
++                    for (int z = Math.max(l, 0); z <= o; z++) {
++                        if (this.forEachInColumn(x, k, n, z, consumer).shouldAbort()) {
++                            this.forEachAccessibleNonEmptySectionVanilla(j, k, l, m, n, o, consumer);
++                            return;
++                        }
++                    }
++                    int bound = Math.min(-1, o);
++                    for (int z = l; z <= bound; z++) {
++                        if (this.forEachInColumn(x, k, n, z, consumer).shouldAbort()) {
++                            this.forEachAccessibleNonEmptySectionVanilla(j, k, l, m, n, o, consumer);
++                            return;
++                        }
++                    }
++                }
++            }
++        } else {
++            this.forEachAccessibleNonEmptySectionVanilla(j, k, l, m, n, o, consumer);
++        }
++    }
++
++    private void forEachAccessibleNonEmptySectionVanilla(int j, int k, int l, int n, int m, int o, AbortableIterationConsumer<EntitySection<T>> consumer) {
++        // Kaiiju end
+         for(int p = j; p <= m; ++p) {
+             long q = SectionPos.asLong(p, 0, 0);
+             long r = SectionPos.asLong(p, -1, -1);
+@@ -60,6 +97,31 @@ public class EntitySectionStorage<T extends EntityAccess> {
+         }
+ 
+     }
++    // Kaiiju start
++    private AbortableIterationConsumer.Continuation forEachInColumn(int x, int k, int n, int z, AbortableIterationConsumer<EntitySection<T>> action) {
++        AbortableIterationConsumer.Continuation ret = AbortableIterationConsumer.Continuation.CONTINUE;
++        //y from negative to positive, but y is treated as unsigned
++        for (int y = Math.max(k, 0); y <= n; y++) {
++            if ((ret = this.consumeSection(SectionPos.asLong(x, y, z), action)).shouldAbort()) {
++                return ret;
++            }
++        }
++        int bound = Math.min(-1, n);
++        for (int y = k; y <= bound; y++) {
++            if ((ret = this.consumeSection(SectionPos.asLong(x, y, z), action)).shouldAbort()) {
++                return ret;
++            }
++        }
++        return ret;
++    }
++    private AbortableIterationConsumer.Continuation consumeSection(long pos, AbortableIterationConsumer<EntitySection<T>> action) {
++        EntitySection<T> entitySection = this.getSection(pos);
++        if (entitySection != null && 0 != entitySection.size() && entitySection.getStatus().isAccessible()) {
++            return action.accept(entitySection);
++        }
++        return AbortableIterationConsumer.Continuation.CONTINUE;
++     }
++    // Kaiiju end
+ 
+     public LongStream getExistingSectionPositionsInChunk(long chunkPos) {
+         int i = ChunkPos.getX(chunkPos);
