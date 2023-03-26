@@ -61,10 +61,10 @@ index dd4c3ca77acb3aeefc69b8eb948b8b202ff87a19..b194f4dbebcbbf5bb4e026a0169e2d24
  }
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index c1b88ae704b3d2b8ebbad28c0291a4ad12e6d5d9..ae4dd7db4e4e32fe8100309d770307fccf31110d 100644
+index 5f5e9db2cbde552216c8990054b96443f180cb3b..de9a1fb5e43170bf7251b3a0faa9a45eee88f328 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -855,7 +855,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -857,7 +857,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
              // Paper start - rewrite chunk system
              worldserver.save((ProgressListener) null, flush, worldserver.noSave && !force, close);
              if (flush) {
@@ -73,7 +73,7 @@ index c1b88ae704b3d2b8ebbad28c0291a4ad12e6d5d9..ae4dd7db4e4e32fe8100309d770307fc
              }
              // Paper end - rewrite chunk system
          }
-@@ -879,7 +879,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -881,7 +881,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
                  //MinecraftServer.LOGGER.info("ThreadedAnvilChunkStorage ({}): All chunks are saved", worldserver2.getChunkSource().chunkMap.getStorageName()); // Paper - move up
              }
  

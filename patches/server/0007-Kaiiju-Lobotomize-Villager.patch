@@ -37,10 +37,10 @@ index b99b438b92587f23c77c5321d5d23e76dc5450de..104f19cced8fb3b692e3a4772360d9eb
  }
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/world/entity/npc/Villager.java b/src/main/java/net/minecraft/world/entity/npc/Villager.java
-index 9d19f6701acd9b5e430263347ee8a9925b9c49c2..9fce2f1a9621f6bd59b08747e48e7ab4852afde6 100644
+index 26857b0e5134f56df47115031727e0ad68216bc6..1c4f726c992a70e9f12a9bd4365f51837c74166c 100644
 --- a/src/main/java/net/minecraft/world/entity/npc/Villager.java
 +++ b/src/main/java/net/minecraft/world/entity/npc/Villager.java
-@@ -198,14 +198,14 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+@@ -200,14 +200,14 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
      }
  
      private boolean checkLobotomized() {
@@ -59,7 +59,7 @@ index 9d19f6701acd9b5e430263347ee8a9925b9c49c2..9fce2f1a9621f6bd59b08747e48e7ab4
  
              if (this.isLobotomized) {
                  this.notLobotomizedCount = 0;
-@@ -217,9 +217,80 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+@@ -219,9 +219,80 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
      }
  
      private boolean canTravelFrom(BlockPos pos) {
@@ -141,7 +141,7 @@ index 9d19f6701acd9b5e430263347ee8a9925b9c49c2..9fce2f1a9621f6bd59b08747e48e7ab4
      private boolean canTravelTo(BlockPos pos) {
          net.minecraft.world.level.block.state.BlockState state = this.level.getBlockStateIfLoaded(pos);
          if (state == null) {
-@@ -334,7 +405,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+@@ -337,7 +408,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
      protected void mobTick(boolean inactive) {
          //this.level.getProfiler().push("villagerBrain"); // Purpur
          // Purpur start
@@ -150,7 +150,7 @@ index 9d19f6701acd9b5e430263347ee8a9925b9c49c2..9fce2f1a9621f6bd59b08747e48e7ab4
              // treat as inactive if lobotomized
              inactive = inactive || checkLobotomized();
          } else {
-@@ -375,7 +446,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+@@ -380,7 +451,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
              this.lastTradedPlayer = null;
          }
  
@@ -159,7 +159,7 @@ index 9d19f6701acd9b5e430263347ee8a9925b9c49c2..9fce2f1a9621f6bd59b08747e48e7ab4
              Raid raid = ((ServerLevel) this.level).getRaidAt(this.blockPosition());
  
              if (raid != null && raid.isActive() && !raid.isOver()) {
-@@ -654,6 +725,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+@@ -659,6 +730,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
          if (this.assignProfessionWhenSpawned) {
              nbt.putBoolean("AssignProfessionWhenSpawned", true);
          }
@@ -167,7 +167,7 @@ index 9d19f6701acd9b5e430263347ee8a9925b9c49c2..9fce2f1a9621f6bd59b08747e48e7ab4
  
      }
  
-@@ -694,6 +766,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+@@ -699,6 +771,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
          if (nbt.contains("AssignProfessionWhenSpawned")) {
              this.assignProfessionWhenSpawned = nbt.getBoolean("AssignProfessionWhenSpawned");
          }

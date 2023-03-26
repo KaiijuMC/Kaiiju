@@ -109,10 +109,10 @@ index 0000000000000000000000000000000000000000..14f085e75295882f52634622b4067629
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/world/entity/LivingEntity.java b/src/main/java/net/minecraft/world/entity/LivingEntity.java
-index 70b52346a42daaa82a56d324ad3290971692da6d..978830d6d830deeaf1e300f060ec659de76ef5b3 100644
+index 8d7c33e16f9eaec2120c5aad75172ff656d1bd17..52b09f9ff2a7bc36ae742a53c5141d7de03fb848 100644
 --- a/src/main/java/net/minecraft/world/entity/LivingEntity.java
 +++ b/src/main/java/net/minecraft/world/entity/LivingEntity.java
-@@ -304,6 +304,8 @@ public abstract class LivingEntity extends Entity implements Attackable {
+@@ -303,6 +303,8 @@ public abstract class LivingEntity extends Entity implements Attackable {
          this.brain = this.makeBrain(new Dynamic(dynamicopsnbt, (Tag) dynamicopsnbt.createMap((Map) ImmutableMap.of(dynamicopsnbt.createString("memories"), (Tag) dynamicopsnbt.emptyMap()))));
      }
  
@@ -321,7 +321,7 @@ index 2ac88f06ebb79e515cd9934ac1e3e2c8003d9e3c..d89c0db4c4173d8558dc4f8b15ddb581
  
      public static boolean checkAnimalSpawnRules(EntityType<? extends Animal> type, LevelAccessor world, MobSpawnType spawnReason, BlockPos pos, RandomSource random) {
 diff --git a/src/main/java/net/minecraft/world/entity/animal/Bee.java b/src/main/java/net/minecraft/world/entity/animal/Bee.java
-index 41598e4ed94fb07e6a4a9aae6156bce4498594d5..d9e8f9b90dfe947e57ddbb9f2fc2be0ef46a46d1 100644
+index d47dc0c3fe8c2b80d7b7eb828a12af6eb32145e4..bb3a7efd11731d518cf8ef29f25c855bbbba0568 100644
 --- a/src/main/java/net/minecraft/world/entity/animal/Bee.java
 +++ b/src/main/java/net/minecraft/world/entity/animal/Bee.java
 @@ -1042,6 +1042,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
