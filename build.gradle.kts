@@ -58,12 +58,12 @@ paperweight {
     remapRepo.set(paperMavenPublicUrl)
     decompileRepo.set(paperMavenPublicUrl)
 
-    useStandardUpstream("Purpur") {
-        url.set(github("PurpurMC", "Purpur"))
-        ref.set(providers.gradleProperty("purpurRef"))
+    useStandardUpstream("Folia") {
+        url.set(github("PaperMC", "Folia"))
+        ref.set(providers.gradleProperty("foliaRef"))
         
         withStandardPatcher {
-            baseName("Purpur")
+            baseName("Folia")
 
             apiPatchDir.set(layout.projectDirectory.dir("patches/api"))
             apiOutputDir.set(layout.projectDirectory.dir("kaiiju-api"))
@@ -73,9 +73,9 @@ paperweight {
         }
     }
 
-    tasks.register("purpurRefLatest") {
-        // Update the purpurRef in gradle.properties to be the latest commit.
-        val tempDir = layout.cacheDir("purpurRefLatest");
+    tasks.register("foliaRefLatest") {
+        // Update the foliaRef in gradle.properties to be the latest commit.
+        val tempDir = layout.cacheDir("foliaRefLatest");
         val file = "gradle.properties";
         
         doFirst {
@@ -83,15 +83,15 @@ paperweight {
                     val sha: String
             )
 
-            val purpurLatestCommitJson = layout.cache.resolve("purpurLatestCommit.json");
-            download.get().download("https://api.github.com/repos/PurpurMC/Purpur/commits/ver/1.19.4", purpurLatestCommitJson);
-            val purpurLatestCommit = gson.fromJson<paper.libs.com.google.gson.JsonObject>(purpurLatestCommitJson)["sha"].asString;
+            val foliaLatestCommitJson = layout.cache.resolve("foliaLatestCommit.json");
+            download.get().download("https://api.github.com/repos/PaperMC/Folia/commits/master", foliaLatestCommitJson);
+            val foliaLatestCommit = gson.fromJson<paper.libs.com.google.gson.JsonObject>(foliaLatestCommitJson)["sha"].asString;
 
             copy {
                 from(file)
                 into(tempDir)
                 filter { line: String ->
-                    line.replace("purpurRef = .*".toRegex(), "purpurRef = $purpurLatestCommit")
+                    line.replace("foliaRef = .*".toRegex(), "foliaRef = $foliaLatestCommit")
                 }
             }
         }
