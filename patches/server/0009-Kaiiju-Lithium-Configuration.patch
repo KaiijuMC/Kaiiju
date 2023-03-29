@@ -5,7 +5,7 @@ Subject: [PATCH] Kaiiju Lithium Configuration
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 6f16786e6107b9e9b52cdbd052c633e757fe351f..913f2f26b1d022e8a812af7caa5dfca5fa548782 100644
+index ab08e11f13921163b8ff1ff51ff9e9b86d2b47c7..3a59a816fe35a0f329fbbde871dcb1933015990d 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 @@ -204,4 +204,9 @@ public class KaiijuConfig {
