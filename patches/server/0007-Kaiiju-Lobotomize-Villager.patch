@@ -5,16 +5,15 @@ Subject: [PATCH] Kaiiju Lobotomize Villager
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index b99b438b92587f23c77c5321d5d23e76dc5450de..104f19cced8fb3b692e3a4772360d9eba3bdd6f2 100644
+index b99b438b92587f23c77c5321d5d23e76dc5450de..366948e447c0729389ec53286236a82cb57e97a2 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-@@ -149,6 +149,13 @@ public class KaiijuWorldConfig {
+@@ -149,6 +149,12 @@ public class KaiijuWorldConfig {
      public boolean lobotomizeAnimalCheckCanJump = true;
      public boolean lobotomizeAnimalLookAtPlayer = false;
      public boolean lobotomizeAnimalFloat = true;
 +    public boolean lobotomizeVillagerEnabled = false;
 +    public int lobotomizeVillagerCheckInterval = 100;
-+    public boolean lobotomizeVillagerDoRaids = true;
 +    public boolean lobotomizeVillagerCheckCanJump = true;
 +    public boolean lobotomizeVillagerCheckOnBed = true;
 +    public boolean lobotomizeVillagerCheckJobSite = true;
@@ -22,12 +21,11 @@ index b99b438b92587f23c77c5321d5d23e76dc5450de..104f19cced8fb3b692e3a4772360d9eb
  
      private void lobotomizeSettings() {
          lobotomizeAnimalEnabled = getBoolean("lobotomize.animal.enabled", lobotomizeAnimalEnabled);
-@@ -156,5 +163,12 @@ public class KaiijuWorldConfig {
+@@ -156,5 +162,11 @@ public class KaiijuWorldConfig {
          lobotomizeAnimalCheckCanJump = getBoolean("lobotomize.animal.check-can-jump", lobotomizeAnimalCheckCanJump);
          lobotomizeAnimalLookAtPlayer = getBoolean("lobotomize.animal.look-at-player", lobotomizeAnimalLookAtPlayer);
          lobotomizeAnimalFloat = getBoolean("lobotomize.animal.float", lobotomizeAnimalFloat);
 +        lobotomizeVillagerEnabled = getBoolean("lobotomize.villager.enabled", lobotomizeVillagerEnabled);
-+        lobotomizeVillagerDoRaids = getBoolean("lobotomize.villager.do-raids", lobotomizeVillagerDoRaids);
 +        lobotomizeVillagerCheckInterval = getInt("lobotomize.villager.check-interval", lobotomizeVillagerCheckInterval);
 +        lobotomizeVillagerCheckCanJump = getBoolean("lobotomize.villager.check-can-jump", lobotomizeVillagerCheckCanJump);
 +        lobotomizeVillagerCheckOnBed = getBoolean("lobotomize.villager.check-on-bed", lobotomizeVillagerCheckOnBed);
@@ -37,7 +35,7 @@ index b99b438b92587f23c77c5321d5d23e76dc5450de..104f19cced8fb3b692e3a4772360d9eb
  }
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/world/entity/npc/Villager.java b/src/main/java/net/minecraft/world/entity/npc/Villager.java
-index 26857b0e5134f56df47115031727e0ad68216bc6..1c4f726c992a70e9f12a9bd4365f51837c74166c 100644
+index 26857b0e5134f56df47115031727e0ad68216bc6..ae629509eef3904abbb2e9881cd277b2e57f7c89 100644
 --- a/src/main/java/net/minecraft/world/entity/npc/Villager.java
 +++ b/src/main/java/net/minecraft/world/entity/npc/Villager.java
 @@ -200,14 +200,14 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
@@ -59,14 +57,15 @@ index 26857b0e5134f56df47115031727e0ad68216bc6..1c4f726c992a70e9f12a9bd4365f5183
  
              if (this.isLobotomized) {
                  this.notLobotomizedCount = 0;
-@@ -219,9 +219,80 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+@@ -219,8 +219,81 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
      }
  
      private boolean canTravelFrom(BlockPos pos) {
 -        return canTravelTo(pos.east()) || canTravelTo(pos.west()) || canTravelTo(pos.north()) || canTravelTo(pos.south());
+-    }
 +        return canInteractAt(pos.east()) || canInteractAt(pos.west()) || canInteractAt(pos.north()) || canInteractAt(pos.south()); // Kaiiju
-     }
- 
++    }
++
 +    // Kaiiju start - Customize canTravelTo checks
 +    private boolean needLobotomy() {
 +        if (this.isSleeping()) return false;
@@ -76,7 +75,8 @@ index 26857b0e5134f56df47115031727e0ad68216bc6..1c4f726c992a70e9f12a9bd4365f5183
 +
 +    private boolean canInteractAt(BlockPos pos) {
 +        net.minecraft.world.level.block.state.BlockState top = null;
-+        // Check if mob can jump over block
++        // STEP 1: CHECK IF MOB CAN MOVE
++        // A/ MOVE BY JUMPING
 +        if (this.level.kaiijuConfig.lobotomizeVillagerCheckCanJump && this.canJump()) {
 +            top = this.level.getBlockStateIfLoaded(pos.above());
 +            if (top == null) return false;
@@ -85,17 +85,18 @@ index 26857b0e5134f56df47115031727e0ad68216bc6..1c4f726c992a70e9f12a9bd4365f5183
 +                if (above.isPathfindable(level, pos, net.minecraft.world.level.pathfinder.PathComputationType.LAND)) return true;
 +            }
 +        }
-+        // Otherwise, check if mob can interact with bottom block
++        // B/ MOVE BY WALKING
 +        net.minecraft.world.level.block.state.BlockState bottom = this.level.getBlockStateIfLoaded(pos);
 +        if (bottom == null) return false;
 +        net.minecraft.world.level.block.Block bottomBlock = bottom.getBlock();
++        // BED CHECK
 +        if (isTallBlock(bottomBlock)) return false;
 +        if (this.level.kaiijuConfig.lobotomizeVillagerCheckBedNearby && isBed(bottomBlock)) return true;
-+        if (this.level.kaiijuConfig.lobotomizeVillagerCheckJobSite && isInteractiveJobSite(bottomBlock, this.getVillagerData().getProfession())) return true;
-+        // If he can't interact, check if he can travel
 +        if (!bottom.isPathfindable(level, pos, net.minecraft.world.level.pathfinder.PathComputationType.LAND)) return false;
 +        if (top == null) top = this.level.getBlockState(pos.above());
-+        return top.isPathfindable(level, pos, net.minecraft.world.level.pathfinder.PathComputationType.LAND);
++        if (!top.isPathfindable(level, pos, net.minecraft.world.level.pathfinder.PathComputationType.LAND)) return false;
++        // STEP 2: IF ITS NEAR IS JOB SITE: LOBOTOMIZE
++        return !(this.level.kaiijuConfig.lobotomizeVillagerCheckJobSite && isAssociatedJobSite(bottomBlock, this.getVillagerData().getProfession()));
 +    }
 +
 +    private boolean canJump() {
@@ -114,21 +115,21 @@ index 26857b0e5134f56df47115031727e0ad68216bc6..1c4f726c992a70e9f12a9bd4365f5183
 +        return block instanceof net.minecraft.world.level.block.BedBlock;
 +    }
 +
-+    private boolean isInteractiveJobSite(net.minecraft.world.level.block.Block block, VillagerProfession profession) {
++    private boolean isAssociatedJobSite(net.minecraft.world.level.block.Block block, VillagerProfession profession) {
 +        if (this.lastTradedPlayer == null) return false;
-+        return (block instanceof net.minecraft.world.level.block.BlastFurnaceBlock && profession != VillagerProfession.ARMORER) ||
-+               (block instanceof net.minecraft.world.level.block.SmokerBlock && profession != VillagerProfession.BUTCHER) ||
-+               (block instanceof net.minecraft.world.level.block.CartographyTableBlock && profession != VillagerProfession.CARTOGRAPHER) ||
-+               (block instanceof net.minecraft.world.level.block.BrewingStandBlock && profession != VillagerProfession.CLERIC) ||
-+               (block instanceof net.minecraft.world.level.block.ComposterBlock && profession != VillagerProfession.FARMER) ||
-+               (block instanceof net.minecraft.world.level.block.BarrelBlock && profession != VillagerProfession.FISHERMAN) ||
-+               (block instanceof net.minecraft.world.level.block.FletchingTableBlock && profession != VillagerProfession.FLETCHER) ||
-+               (block instanceof net.minecraft.world.level.block.CauldronBlock && profession != VillagerProfession.LEATHERWORKER) ||
-+               (block instanceof net.minecraft.world.level.block.LecternBlock && profession != VillagerProfession.LIBRARIAN) ||
-+               (block instanceof net.minecraft.world.level.block.StonecutterBlock && profession != VillagerProfession.MASON) ||
-+               (block instanceof net.minecraft.world.level.block.LoomBlock && profession != VillagerProfession.SHEPHERD) ||
-+               (block instanceof net.minecraft.world.level.block.SmithingTableBlock && profession != VillagerProfession.TOOLSMITH) ||
-+               (block instanceof net.minecraft.world.level.block.GrindstoneBlock && profession != VillagerProfession.WEAPONSMITH);
++        return (block instanceof net.minecraft.world.level.block.BlastFurnaceBlock && profession == VillagerProfession.ARMORER) ||
++               (block instanceof net.minecraft.world.level.block.SmokerBlock && profession == VillagerProfession.BUTCHER) ||
++               (block instanceof net.minecraft.world.level.block.CartographyTableBlock && profession == VillagerProfession.CARTOGRAPHER) ||
++               (block instanceof net.minecraft.world.level.block.BrewingStandBlock && profession == VillagerProfession.CLERIC) ||
++               (block instanceof net.minecraft.world.level.block.ComposterBlock && profession == VillagerProfession.FARMER) ||
++               (block instanceof net.minecraft.world.level.block.BarrelBlock && profession == VillagerProfession.FISHERMAN) ||
++               (block instanceof net.minecraft.world.level.block.FletchingTableBlock && profession == VillagerProfession.FLETCHER) ||
++               (block instanceof net.minecraft.world.level.block.CauldronBlock && profession == VillagerProfession.LEATHERWORKER) ||
++               (block instanceof net.minecraft.world.level.block.LecternBlock && profession == VillagerProfession.LIBRARIAN) ||
++               (block instanceof net.minecraft.world.level.block.StonecutterBlock && profession == VillagerProfession.MASON) ||
++               (block instanceof net.minecraft.world.level.block.LoomBlock && profession == VillagerProfession.SHEPHERD) ||
++               (block instanceof net.minecraft.world.level.block.SmithingTableBlock && profession == VillagerProfession.TOOLSMITH) ||
++               (block instanceof net.minecraft.world.level.block.GrindstoneBlock && profession == VillagerProfession.WEAPONSMITH);
 +    }
 +
 +    private static boolean isTallBlock(net.minecraft.world.level.block.Block block) {
@@ -137,11 +138,10 @@ index 26857b0e5134f56df47115031727e0ad68216bc6..1c4f726c992a70e9f12a9bd4365f5183
 +               block instanceof net.minecraft.world.level.block.WallBlock;
 +    }
 +    // Kaiiju end
-+
+ 
      private boolean canTravelTo(BlockPos pos) {
          net.minecraft.world.level.block.state.BlockState state = this.level.getBlockStateIfLoaded(pos);
-         if (state == null) {
-@@ -337,7 +408,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+@@ -337,7 +410,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
      protected void mobTick(boolean inactive) {
          //this.level.getProfiler().push("villagerBrain"); // Purpur
          // Purpur start
@@ -150,16 +150,7 @@ index 26857b0e5134f56df47115031727e0ad68216bc6..1c4f726c992a70e9f12a9bd4365f5183
              // treat as inactive if lobotomized
              inactive = inactive || checkLobotomized();
          } else {
-@@ -380,7 +451,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
-             this.lastTradedPlayer = null;
-         }
- 
--        if (!inactive && !this.isNoAi() && this.random.nextInt(100) == 0) { // Paper
-+        if ((!inactive || (this.level.kaiijuConfig.lobotomizeVillagerDoRaids && this.isLobotomized)) && !this.isNoAi() && this.random.nextInt(100) == 0) { // Paper // Kaiiju
-             Raid raid = ((ServerLevel) this.level).getRaidAt(this.blockPosition());
- 
-             if (raid != null && raid.isActive() && !raid.isOver()) {
-@@ -659,6 +730,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+@@ -659,6 +732,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
          if (this.assignProfessionWhenSpawned) {
              nbt.putBoolean("AssignProfessionWhenSpawned", true);
          }
@@ -167,7 +158,7 @@ index 26857b0e5134f56df47115031727e0ad68216bc6..1c4f726c992a70e9f12a9bd4365f5183
  
      }
  
-@@ -699,6 +771,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+@@ -699,6 +773,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
          if (nbt.contains("AssignProfessionWhenSpawned")) {
              this.assignProfessionWhenSpawned = nbt.getBoolean("AssignProfessionWhenSpawned");
          }
