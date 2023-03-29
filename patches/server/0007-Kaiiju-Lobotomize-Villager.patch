@@ -35,7 +35,7 @@ index b99b438b92587f23c77c5321d5d23e76dc5450de..366948e447c0729389ec53286236a82c
  }
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/world/entity/npc/Villager.java b/src/main/java/net/minecraft/world/entity/npc/Villager.java
-index 26857b0e5134f56df47115031727e0ad68216bc6..ae629509eef3904abbb2e9881cd277b2e57f7c89 100644
+index 26857b0e5134f56df47115031727e0ad68216bc6..ee50c838a7fb032e533ab3f861f843b8f8276772 100644
 --- a/src/main/java/net/minecraft/world/entity/npc/Villager.java
 +++ b/src/main/java/net/minecraft/world/entity/npc/Villager.java
 @@ -200,14 +200,14 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
@@ -57,16 +57,16 @@ index 26857b0e5134f56df47115031727e0ad68216bc6..ae629509eef3904abbb2e9881cd277b2
  
              if (this.isLobotomized) {
                  this.notLobotomizedCount = 0;
-@@ -219,8 +219,81 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+@@ -219,8 +219,82 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
      }
  
      private boolean canTravelFrom(BlockPos pos) {
 -        return canTravelTo(pos.east()) || canTravelTo(pos.west()) || canTravelTo(pos.north()) || canTravelTo(pos.south());
 -    }
-+        return canInteractAt(pos.east()) || canInteractAt(pos.west()) || canInteractAt(pos.north()) || canInteractAt(pos.south()); // Kaiiju
++    // Kaiiju start - Customize canTravelTo checks
++        return canInteractAt(pos.east()) || canInteractAt(pos.west()) || canInteractAt(pos.north()) || canInteractAt(pos.south());
 +    }
 +
-+    // Kaiiju start - Customize canTravelTo checks
 +    private boolean needLobotomy() {
 +        if (this.isSleeping()) return false;
 +        if (this.level.kaiijuConfig.lobotomizeVillagerCheckOnBed && isOnBed()) return false;
@@ -116,7 +116,8 @@ index 26857b0e5134f56df47115031727e0ad68216bc6..ae629509eef3904abbb2e9881cd277b2
 +    }
 +
 +    private boolean isAssociatedJobSite(net.minecraft.world.level.block.Block block, VillagerProfession profession) {
-+        if (this.lastTradedPlayer == null) return false;
++        if (profession == VillagerProfession.NONE) return false;
++        if (this.lastTradedPlayer == null) return true;
 +        return (block instanceof net.minecraft.world.level.block.BlastFurnaceBlock && profession == VillagerProfession.ARMORER) ||
 +               (block instanceof net.minecraft.world.level.block.SmokerBlock && profession == VillagerProfession.BUTCHER) ||
 +               (block instanceof net.minecraft.world.level.block.CartographyTableBlock && profession == VillagerProfession.CARTOGRAPHER) ||
@@ -141,7 +142,7 @@ index 26857b0e5134f56df47115031727e0ad68216bc6..ae629509eef3904abbb2e9881cd277b2
  
      private boolean canTravelTo(BlockPos pos) {
          net.minecraft.world.level.block.state.BlockState state = this.level.getBlockStateIfLoaded(pos);
-@@ -337,7 +410,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+@@ -337,7 +411,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
      protected void mobTick(boolean inactive) {
          //this.level.getProfiler().push("villagerBrain"); // Purpur
          // Purpur start
@@ -150,7 +151,16 @@ index 26857b0e5134f56df47115031727e0ad68216bc6..ae629509eef3904abbb2e9881cd277b2
              // treat as inactive if lobotomized
              inactive = inactive || checkLobotomized();
          } else {
-@@ -659,6 +732,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+@@ -380,7 +454,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+             this.lastTradedPlayer = null;
+         }
+ 
+-        if (!inactive && !this.isNoAi() && this.random.nextInt(100) == 0) { // Paper
++        if ((!inactive || this.isLobotomized) && !this.isNoAi() && this.random.nextInt(100) == 0) { // Paper // Kaiiju
+             Raid raid = ((ServerLevel) this.level).getRaidAt(this.blockPosition());
+ 
+             if (raid != null && raid.isActive() && !raid.isOver()) {
+@@ -659,6 +733,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
          if (this.assignProfessionWhenSpawned) {
              nbt.putBoolean("AssignProfessionWhenSpawned", true);
          }
@@ -158,7 +168,7 @@ index 26857b0e5134f56df47115031727e0ad68216bc6..ae629509eef3904abbb2e9881cd277b2
  
      }
  
-@@ -699,6 +773,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+@@ -699,6 +774,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
          if (nbt.contains("AssignProfessionWhenSpawned")) {
              this.assignProfessionWhenSpawned = nbt.getBoolean("AssignProfessionWhenSpawned");
          }
