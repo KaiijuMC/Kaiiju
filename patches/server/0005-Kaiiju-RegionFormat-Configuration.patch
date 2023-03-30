@@ -5,12 +5,12 @@ Subject: [PATCH] Kaiiju RegionFormat Configuration
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 7da7e0aeb5eac9ac73a3570e716f1ceb11fd7027..b86c90cc3601e666998cfa12f44515f605bb53eb 100644
+index 75f9fc471069507168ad23092bc77e0d1597fd1d..6af036b2d11aa74bb4a371c03bd2e637f49ed166 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -192,4 +192,10 @@ public class KaiijuConfig {
-         }
-         return builder.build();
+@@ -195,4 +195,10 @@ public class KaiijuConfig {
+ 
+     private static void exploitSettings() {
      }
 +
 +    public static boolean regionFormatDebug = false;
@@ -20,7 +20,7 @@ index 7da7e0aeb5eac9ac73a3570e716f1ceb11fd7027..b86c90cc3601e666998cfa12f44515f6
 +    }
  }
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index dd4c3ca77acb3aeefc69b8eb948b8b202ff87a19..b194f4dbebcbbf5bb4e026a0169e2d24806b46ec 100644
+index 410bb2832140648ab0b59a35545a27f7d78c7222..421d21d3f1126101e66d54894a39b657de7d1590 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 @@ -4,9 +4,11 @@ import org.apache.commons.lang.BooleanUtils;
@@ -35,9 +35,9 @@ index dd4c3ca77acb3aeefc69b8eb948b8b202ff87a19..b194f4dbebcbbf5bb4e026a0169e2d24
  
  import static dev.kaiijumc.kaiiju.KaiijuConfig.log;
  
-@@ -122,4 +124,23 @@ public class KaiijuWorldConfig {
-         final Map<String, Object> value = getMap("world-settings." + worldName + "." + path, null);
-         return value.isEmpty() ? fallback : value;
+@@ -128,4 +130,23 @@ public class KaiijuWorldConfig {
+     private void exploitSettings() {
+         fixSandDuping = getBoolean("exploit.fix-sand-duping", fixSandDuping);
      }
 +
 +    public List<String> regionFormatList = Arrays.asList("ANVIL", "LINEAR");
@@ -61,10 +61,10 @@ index dd4c3ca77acb3aeefc69b8eb948b8b202ff87a19..b194f4dbebcbbf5bb4e026a0169e2d24
  }
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 3d9ae7eb37e98fb139240ca253e7de7adeb07b8d..10b4b4202f6b4cae702a3c66123be06358a4cdc3 100644
+index 0696ad97437726fd6a13badfe7db0617dfbfb1ad..a7233bcc99e9bf148348ebb36bbb15b2eadb381f 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -896,7 +896,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -897,7 +897,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
              // Paper start - rewrite chunk system
              worldserver.save((ProgressListener) null, flush, worldserver.noSave && !force, close);
              if (flush) {
@@ -73,7 +73,7 @@ index 3d9ae7eb37e98fb139240ca253e7de7adeb07b8d..10b4b4202f6b4cae702a3c66123be063
              }
              // Paper end - rewrite chunk system
          }
-@@ -920,7 +920,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -921,7 +921,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
                  //MinecraftServer.LOGGER.info("ThreadedAnvilChunkStorage ({}): All chunks are saved", worldserver2.getChunkSource().chunkMap.getStorageName()); // Paper - move up
              }
  

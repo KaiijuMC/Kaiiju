@@ -5,10 +5,10 @@ Subject: [PATCH] Kaiiju Network Configuration
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index b86c90cc3601e666998cfa12f44515f605bb53eb..7c6d43d8a360530344ef296f4477750c8a298607 100644
+index 6af036b2d11aa74bb4a371c03bd2e637f49ed166..8e7892cb46385ba3189485c144ec9fbcdc347502 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -198,4 +198,7 @@ public class KaiijuConfig {
+@@ -201,4 +201,7 @@ public class KaiijuConfig {
      private static void regionFormatSettings() {
          regionFormatDebug = getBoolean("region-format.debug", regionFormatDebug);
      }

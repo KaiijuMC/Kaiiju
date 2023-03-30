@@ -133,10 +133,10 @@ index abe37c7c3c6f5ab73afd738ec78f06d7e4d2ed96..52fc6bb99f6024273c7438d01314b576
          stringbuilder.append(CrashReport.DATE_TIME_FORMATTER.format(ZonedDateTime.now()));
          stringbuilder.append("\n");
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 61a7d2728c6f4b936dc8f1031950374f2c35cac7..44e014e98bfbbae40e882ca2f80446e9c1062800 100644
+index f5721f6d719b7055fdccc81d5e67ed758e90cb10..0696ad97437726fd6a13badfe7db0617dfbfb1ad 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -998,7 +998,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -999,7 +999,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          shutdownThread = Thread.currentThread();
          org.spigotmc.WatchdogThread.doStop(); // Paper
          if (false && !isSameThread()) { // Folia - region threading
@@ -145,7 +145,7 @@ index 61a7d2728c6f4b936dc8f1031950374f2c35cac7..44e014e98bfbbae40e882ca2f80446e9
              while (this.getRunningThread().isAlive()) {
                  this.getRunningThread().stop();
                  try {
-@@ -1832,7 +1832,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1833,7 +1833,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
      @DontObfuscate
      public String getServerModName() {

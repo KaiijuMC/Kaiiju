@@ -5,10 +5,10 @@ Subject: [PATCH] Purpur Network Send Null Entity Packets
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 7c6d43d8a360530344ef296f4477750c8a298607..ab08e11f13921163b8ff1ff51ff9e9b86d2b47c7 100644
+index 8e7892cb46385ba3189485c144ec9fbcdc347502..94a033e835915dc84c0dd4a84d218c0283aa03fe 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -198,7 +198,10 @@ public class KaiijuConfig {
+@@ -201,7 +201,10 @@ public class KaiijuConfig {
      private static void regionFormatSettings() {
          regionFormatDebug = getBoolean("region-format.debug", regionFormatDebug);
      }
