@@ -2,7 +2,7 @@
 <div align="center">
   <img src="https://github.com/kugge/Kaiiju/blob/ver/1.19.3/logo.png?" width="32%" height="32%"/>
   <h1>Kaiiju</h1>
-  <h3>Designed for vanilla/anarchy servers</h3>
+  <h3>Folia fork, designed for vanilla/anarchy servers</h3>
 
   [![License](https://img.shields.io/github/license/kugge/Kaiiju?style=for-the-badge&logo=github)](LICENSE)
   [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/kugge/Kaiiju/build.yml?style=for-the-badge)](https://github.com/kugge/Kaiiju/actions)
