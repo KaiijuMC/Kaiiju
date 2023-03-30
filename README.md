@@ -14,9 +14,10 @@
 
 ### Additions
 - **Xymb Linear Format**: Saves about 50% of disk space in OW and Nether and 95% in The End.
-- **Lobotomize**: Lobotomize mobs and villagers without breaking vanilla mechanics.
+- **Auto update**: Update upstream everyday.
 
 ### Roadmap
+- **Static view distance**: Reduce RAM usage with a "cached" view distance.
 - **Lithium**: Implementation of Lithium server mixins.
 - **C2ME**: Implementation of C2ME server mixins.
 - **VMP**: Implementation of VMP server mixins.
