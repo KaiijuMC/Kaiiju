@@ -133,7 +133,7 @@ index abe37c7c3c6f5ab73afd738ec78f06d7e4d2ed96..52fc6bb99f6024273c7438d01314b576
          stringbuilder.append(CrashReport.DATE_TIME_FORMATTER.format(ZonedDateTime.now()));
          stringbuilder.append("\n");
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 61a7d2728c6f4b936dc8f1031950374f2c35cac7..3d9ae7eb37e98fb139240ca253e7de7adeb07b8d 100644
+index 61a7d2728c6f4b936dc8f1031950374f2c35cac7..44e014e98bfbbae40e882ca2f80446e9c1062800 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -998,7 +998,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -145,8 +145,17 @@ index 61a7d2728c6f4b936dc8f1031950374f2c35cac7..3d9ae7eb37e98fb139240ca253e7de7a
              while (this.getRunningThread().isAlive()) {
                  this.getRunningThread().stop();
                  try {
+@@ -1832,7 +1832,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+ 
+     @DontObfuscate
+     public String getServerModName() {
+-        return "Folia"; // Folia - Folia > // Paper - Paper > // Spigot - Spigot > // CraftBukkit - cb > vanilla!
++        return "Kaiiju"; // Kaiiju - Kaiiju > // Folia - Folia > // Paper - Paper > // Spigot - Spigot > // CraftBukkit - cb > vanilla!
+     }
+ 
+     public SystemReport fillSystemReport(SystemReport details) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 32c9b38036052649b7b5fb25d7c4a49fdd1ca972..b1680507c05547458e1199412ab97105b67f8973 100644
+index 32c9b38036052649b7b5fb25d7c4a49fdd1ca972..176f3acec268dad80cc90029edd88e7a0c3e8885 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -256,7 +256,7 @@ import javax.annotation.Nullable; // Paper
@@ -154,7 +163,7 @@ index 32c9b38036052649b7b5fb25d7c4a49fdd1ca972..b1680507c05547458e1199412ab97105
  
  public final class CraftServer implements Server {
 -    private final String serverName = "Folia"; // Folia // Paper
-+    private final String serverName = "Folia"; // Folia // Paper // Kaiiju
++    private final String serverName = "Kaiiju"; // Kaiiju // Folia // Paper
      private final String serverVersion;
      private final String bukkitVersion = Versioning.getBukkitVersion();
      private final Logger logger = Logger.getLogger("Minecraft");
