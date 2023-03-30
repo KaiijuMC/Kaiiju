@@ -5,12 +5,12 @@ Subject: [PATCH] Kaiiju Lithium Configuration
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 94a033e835915dc84c0dd4a84d218c0283aa03fe..a94ec0d098394a5bd662268fe17e92e343c4619c 100644
+index e88e9197e99ac68fd58d48e7722eb6254ee75388..4c9200e51ffc24b354d83822b78526d853ad4ddc 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -207,4 +207,9 @@ public class KaiijuConfig {
-     private static void networkSettings() {
+@@ -209,4 +209,9 @@ public class KaiijuConfig {
          sendNullEntityPackets = getBoolean("network.send-null-entity-packets", sendNullEntityPackets);
+         alternateKeepAlive = getBoolean("network.alternate-keepalive", sendNullEntityPackets);
      }
 +
 +    public static boolean lithiumEnable = true;
