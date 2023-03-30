@@ -5,10 +5,10 @@ Subject: [PATCH] Lithium Entity FastRetrieval
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 1fe1435b1cfe547ddbfccca01de580b8f0e59888..fd50b949135178a777abed362a0516591f5b9c98 100644
+index 4bd05b06f4410f8d425ac1f79b37a7fc45b433f4..57ff32c4eac364362ff2e7dc4e8b02156ee30756 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -208,9 +208,11 @@ public class KaiijuConfig {
+@@ -211,9 +211,11 @@ public class KaiijuConfig {
      public static boolean lithiumEnable = true;
      public static boolean lithiumMathFastUtil = true;
      public static boolean lithiumMathSineLut = true;
