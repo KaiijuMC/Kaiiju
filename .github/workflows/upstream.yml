@@ -1,4 +1,4 @@
-name: Update Upstream (Purpur)
+name: Update Upstream (Folia)
 
 on:
   schedule:
@@ -7,9 +7,7 @@ on:
 
 jobs:
   upstream:
-
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Git Repository
         uses: actions/checkout@v2
@@ -22,7 +20,7 @@ jobs:
       - name: Configure Git User Details
         run: git config --global user.email "actions@github.com" && git config --global user.name "Github Actions"
       - name: Update Upstream Commit Hash
-        run: ./gradlew purpurRefLatest --stacktrace
+        run: ./gradlew foliaRefLatest --stacktrace
       - name: Apply Patches
         run: ./gradlew applyPatches --stacktrace
       - name: Build Paperclip jar
@@ -37,8 +35,8 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
         with:
-          commit-message: Update Upstream (Purpur)
+          commit-message: Update Upstream (Folia)
           branch: update-upstream
           delete-branch: true
-          title: 'Update Upstream (Purpur)'
+          title: 'Update Upstream (Folia)'
           body: ''
