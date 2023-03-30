@@ -339,10 +339,10 @@ index 0000000000000000000000000000000000000000..dd4c3ca77acb3aeefc69b8eb948b8b20
 \ No newline at end of file
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/command/KaiijuCommand.java b/src/main/java/dev/kaiijumc/kaiiju/command/KaiijuCommand.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..0dde8879856f8882f2840b4b8bfb5aa0b3f06b91
+index 0000000000000000000000000000000000000000..08a2375b90a2088e2bdfb3e316144677346a3dd6
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/command/KaiijuCommand.java
-@@ -0,0 +1,68 @@
+@@ -0,0 +1,67 @@
 +package dev.kaiijumc.kaiiju.command;
 +
 +import dev.kaiijumc.kaiiju.KaiijuConfig;
@@ -396,7 +396,6 @@ index 0000000000000000000000000000000000000000..0dde8879856f8882f2840b4b8bfb5aa0
 +            KaiijuConfig.reload((File) console.options.valueOf("kaiiju-settings"));
 +            for (ServerLevel level : console.getAllLevels()) {
 +                level.kaiijuConfig.reload();
-+                level.resetBreedingCooldowns();
 +            }
 +            console.server.reloadCount++;
 +

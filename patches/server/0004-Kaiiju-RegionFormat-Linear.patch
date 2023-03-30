@@ -754,7 +754,7 @@ index dcfe090c269d4cbcc2eb1b6f85392848bb34656c..d42c320179ae055b8675d1ce6ce1788e
          try (DataInputStream out = new DataInputStream(new java.io.BufferedInputStream(new InflaterInputStream(Files.newInputStream(file))))) {
              return NbtIo.read((java.io.DataInput) out);
 diff --git a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
-index 9633b01d2d961fd1403e353484d336376ef009eb..0046809490f871f8a1797284307d9d8a98c73726 100644
+index 9633b01d2d961fd1403e353484d336376ef009eb..e417076cda326a24148ad77ff7cbaf1a92d2163e 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 @@ -22,9 +22,13 @@ public class RegionFileStorage implements AutoCloseable {
@@ -836,7 +836,7 @@ index 9633b01d2d961fd1403e353484d336376ef009eb..0046809490f871f8a1797284307d9d8a
              }
              // Paper end
              return regionfile;
-@@ -124,14 +132,31 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -124,28 +132,46 @@ public class RegionFileStorage implements AutoCloseable {
              }
              // Paper end - cache regionfile does not exist state
              if (this.regionCache.size() >= io.papermc.paper.configuration.GlobalConfiguration.get().misc.regionFileCacheSize) { // Paper - configurable
@@ -849,6 +849,8 @@ index 9633b01d2d961fd1403e353484d336376ef009eb..0046809490f871f8a1797284307d9d8a
              int j = chunkcoordintpair.getRegionX();
 -            Path path1 = path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + ".mca"); // Paper - diff on change
 -            if (existingOnly && !java.nio.file.Files.exists(path1)) { // Paper start - cache regionfile does not exist state
+-                this.markNonExisting(regionPos);
+-                return null; // CraftBukkit
 +            // Kaiiju start - Polyglot
 +            //Path path1 = path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + ".mca"); // Paper - diff on change
 +            Path path1;
@@ -857,22 +859,21 @@ index 9633b01d2d961fd1403e353484d336376ef009eb..0046809490f871f8a1797284307d9d8a
 +                Path linear = path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + ".linear");
 +                if (java.nio.file.Files.exists(anvil)) path1 = anvil;
 +                else if (java.nio.file.Files.exists(linear)) path1 = linear;
-+                else return null;
-+            } else {
++                else {
++                    this.markNonExisting(regionPos);
++                    return null;
++                }
+             } else {
 +                String extension = switch (this.format) {
 +                    case "LINEAR" -> "linear";
 +                    default -> "mca";
 +                };
 +                path1 = path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + "." + extension);
-+            }
+                 this.createRegionFile(regionPos);
+             }
 +            if (dev.kaiijumc.kaiiju.KaiijuConfig.regionFormatDebug)
 +                org.bukkit.Bukkit.getLogger().info("[Region File Storage] Opening file " + path1 + " with format " + this.format + " (existingOnly = " + existingOnly + ")");
-+            //if (existingOnly && !java.nio.file.Files.exists(path1)) { // Paper start - cache regionfile does not exist state
-                 this.markNonExisting(regionPos);
-                 return null; // CraftBukkit
-             } else {
-@@ -139,13 +164,15 @@ public class RegionFileStorage implements AutoCloseable {
-             }
++
              // Paper end - cache regionfile does not exist state
              FileUtil.createDirectoriesSafe(this.folder); // Paper - only create directory if not existing only - moved from above
 -            RegionFile regionfile1 = new RegionFile(path1, this.folder, this.sync, this.isChunkData); // Paper - allow for chunk regionfiles to regen header
@@ -889,7 +890,7 @@ index 9633b01d2d961fd1403e353484d336376ef009eb..0046809490f871f8a1797284307d9d8a
              }
              // Paper end
              return regionfile1;
-@@ -173,7 +200,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -173,7 +199,7 @@ public class RegionFileStorage implements AutoCloseable {
      }
  
  
@@ -898,7 +899,7 @@ index 9633b01d2d961fd1403e353484d336376ef009eb..0046809490f871f8a1797284307d9d8a
          synchronized (regionfile) {
              try (DataInputStream datainputstream = regionfile.getChunkDataInputStream(chunkCoordinate)) {
                  CompoundTag oversizedData = regionfile.getOversizedData(chunkCoordinate.x, chunkCoordinate.z);
-@@ -220,14 +247,14 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -220,14 +246,14 @@ public class RegionFileStorage implements AutoCloseable {
      @Nullable
      public CompoundTag read(ChunkPos pos) throws IOException {
          // CraftBukkit start - SPIGOT-5680: There's no good reason to preemptively create files on read, save that for writing
@@ -915,7 +916,7 @@ index 9633b01d2d961fd1403e353484d336376ef009eb..0046809490f871f8a1797284307d9d8a
          // We add the regionfile parameter to avoid the potential deadlock (on fileLock) if we went back to obtain a regionfile
          // if we decide to re-read
          // Paper end
-@@ -237,7 +264,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -237,7 +263,7 @@ public class RegionFileStorage implements AutoCloseable {
  
          // Paper start
          if (regionfile.isOversized(pos.x, pos.z)) {
@@ -924,7 +925,7 @@ index 9633b01d2d961fd1403e353484d336376ef009eb..0046809490f871f8a1797284307d9d8a
              return readOversizedChunk(regionfile, pos);
          }
          // Paper end
-@@ -251,12 +278,12 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -251,12 +277,12 @@ public class RegionFileStorage implements AutoCloseable {
                      if (this.isChunkData) {
                          ChunkPos chunkPos = ChunkSerializer.getChunkCoordinate(nbttagcompound);
                          if (!chunkPos.equals(pos)) {
@@ -940,7 +941,7 @@ index 9633b01d2d961fd1403e353484d336376ef009eb..0046809490f871f8a1797284307d9d8a
                              return null;
                          }
                      }
-@@ -290,13 +317,13 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -290,13 +316,13 @@ public class RegionFileStorage implements AutoCloseable {
  
          return nbttagcompound;
          } finally { // Paper start
@@ -956,7 +957,7 @@ index 9633b01d2d961fd1403e353484d336376ef009eb..0046809490f871f8a1797284307d9d8a
          if (regionfile == null) {
              return;
          }
-@@ -326,7 +353,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -326,7 +352,7 @@ public class RegionFileStorage implements AutoCloseable {
      }
  
      protected void write(ChunkPos pos, @Nullable CompoundTag nbt) throws IOException {
@@ -965,7 +966,7 @@ index 9633b01d2d961fd1403e353484d336376ef009eb..0046809490f871f8a1797284307d9d8a
          if (nbt == null && regionfile == null) {
              return;
          }
-@@ -376,7 +403,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -376,7 +402,7 @@ public class RegionFileStorage implements AutoCloseable {
          }
          // Paper end
          } finally { // Paper start
@@ -974,7 +975,7 @@ index 9633b01d2d961fd1403e353484d336376ef009eb..0046809490f871f8a1797284307d9d8a
          } // Paper end
      }
  
-@@ -385,7 +412,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -385,7 +411,7 @@ public class RegionFileStorage implements AutoCloseable {
          ObjectIterator objectiterator = this.regionCache.values().iterator();
  
          while (objectiterator.hasNext()) {
@@ -983,7 +984,7 @@ index 9633b01d2d961fd1403e353484d336376ef009eb..0046809490f871f8a1797284307d9d8a
  
              try {
                  regionfile.close();
-@@ -401,7 +428,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -401,7 +427,7 @@ public class RegionFileStorage implements AutoCloseable {
          ObjectIterator objectiterator = this.regionCache.values().iterator();
  
          while (objectiterator.hasNext()) {
