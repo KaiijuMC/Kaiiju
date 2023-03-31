@@ -754,7 +754,7 @@ index dcfe090c269d4cbcc2eb1b6f85392848bb34656c..d42c320179ae055b8675d1ce6ce1788e
          try (DataInputStream out = new DataInputStream(new java.io.BufferedInputStream(new InflaterInputStream(Files.newInputStream(file))))) {
              return NbtIo.read((java.io.DataInput) out);
 diff --git a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
-index 9633b01d2d961fd1403e353484d336376ef009eb..e417076cda326a24148ad77ff7cbaf1a92d2163e 100644
+index 9633b01d2d961fd1403e353484d336376ef009eb..c9fbba6f709ed0540dcc22b41e50ce9d01a6381c 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 @@ -22,9 +22,13 @@ public class RegionFileStorage implements AutoCloseable {
@@ -872,7 +872,7 @@ index 9633b01d2d961fd1403e353484d336376ef009eb..e417076cda326a24148ad77ff7cbaf1a
                  this.createRegionFile(regionPos);
              }
 +            if (dev.kaiijumc.kaiiju.KaiijuConfig.regionFormatDebug)
-+                org.bukkit.Bukkit.getLogger().info("[Region File Storage] Opening file " + path1 + " with format " + this.format + " (existingOnly = " + existingOnly + ")");
++                org.bukkit.Bukkit.getLogger().info("Opening file " + path1 + " with format " + this.format + " (existingOnly = " + existingOnly + ")");
 +
              // Paper end - cache regionfile does not exist state
              FileUtil.createDirectoriesSafe(this.folder); // Paper - only create directory if not existing only - moved from above
