@@ -1,18 +1,20 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
-Date: Fri, 31 Mar 2023 07:17:29 +0300
-Subject: [PATCH] Kaiiju Multithreading Configuration
+Date: Thu, 16 Feb 2023 21:28:49 +0200
+Subject: [PATCH] Kaiiju Lithium Configuration
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index e88e9197e99ac68fd58d48e7722eb6254ee75388..e33bd01e948308b479fd85715fff109a7d3c5081 100644
+index e88e9197e99ac68fd58d48e7722eb6254ee75388..4c9200e51ffc24b354d83822b78526d853ad4ddc 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -209,4 +209,7 @@ public class KaiijuConfig {
+@@ -209,4 +209,9 @@ public class KaiijuConfig {
          sendNullEntityPackets = getBoolean("network.send-null-entity-packets", sendNullEntityPackets);
          alternateKeepAlive = getBoolean("network.alternate-keepalive", sendNullEntityPackets);
      }
 +
-+    private static void multithreadingSettings() {
++    public static boolean lithiumEnable = true;
++    private static void lithiumSettings() {
++        lithiumEnable = getBoolean("lithium.enable", lithiumEnable);
 +    }
  }

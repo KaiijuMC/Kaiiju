@@ -7,10 +7,10 @@ Author: JellySquid
 Licence: LGPL-3.0
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 712fcc3dfd1e363166caf7aa05927f2f9c998f91..529057fddb6c3bb5c8952e88da7e1f817db4c684 100644
+index 4c9200e51ffc24b354d83822b78526d853ad4ddc..48bf2e11a4d869aeef4ce7169636ff625555f7e1 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -217,7 +217,9 @@ public class KaiijuConfig {
+@@ -211,7 +211,9 @@ public class KaiijuConfig {
      }
  
      public static boolean lithiumEnable = true;
