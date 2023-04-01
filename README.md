@@ -18,9 +18,7 @@
 
 ### Roadmap
 - **Static view distance**: Reduce RAM usage with a "cached" view distance.
-- **Lithium**: Implementation of Lithium server mixins.
-- **C2ME**: Implementation of C2ME server mixins.
-- **VMP**: Implementation of VMP server mixins.
+- **Native world conversion**: Convert region file format at startup
 
 ## Building
 
