@@ -5,12 +5,12 @@ Subject: [PATCH] Kaiiju RegionFormat Configuration
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 75f9fc471069507168ad23092bc77e0d1597fd1d..6af036b2d11aa74bb4a371c03bd2e637f49ed166 100644
+index 7da7e0aeb5eac9ac73a3570e716f1ceb11fd7027..b86c90cc3601e666998cfa12f44515f605bb53eb 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -195,4 +195,10 @@ public class KaiijuConfig {
- 
-     private static void exploitSettings() {
+@@ -192,4 +192,10 @@ public class KaiijuConfig {
+         }
+         return builder.build();
      }
 +
 +    public static boolean regionFormatDebug = false;
@@ -20,7 +20,7 @@ index 75f9fc471069507168ad23092bc77e0d1597fd1d..6af036b2d11aa74bb4a371c03bd2e637
 +    }
  }
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index 410bb2832140648ab0b59a35545a27f7d78c7222..421d21d3f1126101e66d54894a39b657de7d1590 100644
+index dd4c3ca77acb3aeefc69b8eb948b8b202ff87a19..b194f4dbebcbbf5bb4e026a0169e2d24806b46ec 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 @@ -4,9 +4,11 @@ import org.apache.commons.lang.BooleanUtils;
@@ -35,9 +35,9 @@ index 410bb2832140648ab0b59a35545a27f7d78c7222..421d21d3f1126101e66d54894a39b657
  
  import static dev.kaiijumc.kaiiju.KaiijuConfig.log;
  
-@@ -128,4 +130,23 @@ public class KaiijuWorldConfig {
-     private void exploitSettings() {
-         fixSandDuping = getBoolean("exploit.fix-sand-duping", fixSandDuping);
+@@ -122,4 +124,23 @@ public class KaiijuWorldConfig {
+         final Map<String, Object> value = getMap("world-settings." + worldName + "." + path, null);
+         return value.isEmpty() ? fallback : value;
      }
 +
 +    public List<String> regionFormatList = Arrays.asList("ANVIL", "LINEAR");

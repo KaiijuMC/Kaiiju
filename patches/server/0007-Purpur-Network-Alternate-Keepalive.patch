@@ -5,10 +5,10 @@ Subject: [PATCH] Purpur Network Alternate Keepalive
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 94a033e835915dc84c0dd4a84d218c0283aa03fe..e88e9197e99ac68fd58d48e7722eb6254ee75388 100644
+index ab08e11f13921163b8ff1ff51ff9e9b86d2b47c7..edaeba20d871925ae05f7f1cabb3ac8eb71b4655 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -203,8 +203,10 @@ public class KaiijuConfig {
+@@ -200,8 +200,10 @@ public class KaiijuConfig {
      }
      
      public static boolean sendNullEntityPackets = true;
