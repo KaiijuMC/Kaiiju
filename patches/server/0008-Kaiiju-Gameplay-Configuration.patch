@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
+Date: Sat, 8 Apr 2023 23:32:34 +0300
+Subject: [PATCH] Kaiiju Gameplay Configuration
+
+
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+index edaeba20d871925ae05f7f1cabb3ac8eb71b4655..e216139d08c52640396c07c19c5cfeff09031cdb 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+@@ -206,4 +206,7 @@ public class KaiijuConfig {
+         sendNullEntityPackets = getBoolean("network.send-null-entity-packets", sendNullEntityPackets);
+         alternateKeepAlive = getBoolean("network.alternate-keepalive", sendNullEntityPackets);
+     }
++
++    private static void gameplaySettings() {
++    }
+ }
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
+index b194f4dbebcbbf5bb4e026a0169e2d24806b46ec..73d79fe0077b28db2f9e7fa13a1ae6eff9abd6a9 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
+@@ -143,4 +143,7 @@ public class KaiijuWorldConfig {
+             regionFormatLinearCompressionLevel = 1;
+         }
+     }
++
++    private void gameplaySettings() {
++    }
+ }
+\ No newline at end of file

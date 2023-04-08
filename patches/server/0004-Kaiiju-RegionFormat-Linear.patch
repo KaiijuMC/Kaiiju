@@ -4,8 +4,6 @@ Date: Fri, 10 Feb 2023 22:21:56 +0200
 Subject: [PATCH] Kaiiju RegionFormat Linear
 
 Documentation: https://github.com/xymb-endcrystalme/LinearRegionFileFormatTools
-Copyright xymb@endcrystal.me
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 diff --git a/build.gradle.kts b/build.gradle.kts
 index 6dd416f65755ca0542e6661b8716672264120d59..4686019a152114e63e997ee103fc8424b24b4581 100644
@@ -111,10 +109,10 @@ index 0000000000000000000000000000000000000000..dcfbabf54b19a4c29d5c95830242c5c2
 +}
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/region/LinearRegionFile.java b/src/main/java/dev/kaiijumc/kaiiju/region/LinearRegionFile.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..f05d6313012560c32a3ec574b7169ec8e8930282
+index 0000000000000000000000000000000000000000..32213e1f2432a2ee0c27331e83a04696d4cdd0cc
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/region/LinearRegionFile.java
-@@ -0,0 +1,334 @@
+@@ -0,0 +1,336 @@
 +package dev.kaiijumc.kaiiju.region;
 +
 +import com.github.luben.zstd.ZstdInputStream;
@@ -123,7 +121,6 @@ index 0000000000000000000000000000000000000000..f05d6313012560c32a3ec574b7169ec8
 +import net.jpountz.lz4.LZ4Compressor;
 +import net.jpountz.lz4.LZ4Factory;
 +import net.jpountz.lz4.LZ4FastDecompressor;
-+import net.jpountz.xxhash.XXHashFactory;
 +import net.minecraft.nbt.CompoundTag;
 +import net.minecraft.world.level.ChunkPos;
 +import net.minecraft.world.level.chunk.ChunkStatus;
@@ -329,11 +326,14 @@ index 0000000000000000000000000000000000000000..f05d6313012560c32a3ec574b7169ec8
 +        byte[] compressed = zstdByteArray.toByteArray();
 +
 +        dataStream.writeInt(compressed.length);
-+        dataStream.writeLong(XXHashFactory.fastestInstance().hash64().hash(compressed, 0, compressed.length, 0)); // TODO: Hash the contents, not the whole thing
++        dataStream.writeLong(0);
 +
 +        dataStream.write(compressed, 0, compressed.length);
 +        dataStream.writeLong(SUPERBLOCK);
 +
++        dataStream.flush();
++        fileStream.getFD().sync();
++        fileStream.getChannel().force(true); // Ensure atomicity on Btrfs
 +        dataStream.close();
 +
 +        fileStream.close();
