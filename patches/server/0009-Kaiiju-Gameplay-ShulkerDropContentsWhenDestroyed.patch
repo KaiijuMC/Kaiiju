@@ -5,17 +5,17 @@ Subject: [PATCH] Kaiiju Gameplay ShulkerDropContentsWhenDestroyed
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index 73d79fe0077b28db2f9e7fa13a1ae6eff9abd6a9..1ebc47a266dd3202ac9654eebf1a6a74dead2e27 100644
+index 73d79fe0077b28db2f9e7fa13a1ae6eff9abd6a9..bac11b0e30a86d0689693ff129b53bcad7c2034c 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 @@ -144,6 +144,9 @@ public class KaiijuWorldConfig {
          }
      }
  
-+    public boolean shulkerBoxDropContentsWhenDestroyed  = true;
++    public boolean shulkerBoxDropContentsWhenDestroyed = true;
 +
      private void gameplaySettings() {
-+        shulkerBoxDropContentsWhenDestroyed  = getBoolean("gameplay.shulker-box-drop-contents-when-destroyed", shulkerBoxDropContentsWhenDestroyed );
++        shulkerBoxDropContentsWhenDestroyed = getBoolean("gameplay.shulker-box-drop-contents-when-destroyed", shulkerBoxDropContentsWhenDestroyed);
      }
  }
 \ No newline at end of file

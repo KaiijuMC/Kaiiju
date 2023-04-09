@@ -1,11 +1,11 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
 Date: Fri, 31 Mar 2023 01:52:44 +0300
-Subject: [PATCH] Purpur Network Alternate Keepalive
+Subject: [PATCH] Purpur Network AlternateKeepalive
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index ab08e11f13921163b8ff1ff51ff9e9b86d2b47c7..edaeba20d871925ae05f7f1cabb3ac8eb71b4655 100644
+index ab08e11f13921163b8ff1ff51ff9e9b86d2b47c7..b42a3466f145a92608c8746fd4beb529b4a60b01 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 @@ -200,8 +200,10 @@ public class KaiijuConfig {
@@ -16,7 +16,7 @@ index ab08e11f13921163b8ff1ff51ff9e9b86d2b47c7..edaeba20d871925ae05f7f1cabb3ac8e
  
      private static void networkSettings() {
          sendNullEntityPackets = getBoolean("network.send-null-entity-packets", sendNullEntityPackets);
-+        alternateKeepAlive = getBoolean("network.alternate-keepalive", sendNullEntityPackets);
++        alternateKeepAlive = getBoolean("network.alternate-keepalive", alternateKeepAlive);
      }
  }
 diff --git a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java

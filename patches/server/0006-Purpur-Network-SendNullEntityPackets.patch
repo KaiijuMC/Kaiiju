@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
 Date: Thu, 16 Feb 2023 01:49:54 +0200
-Subject: [PATCH] Purpur Network Send Null Entity Packets
+Subject: [PATCH] Purpur Network SendNullEntityPackets
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java

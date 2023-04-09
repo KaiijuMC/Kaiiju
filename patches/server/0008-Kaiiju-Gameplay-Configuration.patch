@@ -5,12 +5,12 @@ Subject: [PATCH] Kaiiju Gameplay Configuration
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index edaeba20d871925ae05f7f1cabb3ac8eb71b4655..e216139d08c52640396c07c19c5cfeff09031cdb 100644
+index b42a3466f145a92608c8746fd4beb529b4a60b01..6d0e1edfb7d3c020f70f6a194f16e836b462c4de 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 @@ -206,4 +206,7 @@ public class KaiijuConfig {
          sendNullEntityPackets = getBoolean("network.send-null-entity-packets", sendNullEntityPackets);
-         alternateKeepAlive = getBoolean("network.alternate-keepalive", sendNullEntityPackets);
+         alternateKeepAlive = getBoolean("network.alternate-keepalive", alternateKeepAlive);
      }
 +
 +    private static void gameplaySettings() {
