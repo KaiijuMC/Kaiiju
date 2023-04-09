@@ -20,8 +20,30 @@
 - **Static view distance**: Reduce RAM usage with a "cached" view distance.
 - **Native world conversion**: Convert region file format at startup
 
-## Building
+## Configuration 
+```bash
+verbose: false
+region-format:
+  debug: false
+network:
+  send-null-entity-packets: true
+  alternate-keepalive: false
+gameplay:
+  server-mod-name: Kaiiju
+world-settings:
+  default:
+    region-format:
+      format: ANVIL
+      linear:
+        compression-level: 1
+    gameplay:
+      shulker-box-drop-contents-when-destroyed: true
+config-version: 1
+```
+- **format:** ANVIL, LINEAR
+- **compression-level:** If you are using .linear the recommended value is 6.
 
+## Building 
 ```bash
 ./gradlew applyPatches # Apply Kaiiju patches
 ./gradlew createReobfPaperclipJar # Generate Paperclip executable jar
