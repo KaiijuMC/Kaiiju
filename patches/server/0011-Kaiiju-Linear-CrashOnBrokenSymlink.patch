@@ -136,7 +136,7 @@ index 52c2e0fe73a5af18535a2b0b9a506919e3f93003..ea54af3f68c6534ff5a71ca0b7a99d12
      }
  
 diff --git a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
-index c9fbba6f709ed0540dcc22b41e50ce9d01a6381c..f0066cc8dc8069f97008c36cf2cfc7377e201dde 100644
+index c9fbba6f709ed0540dcc22b41e50ce9d01a6381c..70e3ee306283263cdcdb7a66c80fc23484385aac 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 @@ -20,6 +20,7 @@ import net.minecraft.world.level.ChunkPos;
@@ -203,6 +203,14 @@ index c9fbba6f709ed0540dcc22b41e50ce9d01a6381c..f0066cc8dc8069f97008c36cf2cfc737
                  if (java.nio.file.Files.exists(anvil)) path1 = anvil;
                  else if (java.nio.file.Files.exists(linear)) path1 = linear;
                  else {
+@@ -156,6 +174,7 @@ public class RegionFileStorage implements AutoCloseable {
+                     default -> "mca";
+                 };
+                 path1 = path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + "." + extension);
++                guardAgainstBrokenSymlinks(path1);
+                 this.createRegionFile(regionPos);
+             }
+             if (dev.kaiijumc.kaiiju.KaiijuConfig.regionFormatDebug)
 diff --git a/src/main/java/net/minecraft/world/level/chunk/storage/SectionStorage.java b/src/main/java/net/minecraft/world/level/chunk/storage/SectionStorage.java
 index 414aa3ae00c2d28e754235e3e93b6b623d4fd180..15e376fac063430e4355c6ffcd25c35a8ce20c5b 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/storage/SectionStorage.java
