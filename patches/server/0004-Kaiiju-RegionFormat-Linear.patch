@@ -109,10 +109,10 @@ index 0000000000000000000000000000000000000000..dcfbabf54b19a4c29d5c95830242c5c2
 +}
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/region/LinearRegionFile.java b/src/main/java/dev/kaiijumc/kaiiju/region/LinearRegionFile.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..32213e1f2432a2ee0c27331e83a04696d4cdd0cc
+index 0000000000000000000000000000000000000000..245e3b1801c5f92054d9c0d0d8fc2a8fcfd6a1d4
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/region/LinearRegionFile.java
-@@ -0,0 +1,336 @@
+@@ -0,0 +1,328 @@
 +package dev.kaiijumc.kaiiju.region;
 +
 +import com.github.luben.zstd.ZstdInputStream;
@@ -133,15 +133,25 @@ index 0000000000000000000000000000000000000000..32213e1f2432a2ee0c27331e83a04696
 +import java.nio.file.Path;
 +import java.nio.file.StandardCopyOption;
 +import java.util.ArrayList;
++import java.util.Arrays;
 +import java.util.concurrent.locks.ReentrantLock;
 +
 +public class LinearRegionFile extends Thread implements AbstractRegionFile {
++    private static long SUPERBLOCK = -4323716122432332390L;
++    private static byte VERSION = 1;
++    private static int HEADER_SIZE = 32;
++    private static int FOOTER_SIZE = 8;
 +    private static final Logger LOGGER = LogUtils.getLogger();
-+    private final byte[][] buffer = new byte[32*32][];
-+    private final int[] bufferUncompressedSize = new int[32*32];
++
++
++    private final byte[][] buffer = new byte[1024][];
++    private final int[] bufferUncompressedSize = new int[1024];
 +
 +    private final Object markedToSaveLock = new Object();
-+    private final ChunkStatus[] statuses = new ChunkStatus[32 * 32];
++    private final ChunkStatus[] statuses = new ChunkStatus[1024];
++
++    private final LZ4Compressor compressor;
++    private final LZ4FastDecompressor decompressor;
 +
 +    private boolean markedToSave = false;
 +    private boolean close = false;
@@ -162,69 +172,60 @@ index 0000000000000000000000000000000000000000..32213e1f2432a2ee0c27331e83a04696
 +    public LinearRegionFile(Path file, int compression) throws IOException {
 +        this.regionFile = file;
 +        this.compressionLevel = compression;
++
++        this.compressor = LZ4Factory.fastestInstance().fastCompressor();
++        this.decompressor = LZ4Factory.fastestInstance().fastDecompressor();
++
 +        File regionFile = new File(this.regionFile.toString());
 +
-+        LZ4Compressor compressor = LZ4Factory.fastestInstance().fastCompressor();
-+
-+        for (int i = 0; i < 32 * 32; i++)
-+            this.bufferUncompressedSize[i] = 0;
++        Arrays.fill(this.bufferUncompressedSize, 0);
 +
 +        if(regionFile.canRead()) {
-+            long fileLength = file.toFile().length();
 +            FileInputStream fileStream = new FileInputStream(regionFile);
 +            DataInputStream rawDataStream = new DataInputStream(fileStream);
 +
-+            long SUPERBLOCK = -4323716122432332390L;
-+            byte VERSION = 1;
-+            int HEADER_SIZE = 32;
-+            int FOOTER_SIZE = 8;
-+
 +            long superBlock = rawDataStream.readLong();
-+
 +            if (superBlock != SUPERBLOCK)
 +                throw new RuntimeException("Superblock invalid: " + superBlock + " file " + file);
 +
 +            byte version = rawDataStream.readByte();
-+
 +            if (version != VERSION)
 +                throw new RuntimeException("Version invalid: " + version + " file " + file);
 +
-+            rawDataStream.readLong(); // newestTimestamp
-+            rawDataStream.readByte(); // Compression level
-+            rawDataStream.readShort(); // Chunk count
-+            int dataCount = rawDataStream.readInt();
++            // Skip newestTimestamp (Long) + Compression level (Byte) + Chunk count (Short): Unused.
++            rawDataStream.skipBytes(11);
 +
++            int dataCount = rawDataStream.readInt();
++            long fileLength = file.toFile().length();
 +            if (fileLength != HEADER_SIZE + dataCount + FOOTER_SIZE)
 +                throw new IOException("File length invalid " + this.regionFile + " " + fileLength + " " + (HEADER_SIZE + dataCount + FOOTER_SIZE));
 +
-+            rawDataStream.readLong(); // Data Hash
-+            byte[] rawCompressed = new byte[dataCount];
++            rawDataStream.skipBytes(8); // Skip data hash (Long): Unused.
 +
++            byte[] rawCompressed = new byte[dataCount];
 +            rawDataStream.readFully(rawCompressed, 0, dataCount);
 +
 +            superBlock = rawDataStream.readLong();
-+
-+            if (superBlock != SUPERBLOCK) {
++            if (superBlock != SUPERBLOCK)
 +                throw new IOException("Footer superblock invalid " + this.regionFile);
-+            }
 +
 +            DataInputStream dataStream = new DataInputStream(new ZstdInputStream(new ByteArrayInputStream(rawCompressed)));
 +
-+            int[] starts = new int[32 * 32];
-+            for(int i = 0 ; i < 32 * 32 ; i++) {
++            int[] starts = new int[1024];
++            for(int i = 0; i < 1024; i++) {
 +                starts[i] = dataStream.readInt();
-+                dataStream.readInt(); // Skip timestamps
++                dataStream.skipBytes(4); // Skip timestamps (Int): Unimplemented TODO: Implement per-chunk timestamps
 +            }
 +
-+            for(int i = 0 ; i < 32 * 32 ; i++) {
++            for(int i = 0; i < 1024; i++) {
 +                if(starts[i] > 0) {
 +                    int size = starts[i];
 +                    byte[] b = new byte[size];
 +                    dataStream.readFully(b, 0, size);
 +
-+                    int maxCompressedLength = compressor.maxCompressedLength(size);
++                    int maxCompressedLength = this.compressor.maxCompressedLength(size);
 +                    byte[] compressed = new byte[maxCompressedLength];
-+                    int compressedLength = compressor.compress(b, 0, size, compressed, 0, maxCompressedLength);
++                    int compressedLength = this.compressor.compress(b, 0, size, compressed, 0, maxCompressedLength);
 +                    b = new byte[compressedLength];
 +                    System.arraycopy(compressed, 0, b, 0, compressedLength);
 +
@@ -264,9 +265,7 @@ index 0000000000000000000000000000000000000000..32213e1f2432a2ee0c27331e83a04696
 +                }
 +                for(int i = 0 ; i < 100 ; i++) {
 +                    Thread.sleep(100);
-+                    if(close) {
-+                        return;
-+                    }
++                    if(close) return;
 +                }
 +            }
 +        } catch(InterruptedException ignored) {}
@@ -277,11 +276,8 @@ index 0000000000000000000000000000000000000000..32213e1f2432a2ee0c27331e83a04696
 +    }
 +
 +    public synchronized void flush() throws IOException {
-+        if(!isMarkedToSave())
-+            return;
++        if(!isMarkedToSave()) return;
 +
-+        long SUPERBLOCK = -4323716122432332390L;
-+        byte VERSION = 1;
 +        long timestamp = System.currentTimeMillis() / 1000L;
 +        short chunkCount = 0;
 +
@@ -299,23 +295,21 @@ index 0000000000000000000000000000000000000000..32213e1f2432a2ee0c27331e83a04696
 +        dataStream.writeLong(timestamp);
 +        dataStream.writeByte(this.compressionLevel);
 +
-+        LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
-+
 +        ArrayList<byte[]> byteBuffers = new ArrayList<>();
-+        for(int i = 0 ; i < 32 * 32 ; i++) {
++        for(int i = 0; i < 1024; i++) {
 +            if(this.bufferUncompressedSize[i] != 0) {
 +                chunkCount += 1;
 +                byte[] content = new byte[bufferUncompressedSize[i]];
-+                decompressor.decompress(buffer[i], 0, content, 0, bufferUncompressedSize[i]);
++                this.decompressor.decompress(buffer[i], 0, content, 0, bufferUncompressedSize[i]);
 +
 +                byteBuffers.add(content);
 +            } else byteBuffers.add(null);
 +        }
-+        for(int i = 0 ; i < 32 * 32 ; i++) {
++        for(int i = 0; i < 1024; i++) {
 +            zstdDataStream.writeInt(this.bufferUncompressedSize[i]);
-+            zstdDataStream.writeInt(0);
++            zstdDataStream.writeInt(0); // TODO: IMPLEMENT PER CHUNK TIMESTAMPS
 +        }
-+        for(int i = 0 ; i < 32 * 32 ; i++) {
++        for(int i = 0; i < 1024; i++) {
 +            if(byteBuffers.get(i) != null)
 +                zstdDataStream.write(byteBuffers.get(i), 0, byteBuffers.get(i).length);
 +        }
@@ -345,14 +339,13 @@ index 0000000000000000000000000000000000000000..32213e1f2432a2ee0c27331e83a04696
 +    }
 +
 +    public synchronized void write(ChunkPos pos, ByteBuffer buffer) {
-+        LZ4Compressor compressor = LZ4Factory.fastestInstance().fastCompressor();
 +        try {
 +            byte[] b = toByteArray(new ByteArrayInputStream(buffer.array()));
 +            int uncompressedSize = b.length;
 +
-+            int maxCompressedLength = compressor.maxCompressedLength(b.length);
++            int maxCompressedLength = this.compressor.maxCompressedLength(b.length);
 +            byte[] compressed = new byte[maxCompressedLength];
-+            int compressedLength = compressor.compress(b, 0, b.length, compressed, 0, maxCompressedLength);
++            int compressedLength = this.compressor.compress(b, 0, b.length, compressed, 0, maxCompressedLength);
 +            b = new byte[compressedLength];
 +            System.arraycopy(compressed, 0, b, 0, compressedLength);
 +
@@ -399,9 +392,8 @@ index 0000000000000000000000000000000000000000..32213e1f2432a2ee0c27331e83a04696
 +    @Nullable
 +    public synchronized DataInputStream getChunkDataInputStream(ChunkPos pos) {
 +        if(this.bufferUncompressedSize[getChunkIndex(pos.x, pos.z)] != 0) {
-+            LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
 +            byte[] content = new byte[bufferUncompressedSize[getChunkIndex(pos.x, pos.z)]];
-+            decompressor.decompress(this.buffer[getChunkIndex(pos.x, pos.z)], 0, content, 0, bufferUncompressedSize[getChunkIndex(pos.x, pos.z)]);
++            this.decompressor.decompress(this.buffer[getChunkIndex(pos.x, pos.z)], 0, content, 0, bufferUncompressedSize[getChunkIndex(pos.x, pos.z)]);
 +            return new DataInputStream(new ByteArrayInputStream(content));
 +        }
 +        return null;
@@ -432,7 +424,7 @@ index 0000000000000000000000000000000000000000..32213e1f2432a2ee0c27331e83a04696
 +    }
 +
 +    private static int getChunkIndex(int x, int z) {
-+        return (x & 31) + (z & 31) * 32;
++        return (x & 31) + ((z & 31) << 5);
 +    }
 +
 +    public boolean recalculateHeader() {
