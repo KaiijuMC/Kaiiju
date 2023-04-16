@@ -12,13 +12,31 @@
 
 ## Features
 
-### Additions
-- **Xymb Linear Format**: Saves about 50% of disk space in OW and Nether and 95% in The End.
-- **Auto update**: Update upstream everyday.
+### Configuration
+
+```yaml
+region-format:
+  debug: false
+network:
+  send-null-entity-packets: true
+  alternate-keepalive: false
+gameplay:
+  server-mod-name: Kaiiju
+world-settings:
+  default:
+    region-format:
+      format: LINEAR
+      linear:
+        compression-level: 1
+        crash-on-broken-symlink: true
+    gameplay:
+      shulker-box-drop-contents-when-destroyed: true
+```
 
 ### Roadmap
-- **Static view distance**: Reduce RAM usage with a "cached" view distance.
-- **Native world conversion**: Convert region file format at startup
+- **Static view distance**: Reduce RAM usage / Region size with a "static" view distance.
+- **Hash linear**: Add chunk hashes to linear region files.
+- **Native world conversion**: Convert region file format at startup.
 
 ## Building
 
@@ -29,5 +47,3 @@
 
 ## License
 Original patches are licensed under GPL-3.0.
-
-Made with <span style="color: #e25555;">&#9829;</span> on Earth.
