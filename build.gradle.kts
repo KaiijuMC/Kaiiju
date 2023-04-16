@@ -3,8 +3,8 @@ import io.papermc.paperweight.util.constants.*
 
 plugins {
     java
-    id("com.github.johnrengelman.shadow") version "7.1.2"
-    id("io.papermc.paperweight.patcher") version "1.5.1"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("io.papermc.paperweight.patcher") version "1.5.4"
 }
 
 allprojects {
@@ -30,8 +30,8 @@ repositories {
 
 dependencies {
     remapper("net.fabricmc:tiny-remapper:0.8.6:fat")
-    decompiler("net.minecraftforge:forgeflower:2.0.627.2")
-    paperclip("io.papermc:paperclip:3.0.2")
+    decompiler("net.minecraftforge:forgeflower:2.0.629.0")
+    paperclip("io.papermc:paperclip:3.0.3")
 }
 
 subprojects {
@@ -72,36 +72,35 @@ paperweight {
             serverOutputDir.set(layout.projectDirectory.dir("kaiiju-server"))
         }
     }
+}
 
-    tasks.register("foliaRefLatest") {
-        // Update the foliaRef in gradle.properties to be the latest commit.
-        val tempDir = layout.cacheDir("foliaRefLatest");
-        val file = "gradle.properties";
+tasks.register("foliaRefLatest") {
+    // Update the foliaRef in gradle.properties to be the latest commit.
+    val tempDir = layout.cacheDir("foliaRefLatest");
+    val file = "gradle.properties";
         
-        doFirst {
-            data class GithubCommit(
-                    val sha: String
-            )
+    doFirst {
+        data class GithubCommit(
+                val sha: String
+        )
 
-            val foliaLatestCommitJson = layout.cache.resolve("foliaLatestCommit.json");
-            download.get().download("https://api.github.com/repos/PaperMC/Folia/commits/master", foliaLatestCommitJson);
-            val foliaLatestCommit = gson.fromJson<paper.libs.com.google.gson.JsonObject>(foliaLatestCommitJson)["sha"].asString;
+        val foliaLatestCommitJson = layout.cache.resolve("foliaLatestCommit.json");
+        download.get().download("https://api.github.com/repos/PaperMC/Folia/commits/master", foliaLatestCommitJson);
+        val foliaLatestCommit = gson.fromJson<paper.libs.com.google.gson.JsonObject>(foliaLatestCommitJson)["sha"].asString;
 
-            copy {
-                from(file)
-                into(tempDir)
-                filter { line: String ->
-                    line.replace("foliaRef = .*".toRegex(), "foliaRef = $foliaLatestCommit")
-                }
-            }
-        }
-
-        doLast {
-            copy {
-                from(tempDir.file("gradle.properties"))
-                into(project.file(file).parent)
+        copy {
+            from(file)
+            into(tempDir)
+            filter { line: String ->
+                line.replace("foliaRef = .*".toRegex(), "foliaRef = $foliaLatestCommit")
             }
         }
     }
-}
 
+    doLast {
+        copy {
+            from(tempDir.file("gradle.properties"))
+            into(project.file(file).parent)
+        }
+    }
+}
