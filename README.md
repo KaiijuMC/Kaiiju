@@ -12,6 +12,10 @@
 
 ## Features
 
+### Main additions
+- **Xymb Linear Format**: Saves about 50% of disk space in OW/Nether and 95% in The End.
+- **Auto update**: Automatic upstream updates.
+
 ### Configuration
 
 ```yaml
@@ -35,8 +39,9 @@ world-settings:
 
 ### Roadmap
 - **Static view distance**: Reduce RAM usage / Region size with a "static" view distance.
-- **Hash linear**: Add chunk hashes to linear region files.
+- **Linear timestamps**: Add chunk timestamps to linear region files.
 - **Native world conversion**: Convert region file format at startup.
+- **Stash deduplication**: Make giant dupe stashes possible and lagless.
 
 ## Building
 
