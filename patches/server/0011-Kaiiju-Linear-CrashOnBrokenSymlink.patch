@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Xymb <xymb@endcrystal.me>
 Date: Fri, 14 Apr 2023 02:12:58 +0200
-Subject: [PATCH] Add an option to crash on broken Linear symlink
+Subject: [PATCH] Kaiiju Linear CrashOnBrokenSymlink
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
@@ -136,40 +136,18 @@ index 52c2e0fe73a5af18535a2b0b9a506919e3f93003..ea54af3f68c6534ff5a71ca0b7a99d12
      }
  
 diff --git a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
-index c9fbba6f709ed0540dcc22b41e50ce9d01a6381c..601e807096d62b416630db85b04df4e3e932fd89 100644
+index c9fbba6f709ed0540dcc22b41e50ce9d01a6381c..f0066cc8dc8069f97008c36cf2cfc7377e201dde 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
-@@ -1,5 +1,6 @@
- package net.minecraft.world.level.chunk.storage;
- 
-+import com.mojang.logging.LogUtils;
- import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
- import it.unimi.dsi.fastutil.objects.ObjectIterator;
- import java.io.DataInput;
-@@ -7,6 +8,7 @@ import java.io.DataInputStream;
- import java.io.DataOutput;
- import java.io.DataOutputStream;
- import java.io.IOException;
-+import java.nio.file.Files;
- import java.nio.file.Path;
- import javax.annotation.Nullable;
- import net.minecraft.FileUtil;
-@@ -15,11 +17,14 @@ import net.minecraft.nbt.ListTag;
- import net.minecraft.nbt.NbtIo;
- import net.minecraft.nbt.StreamTagVisitor;
- import net.minecraft.nbt.Tag;
-+import net.minecraft.server.MinecraftServer;
- import net.minecraft.util.ExceptionCollector;
- import net.minecraft.world.level.ChunkPos;
-+import org.slf4j.Logger;
+@@ -20,6 +20,7 @@ import net.minecraft.world.level.ChunkPos;
  
  public class RegionFileStorage implements AutoCloseable {
  
-+    private static final Logger LOGGER = LogUtils.getLogger();
++    private static final org.slf4j.Logger LOGGER = com.mojang.logging.LogUtils.getLogger(); // Kaiiju
      public static final String ANVIL_EXTENSION = ".mca";
      private static final int MAX_CACHE_SIZE = 256;
      public final Long2ObjectLinkedOpenHashMap<dev.kaiijumc.kaiiju.region.AbstractRegionFile> regionCache = new Long2ObjectLinkedOpenHashMap(); // Kaiiju
-@@ -28,6 +33,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -28,6 +29,7 @@ public class RegionFileStorage implements AutoCloseable {
      // Kaiiju start - Per world chunk format
      public final String format;
      public final int linearCompression;
@@ -177,7 +155,7 @@ index c9fbba6f709ed0540dcc22b41e50ce9d01a6381c..601e807096d62b416630db85b04df4e3
      // Kaiiju end
  
      private final boolean isChunkData; // Paper
-@@ -61,14 +67,15 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -61,14 +63,15 @@ public class RegionFileStorage implements AutoCloseable {
      }
      // Paper end - cache regionfile does not exist state
  
@@ -196,18 +174,19 @@ index c9fbba6f709ed0540dcc22b41e50ce9d01a6381c..601e807096d62b416630db85b04df4e3
          // Kaiiju end
          this.isChunkData = isChunkData;
          // Paper end - add isChunkData param
-@@ -109,6 +116,19 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -109,6 +112,20 @@ public class RegionFileStorage implements AutoCloseable {
          return regionfile != null ? regionfile.hasChunk(pos) : false;
      }
  
 +    // Kaiiju start
 +    private void guardAgainstBrokenSymlinks(Path path) throws IOException {
-+        if (linearCrashOnBrokenSymlink == false) return;
-+        if (this.format.equals("LINEAR") != true) return;
-+
-+        if (Files.isSymbolicLink(path) && (!Files.exists(Files.readSymbolicLink(path)) || !Files.isReadable(Files.readSymbolicLink(path)))) {
++        if (!linearCrashOnBrokenSymlink) return;
++        if (!this.format.equals("LINEAR")) return;
++        if (!java.nio.file.Files.isSymbolicLink(path)) return;
++        Path link = java.nio.file.Files.readSymbolicLink(path);
++        if (!java.nio.file.Files.exists(link) || !java.nio.file.Files.isReadable(link)) {
 +            LOGGER.error("Linear region file {} is a broken symbolic link, crashing to prevent data loss", path);
-+            MinecraftServer.getServer().halt(false);
++            net.minecraft.server.MinecraftServer.getServer().halt(false);
 +            throw new IOException("Linear region file " + path + " is a broken symbolic link, crashing to prevent data loss");
 +        }
 +    }
@@ -216,22 +195,14 @@ index c9fbba6f709ed0540dcc22b41e50ce9d01a6381c..601e807096d62b416630db85b04df4e3
      public synchronized dev.kaiijumc.kaiiju.region.AbstractRegionFile getRegionFile(ChunkPos chunkcoordintpair, boolean existingOnly) throws IOException { // CraftBukkit // Kaiiju
          return this.getRegionFile(chunkcoordintpair, existingOnly, false);
      }
-@@ -144,6 +164,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -144,6 +161,7 @@ public class RegionFileStorage implements AutoCloseable {
              if (existingOnly) {
                  Path anvil = path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + ".mca");
                  Path linear = path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + ".linear");
-+                guardAgainstBrokenSymlinks(linear); // Kaiiju
++                guardAgainstBrokenSymlinks(linear);
                  if (java.nio.file.Files.exists(anvil)) path1 = anvil;
                  else if (java.nio.file.Files.exists(linear)) path1 = linear;
                  else {
-@@ -156,6 +177,7 @@ public class RegionFileStorage implements AutoCloseable {
-                     default -> "mca";
-                 };
-                 path1 = path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + "." + extension);
-+                guardAgainstBrokenSymlinks(path1); // Kaiiju
-                 this.createRegionFile(regionPos);
-             }
-             if (dev.kaiijumc.kaiiju.KaiijuConfig.regionFormatDebug)
 diff --git a/src/main/java/net/minecraft/world/level/chunk/storage/SectionStorage.java b/src/main/java/net/minecraft/world/level/chunk/storage/SectionStorage.java
 index 414aa3ae00c2d28e754235e3e93b6b623d4fd180..15e376fac063430e4355c6ffcd25c35a8ce20c5b 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/storage/SectionStorage.java
