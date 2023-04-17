@@ -529,7 +529,7 @@ index 513833c2ea23df5b079d157bc5cb89d5c9754c0b..a62a1b281bd0b6ad7d59b45b9470d84f
          long expectedChunks = (long)regionFiles.length * (32L * 32L);
  
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index 6f12d91f73e04c25fb0bc9054dc7d49de16e614a..43503974433c4d1808b2acb2b79f46d640725dc0 100644
+index c8bc7db4c22f48047aa409f0bcff3ef8c4034781..5ad209fed6aef1992af0472ac0af0911d178a260 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
 @@ -272,7 +272,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
@@ -550,7 +550,7 @@ index 6f12d91f73e04c25fb0bc9054dc7d49de16e614a..43503974433c4d1808b2acb2b79f46d6
          this.setViewDistance(viewDistance);
          // Paper start
          this.dataRegionManager = new io.papermc.paper.chunk.SingleThreadChunkRegionManager(this.level, 2, (1.0 / 3.0), 1, 6, "Data", DataRegionData::new, DataRegionSectionData::new);
-@@ -849,13 +849,13 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -853,13 +853,13 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
  
      // Paper start - chunk status cache "api"
      public ChunkStatus getChunkStatusOnDiskIfCached(ChunkPos chunkPos) {
@@ -566,7 +566,7 @@ index 6f12d91f73e04c25fb0bc9054dc7d49de16e614a..43503974433c4d1808b2acb2b79f46d6
  
          if (regionFile == null || !regionFileCache.chunkExists(chunkPos)) {
              return null;
-@@ -873,7 +873,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -877,7 +877,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
      }
  
      public void updateChunkStatusOnDisk(ChunkPos chunkPos, @Nullable CompoundTag compound) throws IOException {
