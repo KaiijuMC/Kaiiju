@@ -1,0 +1,101 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
+Date: Wed, 19 Apr 2023 02:37:04 +0300
+Subject: [PATCH] Static Distance WIP
+
+
+diff --git a/src/main/java/io/papermc/paper/chunk/PlayerChunkLoader.java b/src/main/java/io/papermc/paper/chunk/PlayerChunkLoader.java
+index e77972c4c264100ffdd824bfa2dac58dbbc6d678..cddacd6d5bbe97641bd23f5c067012907d9c5c01 100644
+--- a/src/main/java/io/papermc/paper/chunk/PlayerChunkLoader.java
++++ b/src/main/java/io/papermc/paper/chunk/PlayerChunkLoader.java
+@@ -75,6 +75,17 @@ public final class PlayerChunkLoader {
+         return data.getTargetSendViewDistance();
+     }
+ 
++    // Kaiiju start - Static distance
++    public static int getStaticDistance(final ServerPlayer player) {
++        final ServerLevel level = (ServerLevel)player.level;
++        final PlayerLoaderData data = level.chunkSource.chunkMap.playerChunkManager.getData(player);
++        if (data == null) {
++            return level.chunkSource.chunkMap.playerChunkManager.getTargetStaticDistance();
++        }
++        return data.getTargetSendViewDistance();
++    }
++    // Kaiiju end
++
+     protected final ChunkMap chunkMap;
+     protected final Reference2ObjectLinkedOpenHashMap<ServerPlayer, PlayerLoaderData> playerMap = new Reference2ObjectLinkedOpenHashMap<>(512, 0.7f);
+     protected final ReferenceLinkedOpenHashSet<PlayerLoaderData> chunkSendQueue = new ReferenceLinkedOpenHashSet<>(512, 0.7f);
+@@ -132,6 +143,12 @@ public final class PlayerChunkLoader {
+ 
+     // no throttling is applied below this VD for loading
+ 
++    // Kaiiju start - Static distance
++    public final PlayerAreaMap staticMap;
++    protected int rawStaticDistance = -1;
++    // Kaiiju end
++
++
+     /**
+      * The chunks to be sent to players, provided they're send-ready. Send-ready means the chunk and its 1 radius neighbours are loaded.
+      */
+@@ -190,6 +207,12 @@ public final class PlayerChunkLoader {
+         return this.rawSendDistance == -1 ? this.getLoadDistance() : this.rawSendDistance;
+     }
+ 
++    // Kaiiju start - Static distance
++    public int getTargetStaticDistance() {
++        return this.rawStaticDistance == -1 ? this.getStaticDistance() : this.rawStaticDistance;
++    }
++    // Kaiiju end
++
+     public void setTargetSendDistance(final int distance) {
+         this.setSendDistance(distance);
+     }
+@@ -231,6 +254,16 @@ public final class PlayerChunkLoader {
+         this.rawTickDistance = distance;
+     }
+ 
++    // Kaiiju start - Static distance
++    public void setStaticDistance(final int distance) {
++        this.rawStaticDistance = distance;
++    }
++
++    public int getStaticDistance() {
++        return this.rawStaticDistance;
++    }
++    // Kaiiju end
++
+     /*
+       Players have 3 different types of view distance:
+       1. Sending view distance
+@@ -256,7 +289,13 @@ public final class PlayerChunkLoader {
+ 
+     public PlayerChunkLoader(final ChunkMap chunkMap, final PooledLinkedHashSets<ServerPlayer> pooledHashSets) {
+         this.chunkMap = chunkMap;
++        // Kaiiju start - Static distance
+         this.broadcastMap = new PlayerAreaMap(pooledHashSets,
++                null,
++                (ServerPlayer player, int rangeX, int rangeZ, int currPosX, int currPosZ, int prevPosX, int prevPosZ,
++                 com.destroystokyo.paper.util.misc.PooledLinkedHashSets.PooledObjectLinkedOpenHashSet<ServerPlayer> newState) -> {});
++        // Kaiiju end
++        this.staticMap = new PlayerAreaMap(pooledHashSets,
+                 null,
+                 (ServerPlayer player, int rangeX, int rangeZ, int currPosX, int currPosZ, int prevPosX, int prevPosZ,
+                  com.destroystokyo.paper.util.misc.PooledLinkedHashSets.PooledObjectLinkedOpenHashSet<ServerPlayer> newState) -> {
+@@ -807,6 +846,7 @@ public final class PlayerChunkLoader {
+         protected int sendViewDistance = -1;
+         protected int loadViewDistance = -1;
+         protected int tickViewDistance = -1;
++        protected int staticViewDistance = -1; // Kaiiju
+ 
+         protected long nextChunkSendTarget;
+ 
+@@ -932,6 +972,7 @@ public final class PlayerChunkLoader {
+             this.loader.loadMap.remove(this.player);
+             this.loader.loadTicketCleanup.remove(this.player);
+             this.loader.tickMap.remove(this.player);
++            this.loader.staticMap.remove(this.player); // Kaiiju
+         }
+ 
+         protected int getClientViewDistance() {
