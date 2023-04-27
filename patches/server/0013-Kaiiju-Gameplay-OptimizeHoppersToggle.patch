@@ -1,0 +1,219 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
+Date: Thu, 27 Apr 2023 03:49:08 +0300
+Subject: [PATCH] Kaiiju Gameplay OptimizeHoppersToggle
+
+
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
+index c267b0cd52448246c7701081028ff0986dde2fa2..2624e074e0a14f5e05aca8fa910b5e5d71f320a9 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
+@@ -148,9 +148,11 @@ public class KaiijuWorldConfig {
+ 
+     public boolean shulkerBoxDropContentsWhenDestroyed = true;
+     public boolean fixVoidTrading = true;
++    public boolean optimizeHoppers = true;
+ 
+     private void gameplaySettings() {
+         shulkerBoxDropContentsWhenDestroyed = getBoolean("gameplay.shulker-box-drop-contents-when-destroyed", shulkerBoxDropContentsWhenDestroyed);
+         fixVoidTrading = getBoolean("gameplay.fix-void-trading", fixVoidTrading);
++        optimizeHoppers = getBoolean("gameplay.optimize-hoppers", optimizeHoppers);
+     }
+ }
+\ No newline at end of file
+diff --git a/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
+index 0134370081182260d578ee1d8a16d544c03b6a0d..555d86f0a9132c2292470c60f263e59082f0c26e 100644
+--- a/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
++++ b/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
+@@ -401,49 +401,51 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+             if (HopperBlockEntity.isFullContainer(iinventory1, enumdirection)) {
+                 return false;
+             } else {
++                // Kaiiju start - Toggle paper broken redstone
+                 // Paper start - replace logic; MAKE SURE TO CHECK FOR DIFFS ON UPDATES
+-                return hopperPush(world, iinventory1, enumdirection, hopper);
+-                // for (int i = 0; i < iinventory.getContainerSize(); ++i) {
+-                //     if (!iinventory.getItem(i).isEmpty()) {
+-                //         ItemStack itemstack = iinventory.getItem(i).copy();
+-                //         // ItemStack itemstack1 = addItem(iinventory, iinventory1, iinventory.removeItem(i, 1), enumdirection);
+-
+-                //         // CraftBukkit start - Call event when pushing items into other inventories
+-                //         CraftItemStack oitemstack = CraftItemStack.asCraftMirror(iinventory.removeItem(i, world.spigotConfig.hopperAmount)); // Spigot
+-
+-                //         Inventory destinationInventory;
+-                //        // Have to special case large chests as they work oddly
+-                //         if (iinventory1 instanceof CompoundContainer) {
+-                //             destinationInventory = new org.bukkit.craftbukkit.inventory.CraftInventoryDoubleChest((CompoundContainer) iinventory1);
+-                //         } else if (iinventory1.getOwner() != null) {
+-                //             destinationInventory = iinventory1.getOwner().getInventory();
+-                //         } else {
+-                //             destinationInventory = new CraftInventory(iinventory);
+-                //         }
+-
+-                //         InventoryMoveItemEvent event = new InventoryMoveItemEvent(iinventory.getOwner().getInventory(), oitemstack.clone(), destinationInventory, true);
+-                //         world.getCraftServer().getPluginManager().callEvent(event);
+-                //         if (event.isCancelled()) {
+-                //             hopper.setItem(i, itemstack);
+-                //             hopper.setCooldown(world.spigotConfig.hopperTransfer); // Spigot
+-                //             return false;
+-                //         }
+-                //         int origCount = event.getItem().getAmount(); // Spigot
+-                //         ItemStack itemstack1 = HopperBlockEntity.addItem(iinventory, iinventory1, CraftItemStack.asNMSCopy(event.getItem()), enumdirection);
++                if (world.kaiijuConfig.optimizeHoppers) return hopperPush(world, iinventory1, enumdirection, hopper);
++                for (int i = 0; i < iinventory.getContainerSize(); ++i) {
++                    if (!iinventory.getItem(i).isEmpty()) {
++                        ItemStack itemstack = iinventory.getItem(i).copy();
++                        // ItemStack itemstack1 = addItem(iinventory, iinventory1, iinventory.removeItem(i, 1), enumdirection);
++
++                        // CraftBukkit start - Call event when pushing items into other inventories
++                        CraftItemStack oitemstack = CraftItemStack.asCraftMirror(iinventory.removeItem(i, world.spigotConfig.hopperAmount)); // Spigot
++
++                        Inventory destinationInventory;
++                       // Have to special case large chests as they work oddly
++                        if (iinventory1 instanceof CompoundContainer) {
++                            destinationInventory = new org.bukkit.craftbukkit.inventory.CraftInventoryDoubleChest((CompoundContainer) iinventory1);
++                        } else if (iinventory1.getOwner() != null) {
++                            destinationInventory = iinventory1.getOwner().getInventory();
++                        } else {
++                            destinationInventory = new CraftInventory(iinventory);
++                        }
++
++                        InventoryMoveItemEvent event = new InventoryMoveItemEvent(iinventory.getOwner().getInventory(), oitemstack.clone(), destinationInventory, true);
++                        world.getCraftServer().getPluginManager().callEvent(event);
++                        if (event.isCancelled()) {
++                            hopper.setItem(i, itemstack);
++                            hopper.setCooldown(world.spigotConfig.hopperTransfer); // Spigot
++                            return false;
++                        }
++                        int origCount = event.getItem().getAmount(); // Spigot
++                        ItemStack itemstack1 = HopperBlockEntity.addItem(iinventory, iinventory1, CraftItemStack.asNMSCopy(event.getItem()), enumdirection);
+                         // CraftBukkit end
+ 
+-                //         if (itemstack1.isEmpty()) {
+-                //             iinventory1.setChanged();
+-                //             return true;
+-                //         }
++                        if (itemstack1.isEmpty()) {
++                            iinventory1.setChanged();
++                            return true;
++                        }
+ 
+-                //         itemstack.shrink(origCount - itemstack1.getCount()); // Spigot
+-                //         iinventory.setItem(i, itemstack);
+-                //     }
+-                // }
++                        itemstack.shrink(origCount - itemstack1.getCount()); // Spigot
++                        iinventory.setItem(i, itemstack);
++                    }
++                }
+ 
+-                // return false;
++                return false;
+                 // Paper end
++                // Kaiiju end
+             }
+         }
+     }
+@@ -467,6 +469,12 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+         if (iinventory != null) {
+             Direction enumdirection = Direction.DOWN;
+ 
++            // Kaiiju start - toggle paper broken redstone
++            if (!world.kaiijuConfig.optimizeHoppers)
++            return HopperBlockEntity.isEmptyContainer(iinventory, enumdirection) ? false : HopperBlockEntity.getSlots(iinventory, enumdirection).anyMatch((i) -> {
++                return HopperBlockEntity.a(hopper, iinventory, i, enumdirection, world); // Spigot
++            });
++            // Kaiiju end
+             // Paper start - optimize hoppers and remove streams
+             worldData.skipPullModeEventFire = worldData.skipHopperEvents; // Folia - region threading
+             return !HopperBlockEntity.isEmptyContainer(iinventory, enumdirection) && anyMatch(iinventory, enumdirection, (item, i) -> {
+@@ -499,48 +507,50 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+     private static boolean a(Hopper ihopper, Container iinventory, int i, Direction enumdirection, Level world) { // Spigot
+         ItemStack itemstack = iinventory.getItem(i);
+ 
++        // Kaiiju start - toggle paper broken redstone
+         // Paper start - replace pull logic; MAKE SURE TO CHECK FOR DIFFS WHEN UPDATING
+         if (!itemstack.isEmpty() && HopperBlockEntity.canTakeItemFromContainer(ihopper, iinventory, itemstack, i, enumdirection)) { // If this logic changes, update above. this is left unused incase reflective plugins
+-            return hopperPull(world, ihopper, iinventory, itemstack, i);
+-            // ItemStack itemstack1 = itemstack.copy();
+-            // // ItemStack itemstack2 = addItem(iinventory, ihopper, iinventory.removeItem(i, 1), (EnumDirection) null);
+-            // // CraftBukkit start - Call event on collection of items from inventories into the hopper
+-            // CraftItemStack oitemstack = CraftItemStack.asCraftMirror(iinventory.removeItem(i, world.spigotConfig.hopperAmount)); // Spigot
+-
+-            // Inventory sourceInventory;
+-            // // Have to special case large chests as they work oddly
+-            // if (iinventory instanceof CompoundContainer) {
+-            //     sourceInventory = new org.bukkit.craftbukkit.inventory.CraftInventoryDoubleChest((CompoundContainer) iinventory);
+-            // } else if (iinventory.getOwner() != null) {
+-            //     sourceInventory = iinventory.getOwner().getInventory();
+-            // } else {
+-            //     sourceInventory = new CraftInventory(iinventory);
+-            // }
+-
+-            // InventoryMoveItemEvent event = new InventoryMoveItemEvent(sourceInventory, oitemstack.clone(), ihopper.getOwner().getInventory(), false);
+-
+-            // Bukkit.getServer().getPluginManager().callEvent(event);
+-            // if (event.isCancelled()) {
+-            //     iinventory.setItem(i, itemstack1);
+-
+-                // if (ihopper instanceof HopperBlockEntity) {
+-                //     ((HopperBlockEntity) ihopper).setCooldown(world.spigotConfig.hopperTransfer); // Spigot
+-                // }
+-
+-                // return false;
+-            // }
+-            // int origCount = event.getItem().getAmount(); // Spigot
+-            // ItemStack itemstack2 = HopperBlockEntity.addItem(iinventory, ihopper, CraftItemStack.asNMSCopy(event.getItem()), null);
+-            // // CraftBukkit end
+-
+-            // if (itemstack2.isEmpty()) {
+-            //     iinventory.setChanged();
+-            //     return true;
+-            // }
+-
+-            // itemstack1.shrink(origCount - itemstack2.getCount()); // Spigot
+-            // iinventory.setItem(i, itemstack1);
++            if (world.kaiijuConfig.optimizeHoppers) return hopperPull(world, ihopper, iinventory, itemstack, i);
++            ItemStack itemstack1 = itemstack.copy();
++            // ItemStack itemstack2 = addItem(iinventory, ihopper, iinventory.removeItem(i, 1), (EnumDirection) null);
++            // CraftBukkit start - Call event on collection of items from inventories into the hopper
++            CraftItemStack oitemstack = CraftItemStack.asCraftMirror(iinventory.removeItem(i, world.spigotConfig.hopperAmount)); // Spigot
++
++            Inventory sourceInventory;
++            // Have to special case large chests as they work oddly
++            if (iinventory instanceof CompoundContainer) {
++                sourceInventory = new org.bukkit.craftbukkit.inventory.CraftInventoryDoubleChest((CompoundContainer) iinventory);
++            } else if (iinventory.getOwner() != null) {
++                sourceInventory = iinventory.getOwner().getInventory();
++            } else {
++                sourceInventory = new CraftInventory(iinventory);
++            }
++
++            InventoryMoveItemEvent event = new InventoryMoveItemEvent(sourceInventory, oitemstack.clone(), ihopper.getOwner().getInventory(), false);
++
++            Bukkit.getServer().getPluginManager().callEvent(event);
++            if (event.isCancelled()) {
++                iinventory.setItem(i, itemstack1);
++
++                if (ihopper instanceof HopperBlockEntity) {
++                    ((HopperBlockEntity) ihopper).setCooldown(world.spigotConfig.hopperTransfer); // Spigot
++                }
++
++                return false;
++            }
++            int origCount = event.getItem().getAmount(); // Spigot
++            ItemStack itemstack2 = HopperBlockEntity.addItem(iinventory, ihopper, CraftItemStack.asNMSCopy(event.getItem()), null);
++            // CraftBukkit end
++
++            if (itemstack2.isEmpty()) {
++                iinventory.setChanged();
++                return true;
++            }
++
++            itemstack1.shrink(origCount - itemstack2.getCount()); // Spigot
++            iinventory.setItem(i, itemstack1);
+             // Paper end
++            // Kaiiju end
+         }
+ 
+         return false;
