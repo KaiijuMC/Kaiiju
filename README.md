@@ -12,9 +12,13 @@
 
 ## Features
 
-### Main additions
+### Primary
 - **Xymb Linear Format**: Saves about 50% of disk space in OW/Nether and 95% in The End.
 - **Auto update**: Automatic upstream updates.
+
+### Notable
+- **Optimize Hopper**: Enable/Disable Paper "Optimize Hopper" patch that break a lot of redstone farms.
+- **Fix void trading**: Enable/Disable void trading.
 
 ### Configuration
 
