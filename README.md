@@ -12,30 +12,39 @@
 
 ## Features
 
-### Main additions
+### Primary
 - **Xymb Linear Format**: Saves about 50% of disk space in OW/Nether and 95% in The End.
 - **Auto update**: Automatic upstream updates.
+
+### Notable
+- **Optimize Hopper**: Enable/Disable Paper "Optimize Hopper" patch that break a lot of redstone farms.
+- **Fix void trading**: Enable/Disable void trading.
 
 ### Configuration
 
 ```yaml
-region-format:
-  debug: false
+verbose: false
+gameplay:
+  server-mod-name: Kaiiju
 network:
   send-null-entity-packets: true
   alternate-keepalive: false
-gameplay:
-  server-mod-name: Kaiiju
+region-format:
+  debug: false
 world-settings:
   default:
+    gameplay:
+      shulker-box-drop-contents-when-destroyed: true
+      fix-void-trading: true
+      optimize-hoppers: true
     region-format:
       format: LINEAR
       linear:
         compression-level: 1
         crash-on-broken-symlink: true
-    gameplay:
-      shulker-box-drop-contents-when-destroyed: true
+config-version: 1
 ```
+Documentation: [Kaiiju Wiki](https://github.com/KaiijuMC/Kaiiju/wiki/Configuration)
 
 ### Roadmap
 - **Static view distance**: Reduce RAM usage / Region size with a "static" view distance.
