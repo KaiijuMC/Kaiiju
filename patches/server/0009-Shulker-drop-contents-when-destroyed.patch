@@ -1,8 +1,10 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Xymb <xymb@endcrystal.me>
 Date: Sat, 8 Apr 2023 23:38:13 +0300
-Subject: [PATCH] Kaiiju Gameplay ShulkerDropContentsWhenDestroyed
+Subject: [PATCH] Shulker drop contents when destroyed
 
+Don't drop shulker contents when shulker items are destroyed (by cactus,
+lava..)
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 index 73d79fe0077b28db2f9e7fa13a1ae6eff9abd6a9..bac11b0e30a86d0689693ff129b53bcad7c2034c 100644

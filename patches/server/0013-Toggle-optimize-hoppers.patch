@@ -1,8 +1,9 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
 Date: Thu, 27 Apr 2023 03:49:08 +0300
-Subject: [PATCH] Kaiiju Gameplay OptimizeHoppersToggle
+Subject: [PATCH] Toggle optimize hoppers
 
+Paper optimize hoppers patch break a lot of technical redstone farms because of piston updates. (Example: twiti888 wood farm)
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 index c267b0cd52448246c7701081028ff0986dde2fa2..2624e074e0a14f5e05aca8fa910b5e5d71f320a9 100644

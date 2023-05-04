@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Xymb <xymb@endcrystal.me>
 Date: Fri, 14 Apr 2023 02:12:58 +0200
-Subject: [PATCH] Kaiiju Linear CrashOnBrokenSymlink
+Subject: [PATCH] Crash on broken symlink
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
@@ -42,7 +42,7 @@ index a62a1b281bd0b6ad7d59b45b9470d84f496f6539..7f87dfa131ab7d40a94cf6355765478f
          long expectedChunks = (long)regionFiles.length * (32L * 32L);
  
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index 43503974433c4d1808b2acb2b79f46d640725dc0..73ac94eaebdeaa94c83f1f23b53e686d867e6f98 100644
+index 5ad209fed6aef1992af0472ac0af0911d178a260..0ef89e0bc214364fd904c3e5022c660b32b2caaa 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
 @@ -272,7 +272,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider

@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
 Date: Sat, 8 Apr 2023 23:32:34 +0300
-Subject: [PATCH] Kaiiju Gameplay Configuration
+Subject: [PATCH] Gameplay Configuration
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java

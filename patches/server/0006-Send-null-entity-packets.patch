@@ -1,8 +1,9 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
 Date: Thu, 16 Feb 2023 01:49:54 +0200
-Subject: [PATCH] Purpur Network SendNullEntityPackets
+Subject: [PATCH] Send null entity packets
 
+This is from Purpur. Don't send null entity packets.
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 index 7c6d43d8a360530344ef296f4477750c8a298607..ab08e11f13921163b8ff1ff51ff9e9b86d2b47c7 100644

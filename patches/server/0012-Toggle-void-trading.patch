@@ -1,8 +1,11 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
 Date: Sun, 23 Apr 2023 15:34:30 +0300
-Subject: [PATCH] Purpur Gameplay FixVoidTrading
+Subject: [PATCH] Toggle void trading
 
+Don't close trading windows when the villager is unloaded.
+You should set chunk-unloads to 0s in paper config file to enable void
+trading. Or use Kaiivoid plugin.
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 index 0f0cfd958f7d2c6d2ca4192be1b986900a2bfa53..c267b0cd52448246c7701081028ff0986dde2fa2 100644

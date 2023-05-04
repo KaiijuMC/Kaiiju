@@ -1,8 +1,11 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
 Date: Fri, 10 Feb 2023 22:21:56 +0200
-Subject: [PATCH] Kaiiju RegionFormat Linear
+Subject: [PATCH] Add Linear region format
 
+Linear is a region file format that uses ZSTD compression instead of
+ZLIB.
+This format saves about 50% of disk space.
 Documentation: https://github.com/xymb-endcrystalme/LinearRegionFileFormatTools
 
 diff --git a/build.gradle.kts b/build.gradle.kts

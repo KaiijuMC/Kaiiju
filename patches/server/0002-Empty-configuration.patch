@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
 Date: Fri, 10 Feb 2023 05:53:10 +0200
-Subject: [PATCH] Kaiiju Configuration
+Subject: [PATCH] Empty configuration
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
@@ -432,7 +432,7 @@ index 7abd4f38ae59a6019137345af960fd60a3c7adf0..426777730f77664c69bd0a084a9323d7
          io.papermc.paper.brigadier.PaperBrigadierProviderImpl.INSTANCE.getClass(); // init PaperBrigadierProvider
          // Paper end
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index c7c682cd2d1498e6d6521ddd62acdc1168bfe152..53b9444ff6120628d23ad27fc87d9cd9bdf66648 100644
+index afb3d0fa48b7fd6d273361c6dc32764b5d35c356..a3b4b49ca8612a61bc2e7a1e2d2e942e7ebe1883 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
 @@ -167,6 +167,8 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
@@ -453,7 +453,7 @@ index c7c682cd2d1498e6d6521ddd62acdc1168bfe152..53b9444ff6120628d23ad27fc87d9cd9
          this.world = new CraftWorld((ServerLevel) this, gen, biomeProvider, env);
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index b1680507c05547458e1199412ab97105b67f8973..d1468cb0ae1850719d40524dad9b14fbdb0f79a1 100644
+index 176f3acec268dad80cc90029edd88e7a0c3e8885..48f946243af24a9d4847f6a7a59449136cf6ee83 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -1067,6 +1067,7 @@ public final class CraftServer implements Server {

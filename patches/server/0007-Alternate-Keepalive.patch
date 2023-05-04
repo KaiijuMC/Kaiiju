@@ -1,8 +1,10 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
 Date: Fri, 31 Mar 2023 01:52:44 +0300
-Subject: [PATCH] Purpur Network AlternateKeepalive
+Subject: [PATCH] Alternate Keepalive
 
+Don't kick players because 1 keepalive is lost.
+This patch is from Purpur.
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 index ab08e11f13921163b8ff1ff51ff9e9b86d2b47c7..b42a3466f145a92608c8746fd4beb529b4a60b01 100644

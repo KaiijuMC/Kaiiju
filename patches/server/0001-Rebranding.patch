@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
 Date: Fri, 10 Feb 2023 02:58:46 +0200
-Subject: [PATCH] Kaiiju Rebranding
+Subject: [PATCH] Rebranding
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
@@ -48,7 +48,7 @@ index 58dc84b7b3b04c2d0b00fc5fac5303d3378b3467..a128b1fabd4aadfe26a8375903c0451d
                  metrics.addCustomChart(new Metrics.DrilldownPie("java_version", () -> {
                      Map<String, Map<String, Integer>> map = new HashMap<>();
 diff --git a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
-index 719b0e318a85d4a1fb8f616deeb31193495b462e..751b2bc79d29cb21c38cf5d35e3711149ec7b011 100644
+index 2ce29b6ccb9a3b520b8c1edf53aae2e9769ba252..f675fcae235a8c2722d9bba65d5e1292c5b76deb 100644
 --- a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
 +++ b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
 @@ -19,10 +19,11 @@ import java.util.stream.StreamSupport;
