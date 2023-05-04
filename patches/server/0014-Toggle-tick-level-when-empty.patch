@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
+Date: Thu, 4 May 2023 19:53:33 +0300
+Subject: [PATCH] Toggle tick level when empty
+
+
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
+index 2624e074e0a14f5e05aca8fa910b5e5d71f320a9..b674bad0ace0aba53f1f3e76e6c891421aaac2a5 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
+@@ -149,10 +149,12 @@ public class KaiijuWorldConfig {
+     public boolean shulkerBoxDropContentsWhenDestroyed = true;
+     public boolean fixVoidTrading = true;
+     public boolean optimizeHoppers = true;
++    public boolean tickWhenEmpty = true;
+ 
+     private void gameplaySettings() {
+         shulkerBoxDropContentsWhenDestroyed = getBoolean("gameplay.shulker-box-drop-contents-when-destroyed", shulkerBoxDropContentsWhenDestroyed);
+         fixVoidTrading = getBoolean("gameplay.fix-void-trading", fixVoidTrading);
+         optimizeHoppers = getBoolean("gameplay.optimize-hoppers", optimizeHoppers);
++        tickWhenEmpty = getBoolean("gameplay.tick-when-empty", tickWhenEmpty);
+     }
+ }
+\ No newline at end of file
+diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
+index 92cc38353d25f3749186dbc062402c9bafb25fca..2fcd607c8200ca88e8f56cbe26c275915d3bc74d 100644
+--- a/src/main/java/net/minecraft/server/level/ServerLevel.java
++++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
+@@ -743,7 +743,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+         timings.doSounds.stopTiming(); // Spigot
+         regionizedWorldData.setHandlingTick(false); // Folia - regionised ticking
+         gameprofilerfiller.pop();
+-        boolean flag = true || !this.players.isEmpty() || !this.getForcedChunks().isEmpty(); // CraftBukkit - this prevents entity cleanup, other issues on servers with no players
++        boolean flag = kaiijuConfig.tickWhenEmpty || !this.players.isEmpty() || !this.getForcedChunks().isEmpty(); // CraftBukkit - this prevents entity cleanup, other issues on servers with no players // Kaiiju - i don't think so
+ 
+         if (flag) {
+             this.resetEmptyTime();
