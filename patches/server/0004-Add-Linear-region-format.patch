@@ -112,10 +112,10 @@ index 0000000000000000000000000000000000000000..dcfbabf54b19a4c29d5c95830242c5c2
 +}
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/region/LinearRegionFile.java b/src/main/java/dev/kaiijumc/kaiiju/region/LinearRegionFile.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..245e3b1801c5f92054d9c0d0d8fc2a8fcfd6a1d4
+index 0000000000000000000000000000000000000000..b7ce89429675bde7f037793305275f4bf89d0727
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/region/LinearRegionFile.java
-@@ -0,0 +1,328 @@
+@@ -0,0 +1,337 @@
 +package dev.kaiijumc.kaiiju.region;
 +
 +import com.github.luben.zstd.ZstdInputStream;
@@ -137,19 +137,22 @@ index 0000000000000000000000000000000000000000..245e3b1801c5f92054d9c0d0d8fc2a8f
 +import java.nio.file.StandardCopyOption;
 +import java.util.ArrayList;
 +import java.util.Arrays;
++import java.util.List;
 +import java.util.concurrent.locks.ReentrantLock;
 +
 +public class LinearRegionFile extends Thread implements AbstractRegionFile {
-+    private static long SUPERBLOCK = -4323716122432332390L;
-+    private static byte VERSION = 1;
-+    private static int HEADER_SIZE = 32;
-+    private static int FOOTER_SIZE = 8;
++    private static final long SUPERBLOCK = -4323716122432332390L;
++    private static final byte VERSION = 2;
++    private static final int HEADER_SIZE = 32;
++    private static final int FOOTER_SIZE = 8;
 +    private static final Logger LOGGER = LogUtils.getLogger();
++    private static final List<Byte> SUPPORTED_VERSIONS = Arrays.asList((byte) 1, (byte) 2);
 +
 +
 +    private final byte[][] buffer = new byte[1024][];
 +    private final int[] bufferUncompressedSize = new int[1024];
 +
++    private final int[] chunkTimestamps = new int[1024];
 +    private final Object markedToSaveLock = new Object();
 +    private final ChunkStatus[] statuses = new ChunkStatus[1024];
 +
@@ -189,11 +192,11 @@ index 0000000000000000000000000000000000000000..245e3b1801c5f92054d9c0d0d8fc2a8f
 +
 +            long superBlock = rawDataStream.readLong();
 +            if (superBlock != SUPERBLOCK)
-+                throw new RuntimeException("Superblock invalid: " + superBlock + " file " + file);
++                throw new RuntimeException("Invalid superblock: " + superBlock + " file " + file);
 +
 +            byte version = rawDataStream.readByte();
-+            if (version != VERSION)
-+                throw new RuntimeException("Version invalid: " + version + " file " + file);
++            if (!SUPPORTED_VERSIONS.contains(version))
++                throw new RuntimeException("Invalid version: " + version + " file " + file);
 +
 +            // Skip newestTimestamp (Long) + Compression level (Byte) + Chunk count (Short): Unused.
 +            rawDataStream.skipBytes(11);
@@ -201,7 +204,7 @@ index 0000000000000000000000000000000000000000..245e3b1801c5f92054d9c0d0d8fc2a8f
 +            int dataCount = rawDataStream.readInt();
 +            long fileLength = file.toFile().length();
 +            if (fileLength != HEADER_SIZE + dataCount + FOOTER_SIZE)
-+                throw new IOException("File length invalid " + this.regionFile + " " + fileLength + " " + (HEADER_SIZE + dataCount + FOOTER_SIZE));
++                throw new IOException("Invalid file length: " + this.regionFile + " " + fileLength + " " + (HEADER_SIZE + dataCount + FOOTER_SIZE));
 +
 +            rawDataStream.skipBytes(8); // Skip data hash (Long): Unused.
 +
@@ -217,7 +220,7 @@ index 0000000000000000000000000000000000000000..245e3b1801c5f92054d9c0d0d8fc2a8f
 +            int[] starts = new int[1024];
 +            for(int i = 0; i < 1024; i++) {
 +                starts[i] = dataStream.readInt();
-+                dataStream.skipBytes(4); // Skip timestamps (Int): Unimplemented TODO: Implement per-chunk timestamps
++                dataStream.skipBytes(4); // Skip timestamps (Int): Unused.
 +            }
 +
 +            for(int i = 0; i < 1024; i++) {
@@ -281,7 +284,7 @@ index 0000000000000000000000000000000000000000..245e3b1801c5f92054d9c0d0d8fc2a8f
 +    public synchronized void flush() throws IOException {
 +        if(!isMarkedToSave()) return;
 +
-+        long timestamp = System.currentTimeMillis() / 1000L;
++        long timestamp = getTimestamp();
 +        short chunkCount = 0;
 +
 +        File tempFile = new File(regionFile.toString() + ".tmp");
@@ -309,8 +312,8 @@ index 0000000000000000000000000000000000000000..245e3b1801c5f92054d9c0d0d8fc2a8f
 +            } else byteBuffers.add(null);
 +        }
 +        for(int i = 0; i < 1024; i++) {
-+            zstdDataStream.writeInt(this.bufferUncompressedSize[i]);
-+            zstdDataStream.writeInt(0); // TODO: IMPLEMENT PER CHUNK TIMESTAMPS
++            zstdDataStream.writeInt(this.bufferUncompressedSize[i]); // Write uncompressed size
++            zstdDataStream.writeInt(this.chunkTimestamps[i]); // Write timestamp
 +        }
 +        for(int i = 0; i < 1024; i++) {
 +            if(byteBuffers.get(i) != null)
@@ -352,12 +355,13 @@ index 0000000000000000000000000000000000000000..245e3b1801c5f92054d9c0d0d8fc2a8f
 +            b = new byte[compressedLength];
 +            System.arraycopy(compressed, 0, b, 0, compressedLength);
 +
-+            this.buffer[getChunkIndex(pos.x, pos.z)] = b;
++            int index = getChunkIndex(pos.x, pos.z);
++            this.buffer[index] = b;
++            this.chunkTimestamps[index] = getTimestamp();
 +            this.bufferUncompressedSize[getChunkIndex(pos.x, pos.z)] = uncompressedSize;
 +        } catch (IOException e) {
 +            LOGGER.error("Chunk write IOException " + e + " " + this.regionFile);
 +        }
-+
 +        markToSave();
 +    }
 +
@@ -410,6 +414,7 @@ index 0000000000000000000000000000000000000000..245e3b1801c5f92054d9c0d0d8fc2a8f
 +        int i = getChunkIndex(pos.x, pos.z);
 +        this.buffer[i] = null;
 +        this.bufferUncompressedSize[i] = 0;
++        this.chunkTimestamps[i] = getTimestamp();
 +        markToSave();
 +    }
 +
@@ -428,6 +433,10 @@ index 0000000000000000000000000000000000000000..245e3b1801c5f92054d9c0d0d8fc2a8f
 +
 +    private static int getChunkIndex(int x, int z) {
 +        return (x & 31) + ((z & 31) << 5);
++    }
++
++    private static int getTimestamp() {
++        return (int) (System.currentTimeMillis() / 1000L);
 +    }
 +
 +    public boolean recalculateHeader() {
