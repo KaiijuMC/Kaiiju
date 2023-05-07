@@ -37,8 +37,9 @@ world-settings:
       shulker-box-drop-contents-when-destroyed: true
       fix-void-trading: true
       optimize-hoppers: true
+      tick-when-empty: true
     region-format:
-      format: LINEAR
+      format: ANVIL
       linear:
         compression-level: 1
         crash-on-broken-symlink: true
@@ -48,7 +49,6 @@ Documentation: [Kaiiju Wiki](https://github.com/KaiijuMC/Kaiiju/wiki/Configurati
 
 ### Roadmap
 - **Static view distance**: Reduce RAM usage / Region size with a "static" view distance.
-- **Linear timestamps**: Add chunk timestamps to linear region files.
 - **Native world conversion**: Convert region file format at startup.
 - **Stash deduplication**: Make giant dupe stashes possible and lagless.
 
