@@ -1,0 +1,139 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
+Date: Wed, 10 May 2023 16:30:38 +0300
+Subject: [PATCH] Strip raytracing for EntityLiving#hasLineOfSight
+
+This has been benchmarked on a huge gold farm.
+Resulting in significative performance improvements.
+
+diff --git a/src/main/java/net/minecraft/world/entity/LivingEntity.java b/src/main/java/net/minecraft/world/entity/LivingEntity.java
+index 49716190b784339b80c8a3ac8e5b13bc450284ee..440735caab3be903546638a3d01903720225c553 100644
+--- a/src/main/java/net/minecraft/world/entity/LivingEntity.java
++++ b/src/main/java/net/minecraft/world/entity/LivingEntity.java
+@@ -3612,7 +3612,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
+             Vec3 vec3d1 = new Vec3(entity.getX(), entity.getEyeY(), entity.getZ());
+ 
+             // Paper - diff on change - used in CraftLivingEntity#hasLineOfSight(Location) and CraftWorld#lineOfSightExists
+-            return vec3d1.distanceToSqr(vec3d) > 128D * 128D ? false : this.level.clip(new ClipContext(vec3d, vec3d1, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this)).getType() == HitResult.Type.MISS; // Paper - use distanceToSqr
++            return !(vec3d1.distanceToSqr(vec3d) > 128D * 128D) && this.level.rayTraceDirect(vec3d, vec3d1, net.minecraft.world.phys.shapes.CollisionContext.of(this)) == net.minecraft.world.phys.BlockHitResult.Type.MISS; // Paper - use distanceToSqr // Kaiiju - Pufferfish - Strip raytracing
+         }
+     }
+ 
+diff --git a/src/main/java/net/minecraft/world/level/BlockGetter.java b/src/main/java/net/minecraft/world/level/BlockGetter.java
+index 2ee9e8e3c1a28c1823de8e1fe421cc1f3e72f384..d99d77536e4d49b53575ae30614c0ab5fdbd3f73 100644
+--- a/src/main/java/net/minecraft/world/level/BlockGetter.java
++++ b/src/main/java/net/minecraft/world/level/BlockGetter.java
+@@ -73,6 +73,17 @@ public interface BlockGetter extends LevelHeightAccessor {
+         });
+     }
+ 
++    // Kaiiju start - Pufferfish - broken down variant of below rayTraceBlock, used by World#rayTraceDirect
++    @Nullable
++    default net.minecraft.world.phys.BlockHitResult.Type rayTraceBlockDirect(Vec3 vec3d, Vec3 vec3d1, BlockPos blockposition, BlockState iblockdata, net.minecraft.world.phys.shapes.CollisionContext voxelshapecoll) {
++        if (iblockdata.isAir()) return null;
++        VoxelShape voxelshape = ClipContext.Block.COLLIDER.get(iblockdata, this, blockposition, voxelshapecoll);
++        net.minecraft.world.phys.BlockHitResult movingobjectpositionblock = this.clipWithInteractionOverride(vec3d, vec3d1, blockposition, voxelshape, iblockdata);
++
++        return movingobjectpositionblock == null ? null : movingobjectpositionblock.getType();
++    }
++    // Kaiiju end
++
+     // CraftBukkit start - moved block handling into separate method for use by Block#rayTrace
+     default BlockHitResult clip(ClipContext raytrace1, BlockPos blockposition) {
+             // Paper start - Prevent raytrace from loading chunks
+diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
+index a3b4b49ca8612a61bc2e7a1e2d2e942e7ebe1883..933373aaa7b1fa07862e2146e079abe91d126263 100644
+--- a/src/main/java/net/minecraft/world/level/Level.java
++++ b/src/main/java/net/minecraft/world/level/Level.java
+@@ -433,6 +433,91 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+         return null;
+     }
+ 
++    // Kaiiju start - Pufferfish - broken down method of raytracing for EntityLiving#hasLineOfSight, replaces IBlockAccess#rayTrace(RayTrace)
++    public net.minecraft.world.phys.BlockHitResult.Type rayTraceDirect(net.minecraft.world.phys.Vec3 vec3d, net.minecraft.world.phys.Vec3 vec3d1, net.minecraft.world.phys.shapes.CollisionContext voxelshapecoll) {
++        // most of this code comes from IBlockAccess#a(RayTrace, BiFunction, Function), but removes the needless functions
++        if (vec3d.equals(vec3d1)) {
++            return net.minecraft.world.phys.BlockHitResult.Type.MISS;
++        }
++
++        double endX = Mth.lerp(-1.0E-7D, vec3d1.x, vec3d.x);
++        double endY = Mth.lerp(-1.0E-7D, vec3d1.y, vec3d.y);
++        double endZ = Mth.lerp(-1.0E-7D, vec3d1.z, vec3d.z);
++
++        double startX = Mth.lerp(-1.0E-7D, vec3d.x, vec3d1.x);
++        double startY = Mth.lerp(-1.0E-7D, vec3d.y, vec3d1.y);
++        double startZ = Mth.lerp(-1.0E-7D, vec3d.z, vec3d1.z);
++
++        int currentX = Mth.floor(startX);
++        int currentY = Mth.floor(startY);
++        int currentZ = Mth.floor(startZ);
++
++        BlockPos.MutableBlockPos currentBlock = new BlockPos.MutableBlockPos(currentX, currentY, currentZ);
++
++        LevelChunk chunk = this.getChunkIfLoaded(currentBlock);
++        if (chunk == null) {
++            return net.minecraft.world.phys.BlockHitResult.Type.MISS;
++        }
++
++        net.minecraft.world.phys.BlockHitResult.Type initialCheck = this.rayTraceBlockDirect(vec3d, vec3d1, currentBlock, chunk.getBlockState(currentBlock), voxelshapecoll);
++
++        if (initialCheck != null) {
++            return initialCheck;
++        }
++
++        double diffX = endX - startX;
++        double diffY = endY - startY;
++        double diffZ = endZ - startZ;
++
++        int xDirection = Mth.sign(diffX);
++        int yDirection = Mth.sign(diffY);
++        int zDirection = Mth.sign(diffZ);
++
++        double normalizedX = xDirection == 0 ? Double.MAX_VALUE : (double) xDirection / diffX;
++        double normalizedY = yDirection == 0 ? Double.MAX_VALUE : (double) yDirection / diffY;
++        double normalizedZ = zDirection == 0 ? Double.MAX_VALUE : (double) zDirection / diffZ;
++
++        double normalizedXDirection = normalizedX * (xDirection > 0 ? 1.0D - Mth.frac(startX) : Mth.frac(startX));
++        double normalizedYDirection = normalizedY * (yDirection > 0 ? 1.0D - Mth.frac(startY) : Mth.frac(startY));
++        double normalizedZDirection = normalizedZ * (zDirection > 0 ? 1.0D - Mth.frac(startZ) : Mth.frac(startZ));
++
++        net.minecraft.world.phys.BlockHitResult.Type result;
++
++        do {
++            if (normalizedXDirection > 1.0D && normalizedYDirection > 1.0D && normalizedZDirection > 1.0D) {
++                return net.minecraft.world.phys.BlockHitResult.Type.MISS;
++            }
++
++            if (normalizedXDirection < normalizedYDirection) {
++                if (normalizedXDirection < normalizedZDirection) {
++                    currentX += xDirection;
++                    normalizedXDirection += normalizedX;
++                } else {
++                    currentZ += zDirection;
++                    normalizedZDirection += normalizedZ;
++                }
++            } else if (normalizedYDirection < normalizedZDirection) {
++                currentY += yDirection;
++                normalizedYDirection += normalizedY;
++            } else {
++                currentZ += zDirection;
++                normalizedZDirection += normalizedZ;
++            }
++
++            currentBlock.set(currentX, currentY, currentZ);
++            if (chunk.getPos().x != currentBlock.getX() >> 4 || chunk.getPos().z != currentBlock.getZ() >> 4) {
++                chunk = this.getChunkIfLoaded(currentBlock);
++                if (chunk == null) {
++                    return net.minecraft.world.phys.BlockHitResult.Type.MISS;
++                }
++            }
++            result = this.rayTraceBlockDirect(vec3d, vec3d1, currentBlock, chunk.getBlockState(currentBlock), voxelshapecoll);
++        } while (result == null);
++
++        return result;
++    }
++    // Kaiiju end
++
+     public boolean isInWorldBounds(BlockPos pos) {
+         return pos.isInsideBuildHeightAndWorldBoundsHorizontal(this); // Paper - use better/optimized check
+     }
