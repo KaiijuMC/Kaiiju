@@ -1,0 +1,18 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
+Date: Tue, 9 May 2023 15:11:56 +0300
+Subject: [PATCH] Fix off thread raid winners
+
+
+diff --git a/src/main/java/net/minecraft/world/entity/raid/Raid.java b/src/main/java/net/minecraft/world/entity/raid/Raid.java
+index 359f1690497eac00899eb26c17308e0a6fe943ad..3cc320e854cbb9e70b6c63f1f950091c5195edae 100644
+--- a/src/main/java/net/minecraft/world/entity/raid/Raid.java
++++ b/src/main/java/net/minecraft/world/entity/raid/Raid.java
+@@ -404,6 +404,7 @@ public class Raid {
+                             UUID uuid = (UUID) iterator.next();
+                             Entity entity = this.level.getEntity(uuid);
+ 
++                            if (!io.papermc.paper.util.TickThread.isTickThreadFor(entity)) continue; // Kaiiju - Prevent give effect to player off thread
+                             if (entity instanceof LivingEntity && !entity.isSpectator()) {
+                                 LivingEntity entityliving = (LivingEntity) entity;
+ 
