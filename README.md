@@ -24,25 +24,27 @@
 
 ```yaml
 verbose: false
-gameplay:
-  server-mod-name: Kaiiju
+region-format:
+  debug: false
 network:
   send-null-entity-packets: true
   alternate-keepalive: false
-region-format:
-  debug: false
+gameplay:
+  server-mod-name: Kaiiju
+  shared-random-for-players: true
 world-settings:
   default:
-    gameplay:
-      shulker-box-drop-contents-when-destroyed: true
-      fix-void-trading: true
-      optimize-hoppers: true
-      tick-when-empty: true
     region-format:
       format: ANVIL
       linear:
         compression-level: 1
         crash-on-broken-symlink: true
+    gameplay:
+      shulker-box-drop-contents-when-destroyed: true
+      fix-void-trading: true
+      optimize-hoppers: true
+      tick-when-empty: true
+      break-redstone-on-top-of-trap-doors-early: true
 config-version: 1
 ```
 Documentation: [Kaiiju Wiki](https://github.com/KaiijuMC/Kaiiju/wiki/Configuration)
