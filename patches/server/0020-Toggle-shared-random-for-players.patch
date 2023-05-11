@@ -5,7 +5,7 @@ Subject: [PATCH] Toggle shared random for players
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 9fb33b35b4d6842ca8597f77a4116e3983ebfbcb..51a49fc98147eef7bb50e7a2c71e0e8ed75e3dd6 100644
+index f1fe094c4b4c5932ba656165bb1671020c1277a5..d3f6e5c873255d00160cf792898204a82a0ec5e8 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 @@ -208,8 +208,10 @@ public class KaiijuConfig {
@@ -20,7 +20,7 @@ index 9fb33b35b4d6842ca8597f77a4116e3983ebfbcb..51a49fc98147eef7bb50e7a2c71e0e8e
      }
  }
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 08e61a8940c142c68ed93359084ea46c7fd52310..5f61a405914bf9538144a62cfa5bec8ededc9a5e 100644
+index 08e61a8940c142c68ed93359084ea46c7fd52310..f22b4ad629845462656834abb3e28d2c2588ace6 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -560,6 +560,11 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
@@ -28,7 +28,7 @@ index 08e61a8940c142c68ed93359084ea46c7fd52310..5f61a405914bf9538144a62cfa5bec8e
          this.stuckSpeedMultiplier = Vec3.ZERO;
          this.nextStep = 1.0F;
 +        // Kaiiju start - Toggle shared random for players
-+        if (dev.kaiijumc.kaiiju.KaiijuConfig.sharedRandomForPlayers && this instanceof Player)
++        if (!dev.kaiijumc.kaiiju.KaiijuConfig.sharedRandomForPlayers && this instanceof Player)
 +            this.random = RandomSource.create();
 +        else
 +        // Kaiiju end
