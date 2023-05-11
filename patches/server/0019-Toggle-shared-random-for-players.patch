@@ -4,28 +4,23 @@ Date: Thu, 11 May 2023 17:12:34 +0300
 Subject: [PATCH] Toggle shared random for players
 
 
-diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index 43c8e95454cfe831f69858eb3b520f9958280b54..70b86b1ffb45d0288a44905a7f13c3a439a73eb6 100644
---- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-+++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-@@ -151,6 +151,7 @@ public class KaiijuWorldConfig {
-     public boolean optimizeHoppers = true;
-     public boolean tickWhenEmpty = true;
-     public boolean breakRedstoneOnTopOfTrapDoorsEarly = true;
-+    public boolean sharedRandomForPlayers = true;
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+index 9fb33b35b4d6842ca8597f77a4116e3983ebfbcb..51a49fc98147eef7bb50e7a2c71e0e8ed75e3dd6 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+@@ -208,8 +208,10 @@ public class KaiijuConfig {
+     }
  
-     private void gameplaySettings() {
-         shulkerBoxDropContentsWhenDestroyed = getBoolean("gameplay.shulker-box-drop-contents-when-destroyed", shulkerBoxDropContentsWhenDestroyed);
-@@ -158,5 +159,6 @@ public class KaiijuWorldConfig {
-         optimizeHoppers = getBoolean("gameplay.optimize-hoppers", optimizeHoppers);
-         tickWhenEmpty = getBoolean("gameplay.tick-when-empty", tickWhenEmpty);
-         breakRedstoneOnTopOfTrapDoorsEarly = getBoolean("gameplay.break-redstone-on-top-of-trap-doors-early", breakRedstoneOnTopOfTrapDoorsEarly);
+     public static String serverModName = "Kaiiju";
++    public static boolean sharedRandomForPlayers = true;
+ 
+     private static void gameplaySettings() {
+         serverModName = getString("gameplay.server-mod-name", serverModName);
 +        sharedRandomForPlayers = getBoolean("gameplay.shared-random-for-players", sharedRandomForPlayers);
      }
  }
-\ No newline at end of file
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 08e61a8940c142c68ed93359084ea46c7fd52310..7d01c6713c758f3ebb1f0fcc90a52c783b31282f 100644
+index 08e61a8940c142c68ed93359084ea46c7fd52310..5f61a405914bf9538144a62cfa5bec8ededc9a5e 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -560,6 +560,11 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
@@ -33,7 +28,7 @@ index 08e61a8940c142c68ed93359084ea46c7fd52310..7d01c6713c758f3ebb1f0fcc90a52c78
          this.stuckSpeedMultiplier = Vec3.ZERO;
          this.nextStep = 1.0F;
 +        // Kaiiju start - Toggle shared random for players
-+        if (this.level.kaiijuConfig.sharedRandomForPlayers && this instanceof Player)
++        if (dev.kaiijumc.kaiiju.KaiijuConfig.sharedRandomForPlayers && this instanceof Player)
 +            this.random = RandomSource.create();
 +        else
 +        // Kaiiju end
