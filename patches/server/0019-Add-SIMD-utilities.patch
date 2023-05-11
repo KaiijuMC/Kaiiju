@@ -1,0 +1,78 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
+Date: Thu, 11 May 2023 05:02:40 +0300
+Subject: [PATCH] Add SIMD utilities
+
+Patch from Pufferfish
+
+diff --git a/build.gradle.kts b/build.gradle.kts
+index 4686019a152114e63e997ee103fc8424b24b4581..0851203a4bed670242afc5ac86562075f32693ab 100644
+--- a/build.gradle.kts
++++ b/build.gradle.kts
+@@ -58,6 +58,14 @@ dependencies {
+ }
+ 
+ val craftbukkitPackageVersion = "1_19_R3" // Paper
++
++// Kaiiju start - Pufferfish - SIMD utilities
++tasks.withType<JavaCompile> {
++    val compilerArgs = options.compilerArgs
++    compilerArgs.add("--add-modules=jdk.incubator.vector")
++}
++// Kaiiju end
++
+ tasks.jar {
+     archiveClassifier.set("dev")
+ 
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+index 9fb33b35b4d6842ca8597f77a4116e3983ebfbcb..09cad3d066b3ac99d3443d9e987828b5596a06af 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+@@ -3,6 +3,7 @@ package dev.kaiijumc.kaiiju;
+ import com.google.common.base.Throwables;
+ import com.google.common.collect.ImmutableMap;
+ import dev.kaiijumc.kaiiju.command.KaiijuCommand;
++import gg.pufferfish.pufferfish.simd.SIMDDetection;
+ import net.minecraft.server.MinecraftServer;
+ import org.bukkit.Bukkit;
+ import org.bukkit.command.Command;
+@@ -109,6 +110,27 @@ public class KaiijuConfig {
+         }
+     }
+ 
++    public static void simdWarning() {
++		// Attempt to detect vectorization
++		try {
++			SIMDDetection.isEnabled = SIMDDetection.canEnable(Bukkit.getLogger());
++			SIMDDetection.versionLimited = SIMDDetection.getJavaVersion() != 17 && SIMDDetection.getJavaVersion() != 18 && SIMDDetection.getJavaVersion() != 19;
++		} catch (NoClassDefFoundError | Exception ignored) {
++			ignored.printStackTrace();
++		}
++
++		if (SIMDDetection.isEnabled) {
++			Bukkit.getLogger().info("SIMD operations detected as functional. Will replace some operations with faster versions.");
++		} else if (SIMDDetection.versionLimited) {
++			Bukkit.getLogger().warning("Will not enable SIMD! These optimizations are only safely supported on Java 17, Java 18, and Java 19.");
++		} else {
++			Bukkit.getLogger().warning("SIMD operations are available for your server, but are not configured!");
++			Bukkit.getLogger().warning("To enable additional optimizations, add \"--add-modules=jdk.incubator.vector\" to your startup flags, BEFORE the \"-jar\".");
++			Bukkit.getLogger().warning("If you have already added this flag, then SIMD operations are not supported on your JVM or CPU.");
++			Bukkit.getLogger().warning("Debug: Java: " + System.getProperty("java.version") + ", test run: " + SIMDDetection.testRun);
++		}
++    }
++
+     protected static void set(String path, Object val) {
+         config.addDefault(path, val);
+         config.set(path, val);
+diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
+index 426777730f77664c69bd0a084a9323d767ebc0ad..c6d458f879069ae4a994c4b5043e03cced89ae36 100644
+--- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
++++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
+@@ -225,6 +225,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+             DedicatedServer.LOGGER.error("Unable to load server configuration", e);
+             return false;
+         }
++        dev.kaiijumc.kaiiju.KaiijuConfig.simdWarning();
+         dev.kaiijumc.kaiiju.KaiijuConfig.registerCommands();
+         // Kaiiju end
+         com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // load version history now
