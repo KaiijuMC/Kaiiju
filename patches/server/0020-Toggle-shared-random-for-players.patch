@@ -1,0 +1,42 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
+Date: Thu, 11 May 2023 17:12:34 +0300
+Subject: [PATCH] Toggle shared random for players
+
+
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
+index 43c8e95454cfe831f69858eb3b520f9958280b54..70b86b1ffb45d0288a44905a7f13c3a439a73eb6 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
+@@ -151,6 +151,7 @@ public class KaiijuWorldConfig {
+     public boolean optimizeHoppers = true;
+     public boolean tickWhenEmpty = true;
+     public boolean breakRedstoneOnTopOfTrapDoorsEarly = true;
++    public boolean sharedRandomForPlayers = true;
+ 
+     private void gameplaySettings() {
+         shulkerBoxDropContentsWhenDestroyed = getBoolean("gameplay.shulker-box-drop-contents-when-destroyed", shulkerBoxDropContentsWhenDestroyed);
+@@ -158,5 +159,6 @@ public class KaiijuWorldConfig {
+         optimizeHoppers = getBoolean("gameplay.optimize-hoppers", optimizeHoppers);
+         tickWhenEmpty = getBoolean("gameplay.tick-when-empty", tickWhenEmpty);
+         breakRedstoneOnTopOfTrapDoorsEarly = getBoolean("gameplay.break-redstone-on-top-of-trap-doors-early", breakRedstoneOnTopOfTrapDoorsEarly);
++        sharedRandomForPlayers = getBoolean("gameplay.shared-random-for-players", sharedRandomForPlayers);
+     }
+ }
+\ No newline at end of file
+diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
+index 08e61a8940c142c68ed93359084ea46c7fd52310..7d01c6713c758f3ebb1f0fcc90a52c783b31282f 100644
+--- a/src/main/java/net/minecraft/world/entity/Entity.java
++++ b/src/main/java/net/minecraft/world/entity/Entity.java
+@@ -560,6 +560,11 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+         this.bb = Entity.INITIAL_AABB;
+         this.stuckSpeedMultiplier = Vec3.ZERO;
+         this.nextStep = 1.0F;
++        // Kaiiju start - Toggle shared random for players
++        if (this.level.kaiijuConfig.sharedRandomForPlayers && this instanceof Player)
++            this.random = RandomSource.create();
++        else
++        // Kaiiju end
+         this.random = SHARED_RANDOM; // Paper
+         this.remainingFireTicks = -this.getFireImmuneTicks();
+         this.fluidHeight = new Object2DoubleArrayMap(2);
