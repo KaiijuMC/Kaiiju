@@ -5,7 +5,7 @@ Subject: [PATCH] Kick player instead of crashing
 
 
 diff --git a/src/main/java/io/papermc/paper/chunk/system/RegionizedPlayerChunkLoader.java b/src/main/java/io/papermc/paper/chunk/system/RegionizedPlayerChunkLoader.java
-index d52a522fe6d5c4375862691fa32450bc458ca38b..4e7f1550d46133c23f422700f8fc3d5a2d8df24d 100644
+index d52a522fe6d5c4375862691fa32450bc458ca38b..648aff395887d2f13846b1bbe59f4115206ad7cf 100644
 --- a/src/main/java/io/papermc/paper/chunk/system/RegionizedPlayerChunkLoader.java
 +++ b/src/main/java/io/papermc/paper/chunk/system/RegionizedPlayerChunkLoader.java
 @@ -486,7 +486,12 @@ public class RegionizedPlayerChunkLoader {
@@ -14,7 +14,7 @@ index d52a522fe6d5c4375862691fa32450bc458ca38b..4e7f1550d46133c23f422700f8fc3d5a
              }
 -            throw new IllegalStateException();
 +            // Kaiiju - Kick player instead of crashing
-+            String errorMsg = "Already sent chunk [" + chunkX + ", " + chunkZ + "] in world '" + this.world;
++            String errorMsg = "Already sent chunk [" + chunkX + ", " + chunkZ + "] in world " + this.world;
 +            this.player.getBukkitEntity().kickPlayer(errorMsg);
 +            org.bukkit.Bukkit.getLogger().severe(errorMsg);
 +            // throw new IllegalStateException();
@@ -23,7 +23,7 @@ index d52a522fe6d5c4375862691fa32450bc458ca38b..4e7f1550d46133c23f422700f8fc3d5a
  
          private void sendUnloadChunk(final int chunkX, final int chunkZ) {
 diff --git a/src/main/java/net/minecraft/server/level/ChunkHolder.java b/src/main/java/net/minecraft/server/level/ChunkHolder.java
-index 5ccfc95f51a899b1cd3f34af5e5bb05d902016b8..2785be5752632902c20b1a727886f75bfd097d6f 100644
+index 5ccfc95f51a899b1cd3f34af5e5bb05d902016b8..9c20bd199454b6032a6a90676d12526168b8dd0b 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkHolder.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkHolder.java
 @@ -133,7 +133,12 @@ public class ChunkHolder {
@@ -32,7 +32,7 @@ index 5ccfc95f51a899b1cd3f34af5e5bb05d902016b8..2785be5752632902c20b1a727886f75b
          if (!this.playersSentChunkTo.add(player)) {
 -            throw new IllegalStateException("Already sent chunk " + this.pos + " in world '" + this.chunkMap.level.getWorld().getName() + "' to player " + player);
 +            // Kaiiju start - Kick player instead of crashing
-+            String errorMsg = "Already sent chunk " + this.pos + " in world '" + this.chunkMap.level.getWorld().getName();
++            String errorMsg = "Already sent chunk " + this.pos + " in world " + this.chunkMap.level.getWorld().getName();
 +            player.getBukkitEntity().kickPlayer(errorMsg);
 +            org.bukkit.Bukkit.getLogger().severe(errorMsg);
 +            //throw new IllegalStateException("Already sent chunk " + this.pos + " in world '" + this.chunkMap.level.getWorld().getName() + "' to player " + player);
