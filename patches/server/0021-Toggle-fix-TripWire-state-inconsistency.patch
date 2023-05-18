@@ -1,0 +1,40 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
+Date: Thu, 18 May 2023 15:50:40 +0300
+Subject: [PATCH] Toggle fix TripWire state inconsistency
+
+This allow string duplication
+
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
+index 43c8e95454cfe831f69858eb3b520f9958280b54..8026f9ac95cd54e74ff7e161fe4768830f8e0d30 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
+@@ -151,6 +151,7 @@ public class KaiijuWorldConfig {
+     public boolean optimizeHoppers = true;
+     public boolean tickWhenEmpty = true;
+     public boolean breakRedstoneOnTopOfTrapDoorsEarly = true;
++    public boolean fixTripWireStateInconsistency = true;
+ 
+     private void gameplaySettings() {
+         shulkerBoxDropContentsWhenDestroyed = getBoolean("gameplay.shulker-box-drop-contents-when-destroyed", shulkerBoxDropContentsWhenDestroyed);
+@@ -158,5 +159,6 @@ public class KaiijuWorldConfig {
+         optimizeHoppers = getBoolean("gameplay.optimize-hoppers", optimizeHoppers);
+         tickWhenEmpty = getBoolean("gameplay.tick-when-empty", tickWhenEmpty);
+         breakRedstoneOnTopOfTrapDoorsEarly = getBoolean("gameplay.break-redstone-on-top-of-trap-doors-early", breakRedstoneOnTopOfTrapDoorsEarly);
++        fixTripWireStateInconsistency = getBoolean("gameplay.fix-tripwire-state-inconsistency", fixTripWireStateInconsistency);
+     }
+ }
+\ No newline at end of file
+diff --git a/src/main/java/net/minecraft/world/level/block/TripWireBlock.java b/src/main/java/net/minecraft/world/level/block/TripWireBlock.java
+index 7f60175bf671d282c11e9084670d2bb900968255..baa6d2bb3a4bec920cb8b57cb08d706929985ea9 100644
+--- a/src/main/java/net/minecraft/world/level/block/TripWireBlock.java
++++ b/src/main/java/net/minecraft/world/level/block/TripWireBlock.java
+@@ -74,7 +74,7 @@ public class TripWireBlock extends Block {
+     @Override
+     public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean moved) {
+         if (!moved && !state.is(newState.getBlock())) {
+-            this.updateSource(world, pos, (BlockState) state.setValue(TripWireBlock.POWERED, true), true); // Paper - fix state inconsistency
++            this.updateSource(world, pos, (BlockState) state.setValue(TripWireBlock.POWERED, true), world.kaiijuConfig.fixTripWireStateInconsistency); // Paper - fix state inconsistency // Kaiiju - Toggle this
+         }
+     }
+ 
