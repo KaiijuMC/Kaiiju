@@ -1,0 +1,65 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
+Date: Thu, 18 May 2023 20:05:49 +0300
+Subject: [PATCH] Configurable removed entities teleportation
+
+
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
+index 8026f9ac95cd54e74ff7e161fe4768830f8e0d30..f24874a195fcba35f37a03a85c84f161abb790e8 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
+@@ -152,6 +152,7 @@ public class KaiijuWorldConfig {
+     public boolean tickWhenEmpty = true;
+     public boolean breakRedstoneOnTopOfTrapDoorsEarly = true;
+     public boolean fixTripWireStateInconsistency = true;
++    public boolean teleportRemovedEntities = false;
+ 
+     private void gameplaySettings() {
+         shulkerBoxDropContentsWhenDestroyed = getBoolean("gameplay.shulker-box-drop-contents-when-destroyed", shulkerBoxDropContentsWhenDestroyed);
+@@ -160,5 +161,6 @@ public class KaiijuWorldConfig {
+         tickWhenEmpty = getBoolean("gameplay.tick-when-empty", tickWhenEmpty);
+         breakRedstoneOnTopOfTrapDoorsEarly = getBoolean("gameplay.break-redstone-on-top-of-trap-doors-early", breakRedstoneOnTopOfTrapDoorsEarly);
+         fixTripWireStateInconsistency = getBoolean("gameplay.fix-tripwire-state-inconsistency", fixTripWireStateInconsistency);
++        teleportRemovedEntities = getBoolean("gameplay.teleport-removed-entities", teleportRemovedEntities);
+     }
+ }
+\ No newline at end of file
+diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
+index f22b4ad629845462656834abb3e28d2c2588ace6..26c776826b0b95f54361c6f00062543d92ef2d3d 100644
+--- a/src/main/java/net/minecraft/world/entity/Entity.java
++++ b/src/main/java/net/minecraft/world/entity/Entity.java
+@@ -3666,7 +3666,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+     }
+ 
+     protected boolean canTeleportAsync() {
+-        return !this.hasNullCallback() && !this.isRemoved() && this.isAlive() && (!(this instanceof net.minecraft.world.entity.LivingEntity livingEntity) || !livingEntity.isSleeping());
++        return !this.hasNullCallback() && ((!this.isRemoved() && this.isAlive()) || this.level.kaiijuConfig.teleportRemovedEntities) && (!(this instanceof net.minecraft.world.entity.LivingEntity livingEntity) || !livingEntity.isSleeping()); // Kaiiju - Allow removed entities to teleport
+     }
+ 
+     protected void teleportSyncSameRegion(Vec3 pos, Float yaw, Float pitch, Vec3 speedDirectionUpdate) {
+@@ -3835,7 +3835,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+             return false;
+         }
+ 
+-        if (this.isPassenger() || this.isVehicle() || !this.canChangeDimensions() || this.isRemoved() || !this.valid || !this.isAlive()) {
++        if (this.isPassenger() || this.isVehicle() || (!this.canChangeDimensions() || this.isRemoved() || !this.valid || !this.isAlive()) && !this.level.kaiijuConfig.teleportRemovedEntities) { // Kaiiju - Allow removed entities to teleport
+             return false;
+         }
+ 
+@@ -4386,7 +4386,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+     }
+ 
+     public boolean canChangeDimensions() {
+-        return !this.isPassenger() && !this.isVehicle() && isAlive() && valid; // Paper
++        return !this.isPassenger() && !this.isVehicle() && ((isAlive() && valid) || this.level.kaiijuConfig.teleportRemovedEntities); // Paper // Kaiiju - Allow removed entities to teleport
+     }
+ 
+     public float getBlockExplosionResistance(Explosion explosion, BlockGetter world, BlockPos pos, BlockState blockState, FluidState fluidState, float max) {
+@@ -5351,6 +5351,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+         this.levelCallback.onRemove(reason);
+         // Folia start - region threading
+         if (!(this instanceof ServerPlayer) && reason != RemovalReason.CHANGED_DIMENSION) {
++            if (this.level.kaiijuConfig.teleportRemovedEntities && this.canPortalAsync(true)) return; // Kaiiju - Allow removed entities to teleport
+             // Players need to be special cased, because they are regularly removed from the world
+             this.retireScheduler();
+         }

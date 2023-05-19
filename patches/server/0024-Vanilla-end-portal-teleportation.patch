@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
+Date: Fri, 19 May 2023 03:38:03 +0300
+Subject: [PATCH] Vanilla end portal teleportation
+
+
+diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
+index 26c776826b0b95f54361c6f00062543d92ef2d3d..e8f13219d5bd1e0a6a3dab72d5f9fe58c33e2cc3 100644
+--- a/src/main/java/net/minecraft/world/entity/Entity.java
++++ b/src/main/java/net/minecraft/world/entity/Entity.java
+@@ -3913,10 +3913,16 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+                         (chunks) -> {
+                             ServerLevel.makeObsidianPlatform(destination, null, targetPos);
+ 
++                            // Kaiiju start - Vanilla end teleportation
++                            Vec3 finalPos;
++                            if (this instanceof Player) finalPos = Vec3.atBottomCenterOf(targetPos.below());
++                            else if (this instanceof net.minecraft.world.entity.item.FallingBlockEntity) finalPos = Vec3.atBottomCenterOf(targetPos).subtract(0, 0.04, 0);
++                            else finalPos = Vec3.atBottomCenterOf(targetPos);
++                            // Kaiiju end
+                             // the portal obsidian is placed at targetPos.y - 2, so if we want to place the entity
+                             // on the obsidian, we need to spawn at targetPos.y - 1
+                             portalInfoCompletable.complete(
+-                                new PortalInfo(Vec3.atBottomCenterOf(targetPos.below()), Vec3.ZERO, 90.0f, 0.0f, destination, null)
++                                new PortalInfo(finalPos, Vec3.ZERO, 90.0f, 0.0f, destination, null) // Kaiiju - Vanilla end teleportation
+                             );
+                         }
+                     );
