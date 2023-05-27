@@ -133,7 +133,7 @@ index abe37c7c3c6f5ab73afd738ec78f06d7e4d2ed96..52fc6bb99f6024273c7438d01314b576
          stringbuilder.append(CrashReport.DATE_TIME_FORMATTER.format(ZonedDateTime.now()));
          stringbuilder.append("\n");
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index f5721f6d719b7055fdccc81d5e67ed758e90cb10..0696ad97437726fd6a13badfe7db0617dfbfb1ad 100644
+index 61bac6fda2d2f4b3db8a3f7e3003f47c84d5c4cd..19d6b811dccdc2b7a22054d3fe72b3981a6aae3a 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -999,7 +999,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -145,7 +145,7 @@ index f5721f6d719b7055fdccc81d5e67ed758e90cb10..0696ad97437726fd6a13badfe7db0617
              while (this.getRunningThread().isAlive()) {
                  this.getRunningThread().stop();
                  try {
-@@ -1833,7 +1833,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1815,7 +1815,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
      @DontObfuscate
      public String getServerModName() {
