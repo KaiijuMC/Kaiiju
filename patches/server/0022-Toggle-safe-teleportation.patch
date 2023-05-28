@@ -25,18 +25,10 @@ index 8026f9ac95cd54e74ff7e161fe4768830f8e0d30..bf23ddc5fdc274c9fc755f64d30d6792
  }
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index f22b4ad629845462656834abb3e28d2c2588ace6..87290b3ee0d7a6234c72a04412063079b38ba54c 100644
+index f22b4ad629845462656834abb3e28d2c2588ace6..7875659b195e98b7e725e3daf8495d2efb1b5f88 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -57,7 +57,6 @@ import net.minecraft.network.syncher.EntityDataSerializers;
- import net.minecraft.network.syncher.SynchedEntityData;
- import net.minecraft.resources.ResourceKey;
- import net.minecraft.resources.ResourceLocation;
--import io.papermc.paper.util.MCUtil;
- import net.minecraft.server.MinecraftServer;
- import net.minecraft.server.level.ServerLevel;
- import net.minecraft.server.level.ServerPlayer;
-@@ -3666,7 +3665,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+@@ -3666,7 +3666,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
      }
  
      protected boolean canTeleportAsync() {
@@ -45,7 +37,7 @@ index f22b4ad629845462656834abb3e28d2c2588ace6..87290b3ee0d7a6234c72a04412063079
      }
  
      protected void teleportSyncSameRegion(Vec3 pos, Float yaw, Float pitch, Vec3 speedDirectionUpdate) {
-@@ -3826,6 +3825,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+@@ -3826,6 +3826,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
  
      protected boolean tryEndPortal() {
          io.papermc.paper.util.TickThread.ensureTickThread(this, "Cannot portal entity async");
@@ -53,7 +45,7 @@ index f22b4ad629845462656834abb3e28d2c2588ace6..87290b3ee0d7a6234c72a04412063079
          BlockPos pos = this.portalBlock;
          ServerLevel world = this.portalWorld;
          this.portalBlock = null;
-@@ -3835,7 +3835,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+@@ -3835,7 +3836,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
              return false;
          }
  
@@ -62,7 +54,7 @@ index f22b4ad629845462656834abb3e28d2c2588ace6..87290b3ee0d7a6234c72a04412063079
              return false;
          }
  
-@@ -4386,7 +4386,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+@@ -4386,7 +4387,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
      }
  
      public boolean canChangeDimensions() {
@@ -71,7 +63,7 @@ index f22b4ad629845462656834abb3e28d2c2588ace6..87290b3ee0d7a6234c72a04412063079
      }
  
      public float getBlockExplosionResistance(Explosion explosion, BlockGetter world, BlockPos pos, BlockState blockState, FluidState fluidState, float max) {
-@@ -5351,6 +5351,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+@@ -5351,6 +5352,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
          this.levelCallback.onRemove(reason);
          // Folia start - region threading
          if (!(this instanceof ServerPlayer) && reason != RemovalReason.CHANGED_DIMENSION) {
