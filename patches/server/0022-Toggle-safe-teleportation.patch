@@ -25,18 +25,9 @@ index 8026f9ac95cd54e74ff7e161fe4768830f8e0d30..bf23ddc5fdc274c9fc755f64d30d6792
  }
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index f22b4ad629845462656834abb3e28d2c2588ace6..7875659b195e98b7e725e3daf8495d2efb1b5f88 100644
+index f22b4ad629845462656834abb3e28d2c2588ace6..7af60ebb91fb39374355c64396b6adc48b2a5f89 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -3666,7 +3666,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
-     }
- 
-     protected boolean canTeleportAsync() {
--        return !this.hasNullCallback() && !this.isRemoved() && this.isAlive() && (!(this instanceof net.minecraft.world.entity.LivingEntity livingEntity) || !livingEntity.isSleeping());
-+        return !this.hasNullCallback() && ((!this.isRemoved() && this.isAlive()) || this.level.kaiijuConfig.safeTeleporting) && (!(this instanceof net.minecraft.world.entity.LivingEntity livingEntity) || !livingEntity.isSleeping()); // Kaiiju - Allow removed entities to teleport
-     }
- 
-     protected void teleportSyncSameRegion(Vec3 pos, Float yaw, Float pitch, Vec3 speedDirectionUpdate) {
 @@ -3826,6 +3826,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
  
      protected boolean tryEndPortal() {
@@ -45,32 +36,6 @@ index f22b4ad629845462656834abb3e28d2c2588ace6..7875659b195e98b7e725e3daf8495d2e
          BlockPos pos = this.portalBlock;
          ServerLevel world = this.portalWorld;
          this.portalBlock = null;
-@@ -3835,7 +3836,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
-             return false;
-         }
- 
--        if (this.isPassenger() || this.isVehicle() || !this.canChangeDimensions() || this.isRemoved() || !this.valid || !this.isAlive()) {
-+        if (this.isPassenger() || this.isVehicle() || (!this.canChangeDimensions() || this.isRemoved() || !this.valid || !this.isAlive()) && !this.level.kaiijuConfig.safeTeleporting) { // Kaiiju - Allow removed entities to teleport
-             return false;
-         }
- 
-@@ -4386,7 +4387,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
-     }
- 
-     public boolean canChangeDimensions() {
--        return !this.isPassenger() && !this.isVehicle() && isAlive() && valid; // Paper
-+        return !this.isPassenger() && !this.isVehicle() && ((isAlive() && valid) || this.level.kaiijuConfig.safeTeleporting); // Paper // Kaiiju - Allow removed entities to teleport
-     }
- 
-     public float getBlockExplosionResistance(Explosion explosion, BlockGetter world, BlockPos pos, BlockState blockState, FluidState fluidState, float max) {
-@@ -5351,6 +5352,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
-         this.levelCallback.onRemove(reason);
-         // Folia start - region threading
-         if (!(this instanceof ServerPlayer) && reason != RemovalReason.CHANGED_DIMENSION) {
-+            if (this.level.kaiijuConfig.safeTeleporting && this.canPortalAsync(true)) return; // Kaiiju - Allow removed entities to teleport
-             // Players need to be special cased, because they are regularly removed from the world
-             this.retireScheduler();
-         }
 diff --git a/src/main/java/net/minecraft/world/level/block/EndPortalBlock.java b/src/main/java/net/minecraft/world/level/block/EndPortalBlock.java
 index 41d7cff39fc37955877668337689b4b26cd8c7cf..aee4ae51a73ac3c74bf4b3db23247b0eb45c2d7a 100644
 --- a/src/main/java/net/minecraft/world/level/block/EndPortalBlock.java
