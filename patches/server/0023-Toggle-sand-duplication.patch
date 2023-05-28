@@ -1,0 +1,48 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
+Date: Sun, 28 May 2023 01:51:52 +0300
+Subject: [PATCH] Toggle sand duplication
+
+
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
+index bf23ddc5fdc274c9fc755f64d30d6792c9f4b0da..96f676cacbbb25e818d0f197c175a5f1179d3df9 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
+@@ -153,6 +153,7 @@ public class KaiijuWorldConfig {
+     public boolean breakRedstoneOnTopOfTrapDoorsEarly = true;
+     public boolean fixTripWireStateInconsistency = true;
+     public boolean safeTeleporting = true;
++    public boolean sandDuplication = false;
+ 
+     private void gameplaySettings() {
+         shulkerBoxDropContentsWhenDestroyed = getBoolean("gameplay.shulker-box-drop-contents-when-destroyed", shulkerBoxDropContentsWhenDestroyed);
+@@ -162,5 +163,6 @@ public class KaiijuWorldConfig {
+         breakRedstoneOnTopOfTrapDoorsEarly = getBoolean("gameplay.break-redstone-on-top-of-trap-doors-early", breakRedstoneOnTopOfTrapDoorsEarly);
+         fixTripWireStateInconsistency = getBoolean("gameplay.fix-tripwire-state-inconsistency", fixTripWireStateInconsistency);
+         safeTeleporting = getBoolean("gameplay.safe-teleportation", safeTeleporting);
++        sandDuplication = getBoolean("gameplay.sand-duplication", sandDuplication);
+     }
+ }
+\ No newline at end of file
+diff --git a/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java b/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java
+index c8d125955754e27da54d95fb5b1cea39ca54b618..ffe82c153602babb679dee29d20e807a771a00ce 100644
+--- a/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java
++++ b/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java
+@@ -131,7 +131,7 @@ public class FallingBlockEntity extends Entity {
+     @Override
+     public void tick() {
+         // Paper start - fix sand duping
+-        if (this.isRemoved()) {
++        if (!this.level.kaiijuConfig.sandDuplication && this.isRemoved()) { // Kaiiju - Toggle sand duplication
+             return;
+         }
+         // Paper end - fix sand duping
+@@ -148,7 +148,7 @@ public class FallingBlockEntity extends Entity {
+             this.move(MoverType.SELF, this.getDeltaMovement());
+ 
+             // Paper start - fix sand duping
+-            if (this.isRemoved()) {
++            if (!this.level.kaiijuConfig.sandDuplication && this.isRemoved()) { // Kaiiju - Toggle sand duplication
+                 return;
+             }
+             // Paper end - fix sand duping

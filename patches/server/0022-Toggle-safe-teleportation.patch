@@ -1,0 +1,99 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
+Date: Thu, 18 May 2023 20:05:49 +0300
+Subject: [PATCH] Toggle safe teleportation
+
+
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
+index 8026f9ac95cd54e74ff7e161fe4768830f8e0d30..bf23ddc5fdc274c9fc755f64d30d6792c9f4b0da 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
+@@ -152,6 +152,7 @@ public class KaiijuWorldConfig {
+     public boolean tickWhenEmpty = true;
+     public boolean breakRedstoneOnTopOfTrapDoorsEarly = true;
+     public boolean fixTripWireStateInconsistency = true;
++    public boolean safeTeleporting = true;
+ 
+     private void gameplaySettings() {
+         shulkerBoxDropContentsWhenDestroyed = getBoolean("gameplay.shulker-box-drop-contents-when-destroyed", shulkerBoxDropContentsWhenDestroyed);
+@@ -160,5 +161,6 @@ public class KaiijuWorldConfig {
+         tickWhenEmpty = getBoolean("gameplay.tick-when-empty", tickWhenEmpty);
+         breakRedstoneOnTopOfTrapDoorsEarly = getBoolean("gameplay.break-redstone-on-top-of-trap-doors-early", breakRedstoneOnTopOfTrapDoorsEarly);
+         fixTripWireStateInconsistency = getBoolean("gameplay.fix-tripwire-state-inconsistency", fixTripWireStateInconsistency);
++        safeTeleporting = getBoolean("gameplay.safe-teleportation", safeTeleporting);
+     }
+ }
+\ No newline at end of file
+diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
+index f22b4ad629845462656834abb3e28d2c2588ace6..87290b3ee0d7a6234c72a04412063079b38ba54c 100644
+--- a/src/main/java/net/minecraft/world/entity/Entity.java
++++ b/src/main/java/net/minecraft/world/entity/Entity.java
+@@ -57,7 +57,6 @@ import net.minecraft.network.syncher.EntityDataSerializers;
+ import net.minecraft.network.syncher.SynchedEntityData;
+ import net.minecraft.resources.ResourceKey;
+ import net.minecraft.resources.ResourceLocation;
+-import io.papermc.paper.util.MCUtil;
+ import net.minecraft.server.MinecraftServer;
+ import net.minecraft.server.level.ServerLevel;
+ import net.minecraft.server.level.ServerPlayer;
+@@ -3666,7 +3665,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+     }
+ 
+     protected boolean canTeleportAsync() {
+-        return !this.hasNullCallback() && !this.isRemoved() && this.isAlive() && (!(this instanceof net.minecraft.world.entity.LivingEntity livingEntity) || !livingEntity.isSleeping());
++        return !this.hasNullCallback() && ((!this.isRemoved() && this.isAlive()) || this.level.kaiijuConfig.safeTeleporting) && (!(this instanceof net.minecraft.world.entity.LivingEntity livingEntity) || !livingEntity.isSleeping()); // Kaiiju - Allow removed entities to teleport
+     }
+ 
+     protected void teleportSyncSameRegion(Vec3 pos, Float yaw, Float pitch, Vec3 speedDirectionUpdate) {
+@@ -3826,6 +3825,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+ 
+     protected boolean tryEndPortal() {
+         io.papermc.paper.util.TickThread.ensureTickThread(this, "Cannot portal entity async");
++        if (!this.level.kaiijuConfig.safeTeleporting && !(this instanceof net.minecraft.world.entity.player.Player)) return false; // Kaiiju - Unsafe teleportation
+         BlockPos pos = this.portalBlock;
+         ServerLevel world = this.portalWorld;
+         this.portalBlock = null;
+@@ -3835,7 +3835,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+             return false;
+         }
+ 
+-        if (this.isPassenger() || this.isVehicle() || !this.canChangeDimensions() || this.isRemoved() || !this.valid || !this.isAlive()) {
++        if (this.isPassenger() || this.isVehicle() || (!this.canChangeDimensions() || this.isRemoved() || !this.valid || !this.isAlive()) && !this.level.kaiijuConfig.safeTeleporting) { // Kaiiju - Allow removed entities to teleport
+             return false;
+         }
+ 
+@@ -4386,7 +4386,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+     }
+ 
+     public boolean canChangeDimensions() {
+-        return !this.isPassenger() && !this.isVehicle() && isAlive() && valid; // Paper
++        return !this.isPassenger() && !this.isVehicle() && ((isAlive() && valid) || this.level.kaiijuConfig.safeTeleporting); // Paper // Kaiiju - Allow removed entities to teleport
+     }
+ 
+     public float getBlockExplosionResistance(Explosion explosion, BlockGetter world, BlockPos pos, BlockState blockState, FluidState fluidState, float max) {
+@@ -5351,6 +5351,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+         this.levelCallback.onRemove(reason);
+         // Folia start - region threading
+         if (!(this instanceof ServerPlayer) && reason != RemovalReason.CHANGED_DIMENSION) {
++            if (this.level.kaiijuConfig.safeTeleporting && this.canPortalAsync(true)) return; // Kaiiju - Allow removed entities to teleport
+             // Players need to be special cased, because they are regularly removed from the world
+             this.retireScheduler();
+         }
+diff --git a/src/main/java/net/minecraft/world/level/block/EndPortalBlock.java b/src/main/java/net/minecraft/world/level/block/EndPortalBlock.java
+index 41d7cff39fc37955877668337689b4b26cd8c7cf..aee4ae51a73ac3c74bf4b3db23247b0eb45c2d7a 100644
+--- a/src/main/java/net/minecraft/world/level/block/EndPortalBlock.java
++++ b/src/main/java/net/minecraft/world/level/block/EndPortalBlock.java
+@@ -53,6 +53,13 @@ public class EndPortalBlock extends BaseEntityBlock {
+                 // return; // CraftBukkit - always fire event in case plugins wish to change it
+             }
+ 
++            // Kaiiju start - Unsafe teleportation
++            if (!entity.level.kaiijuConfig.safeTeleporting && !(entity instanceof net.minecraft.world.entity.player.Player)) {
++                entity.endPortalLogicAsync();
++                return;
++            }
++            // Kaiiju end
++
+             // Paper start - move all of this logic into portal tick
+             entity.portalWorld = ((ServerLevel)world);
+             entity.portalBlock = pos.immutable();
