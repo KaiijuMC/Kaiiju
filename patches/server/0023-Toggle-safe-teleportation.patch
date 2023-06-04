@@ -5,21 +5,21 @@ Subject: [PATCH] Toggle safe teleportation
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index 8026f9ac95cd54e74ff7e161fe4768830f8e0d30..bf23ddc5fdc274c9fc755f64d30d6792c9f4b0da 100644
+index 9c73b96aa1ff2210925fd12b5d5691c327234c92..4573111d3a367eb73679c858174e8b8fe32cf359 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-@@ -152,6 +152,7 @@ public class KaiijuWorldConfig {
-     public boolean tickWhenEmpty = true;
+@@ -153,6 +153,7 @@ public class KaiijuWorldConfig {
      public boolean breakRedstoneOnTopOfTrapDoorsEarly = true;
      public boolean fixTripWireStateInconsistency = true;
+     public boolean enableEntityThrottling = false;
 +    public boolean safeTeleporting = true;
  
      private void gameplaySettings() {
          shulkerBoxDropContentsWhenDestroyed = getBoolean("gameplay.shulker-box-drop-contents-when-destroyed", shulkerBoxDropContentsWhenDestroyed);
-@@ -160,5 +161,6 @@ public class KaiijuWorldConfig {
-         tickWhenEmpty = getBoolean("gameplay.tick-when-empty", tickWhenEmpty);
+@@ -162,5 +163,6 @@ public class KaiijuWorldConfig {
          breakRedstoneOnTopOfTrapDoorsEarly = getBoolean("gameplay.break-redstone-on-top-of-trap-doors-early", breakRedstoneOnTopOfTrapDoorsEarly);
          fixTripWireStateInconsistency = getBoolean("gameplay.fix-tripwire-state-inconsistency", fixTripWireStateInconsistency);
+         enableEntityThrottling = getBoolean("gameplay.enable-entity-throttling", enableEntityThrottling);
 +        safeTeleporting = getBoolean("gameplay.safe-teleportation", safeTeleporting);
      }
  }
