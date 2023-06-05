@@ -7,7 +7,7 @@ Don't drop shulker contents when shulker items are destroyed (by cactus,
 lava..)
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index 73d79fe0077b28db2f9e7fa13a1ae6eff9abd6a9..bac11b0e30a86d0689693ff129b53bcad7c2034c 100644
+index 6a700b5b15da394f42461b59f85eb8918c2121ad..c3347922439153bb4377d322fc3da2d16255d885 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 @@ -144,6 +144,9 @@ public class KaiijuWorldConfig {
@@ -20,7 +20,6 @@ index 73d79fe0077b28db2f9e7fa13a1ae6eff9abd6a9..bac11b0e30a86d0689693ff129b53bca
 +        shulkerBoxDropContentsWhenDestroyed = getBoolean("gameplay.shulker-box-drop-contents-when-destroyed", shulkerBoxDropContentsWhenDestroyed);
      }
  }
-\ No newline at end of file
 diff --git a/src/main/java/net/minecraft/world/item/BlockItem.java b/src/main/java/net/minecraft/world/item/BlockItem.java
 index b0204af850ee182773ad458208cccd946ad148d5..cb67928eb9d493b4c43489aa06a5c0c947999dac 100644
 --- a/src/main/java/net/minecraft/world/item/BlockItem.java

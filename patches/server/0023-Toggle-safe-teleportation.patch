@@ -5,7 +5,7 @@ Subject: [PATCH] Toggle safe teleportation
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index 9c73b96aa1ff2210925fd12b5d5691c327234c92..4573111d3a367eb73679c858174e8b8fe32cf359 100644
+index 2cc57d5a759ac3edcd2c3724f7f7b022b3e42f0f..915ac0ab2fc4ee2cdeeaac821a28ed861f9e6c12 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 @@ -153,6 +153,7 @@ public class KaiijuWorldConfig {
@@ -23,7 +23,6 @@ index 9c73b96aa1ff2210925fd12b5d5691c327234c92..4573111d3a367eb73679c858174e8b8f
 +        safeTeleporting = getBoolean("gameplay.safe-teleportation", safeTeleporting);
      }
  }
-\ No newline at end of file
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
 index f22b4ad629845462656834abb3e28d2c2588ace6..7af60ebb91fb39374355c64396b6adc48b2a5f89 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java

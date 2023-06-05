@@ -5,7 +5,7 @@ Subject: [PATCH] Toggle sand duplication
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index 4573111d3a367eb73679c858174e8b8fe32cf359..3180635fd6f15f46ebaf667780c3ff848420439f 100644
+index 915ac0ab2fc4ee2cdeeaac821a28ed861f9e6c12..91749e471488233dd4f2515b1ff51331dea90f53 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 @@ -154,6 +154,7 @@ public class KaiijuWorldConfig {
@@ -23,7 +23,6 @@ index 4573111d3a367eb73679c858174e8b8fe32cf359..3180635fd6f15f46ebaf667780c3ff84
 +        sandDuplication = getBoolean("gameplay.sand-duplication", sandDuplication);
      }
  }
-\ No newline at end of file
 diff --git a/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java b/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java
 index c8d125955754e27da54d95fb5b1cea39ca54b618..ffe82c153602babb679dee29d20e807a771a00ce 100644
 --- a/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java

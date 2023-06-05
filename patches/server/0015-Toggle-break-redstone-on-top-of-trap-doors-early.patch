@@ -6,7 +6,7 @@ Subject: [PATCH] Toggle break redstone on top of trap doors early
 That patch break vanilla mechanics such as portal slicing.
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index b674bad0ace0aba53f1f3e76e6c891421aaac2a5..43c8e95454cfe831f69858eb3b520f9958280b54 100644
+index 657a56a8cfa134943f8503e413b4eaf592a83854..ab56f61e9f77f743caabbd49d1e028e8ce296355 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 @@ -150,11 +150,13 @@ public class KaiijuWorldConfig {
@@ -23,7 +23,6 @@ index b674bad0ace0aba53f1f3e76e6c891421aaac2a5..43c8e95454cfe831f69858eb3b520f99
 +        breakRedstoneOnTopOfTrapDoorsEarly = getBoolean("gameplay.break-redstone-on-top-of-trap-doors-early", breakRedstoneOnTopOfTrapDoorsEarly);
      }
  }
-\ No newline at end of file
 diff --git a/src/main/java/net/minecraft/world/level/block/TrapDoorBlock.java b/src/main/java/net/minecraft/world/level/block/TrapDoorBlock.java
 index 4bddb91e289bbfbc75d532e63f935d585e41fc43..f8dba24931bcfa28bde9cdec0201b591f29f9e09 100644
 --- a/src/main/java/net/minecraft/world/level/block/TrapDoorBlock.java

@@ -8,7 +8,7 @@ You should set chunk-unloads to 0s in paper config file to enable void
 trading. Or use Kaiivoid plugin.
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index 1bedca8a975bb836083d592bb666824259fb6b66..c1f7d3abf3862249c37836bded15d104699f95cf 100644
+index 6f785078ca5123eb06913f95183475584116ebf5..a2eaa6d58ff7cbb88716d26996d2842cddfee560 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 @@ -147,8 +147,10 @@ public class KaiijuWorldConfig {
@@ -22,7 +22,6 @@ index 1bedca8a975bb836083d592bb666824259fb6b66..c1f7d3abf3862249c37836bded15d104
 +        fixVoidTrading = getBoolean("gameplay.fix-void-trading", fixVoidTrading);
      }
  }
-\ No newline at end of file
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
 index c9cfbde14bfde9fa24835ff29b7aa802c2fd1c87..9ad16476bedc9ac3d44cd3fbecbf9cf326d6f1be 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java

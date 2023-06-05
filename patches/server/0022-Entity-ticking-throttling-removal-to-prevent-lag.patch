@@ -252,7 +252,7 @@ index 0000000000000000000000000000000000000000..eb690efacf083e4ff3e321578b12c534
 +    }
 +}
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index 776d3bfc7c976eef5fab7374499fba99554795fc..13c0792725ae51a45bed87adb9c539a3065865f3 100644
+index c344ceee85cd7fe3d8e68df49e7e57db497a5c4b..2cc57d5a759ac3edcd2c3724f7f7b022b3e42f0f 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 @@ -152,6 +152,7 @@ public class KaiijuWorldConfig {
@@ -270,9 +270,8 @@ index 776d3bfc7c976eef5fab7374499fba99554795fc..13c0792725ae51a45bed87adb9c539a3
 +        enableEntityThrottling = getBoolean("gameplay.enable-entity-throttling", enableEntityThrottling);
      }
  }
-\ No newline at end of file
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/command/KaiijuCommand.java b/src/main/java/dev/kaiijumc/kaiiju/command/KaiijuCommand.java
-index 08a2375b90a2088e2bdfb3e316144677346a3dd6..012346c00de242db9fbdd38d67b2852ec070e55c 100644
+index 6fac162e0ec057af9f3336314d5663554cef0490..efecc7e132c67577577c99bfcf98e2b4ddae14ab 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/command/KaiijuCommand.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/command/KaiijuCommand.java
 @@ -1,6 +1,7 @@
@@ -283,7 +282,7 @@ index 08a2375b90a2088e2bdfb3e316144677346a3dd6..012346c00de242db9fbdd38d67b2852e
  import net.minecraft.server.MinecraftServer;
  import net.minecraft.server.level.ServerLevel;
  import net.md_5.bungee.api.ChatColor;
-@@ -49,6 +50,7 @@ public class KaiijuCommand extends Command {
+@@ -48,6 +49,7 @@ public class KaiijuCommand extends Command {
  
              MinecraftServer console = MinecraftServer.getServer();
              KaiijuConfig.reload((File) console.options.valueOf("kaiiju-settings"));

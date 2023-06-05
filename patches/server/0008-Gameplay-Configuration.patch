@@ -17,7 +17,7 @@ index b42a3466f145a92608c8746fd4beb529b4a60b01..6d0e1edfb7d3c020f70f6a194f16e836
 +    }
  }
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index b194f4dbebcbbf5bb4e026a0169e2d24806b46ec..73d79fe0077b28db2f9e7fa13a1ae6eff9abd6a9 100644
+index a6e7af5f4148e067660e9f5beeacde3a59a1de9c..6a700b5b15da394f42461b59f85eb8918c2121ad 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 @@ -143,4 +143,7 @@ public class KaiijuWorldConfig {
@@ -28,4 +28,3 @@ index b194f4dbebcbbf5bb4e026a0169e2d24806b46ec..73d79fe0077b28db2f9e7fa13a1ae6ef
 +    private void gameplaySettings() {
 +    }
  }
-\ No newline at end of file

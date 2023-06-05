@@ -6,7 +6,7 @@ Subject: [PATCH] Toggle optimize hoppers
 Paper optimize hoppers patch break a lot of technical redstone farms because of piston updates. (Example: twiti888 wood farm)
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index c267b0cd52448246c7701081028ff0986dde2fa2..2624e074e0a14f5e05aca8fa910b5e5d71f320a9 100644
+index a2eaa6d58ff7cbb88716d26996d2842cddfee560..01f194cfbd6f0e371f410c94aaecf1595acb22d8 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 @@ -148,9 +148,11 @@ public class KaiijuWorldConfig {
@@ -21,7 +21,6 @@ index c267b0cd52448246c7701081028ff0986dde2fa2..2624e074e0a14f5e05aca8fa910b5e5d
 +        optimizeHoppers = getBoolean("gameplay.optimize-hoppers", optimizeHoppers);
      }
  }
-\ No newline at end of file
 diff --git a/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 index 0134370081182260d578ee1d8a16d544c03b6a0d..555d86f0a9132c2292470c60f263e59082f0c26e 100644
 --- a/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java

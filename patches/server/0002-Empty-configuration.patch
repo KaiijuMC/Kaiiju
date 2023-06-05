@@ -207,7 +207,7 @@ index 0000000000000000000000000000000000000000..7da7e0aeb5eac9ac73a3570e716f1ceb
 +}
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..dd4c3ca77acb3aeefc69b8eb948b8b202ff87a19
+index 0000000000000000000000000000000000000000..87ca934473f3b9553c1b9b3ed60e0fa07838c711
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 @@ -0,0 +1,125 @@
@@ -336,13 +336,12 @@ index 0000000000000000000000000000000000000000..dd4c3ca77acb3aeefc69b8eb948b8b20
 +        return value.isEmpty() ? fallback : value;
 +    }
 +}
-\ No newline at end of file
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/command/KaiijuCommand.java b/src/main/java/dev/kaiijumc/kaiiju/command/KaiijuCommand.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..08a2375b90a2088e2bdfb3e316144677346a3dd6
+index 0000000000000000000000000000000000000000..6fac162e0ec057af9f3336314d5663554cef0490
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/command/KaiijuCommand.java
-@@ -0,0 +1,67 @@
+@@ -0,0 +1,66 @@
 +package dev.kaiijumc.kaiiju.command;
 +
 +import dev.kaiijumc.kaiiju.KaiijuConfig;
@@ -381,16 +380,15 @@ index 0000000000000000000000000000000000000000..08a2375b90a2088e2bdfb3e316144677
 +    @Override
 +    public boolean execute(CommandSender sender, String commandLabel, String[] args) {
 +        if (!testPermission(sender)) return true;
-+        String prefix = ChatColor.of(Color.decode("#F25DF6")) + "Kaiiju » " + ChatColor.RESET;
 +
 +        if (args.length != 1) {
-+            sender.sendMessage(prefix + ChatColor.RED + "Usage: " + usageMessage);
++            sender.sendMessage(ChatColor.RED + "Usage: " + usageMessage);
 +            return false;
 +        }
 +
 +        if (args[0].equalsIgnoreCase("reload")) {
-+            Command.broadcastCommandMessage(sender, prefix + ChatColor.RED + "Please note that this command is not supported and may cause issues.");
-+            Command.broadcastCommandMessage(sender, prefix + ChatColor.RED + "If you encounter any issues please use the /stop command to restart your server.");
++            Command.broadcastCommandMessage(sender, ChatColor.RED + "Please note that this command is not supported and may cause issues.");
++            Command.broadcastCommandMessage(sender, ChatColor.RED + "If you encounter any issues please use the /stop command to restart your server.");
 +
 +            MinecraftServer console = MinecraftServer.getServer();
 +            KaiijuConfig.reload((File) console.options.valueOf("kaiiju-settings"));
@@ -399,7 +397,7 @@ index 0000000000000000000000000000000000000000..08a2375b90a2088e2bdfb3e316144677
 +            }
 +            console.server.reloadCount++;
 +
-+            Command.broadcastCommandMessage(sender, prefix + ChatColor.GREEN + "Kaiiju config reload complete.");
++            Command.broadcastCommandMessage(sender, ChatColor.GREEN + "Kaiiju config reload complete.");
 +        } else if (args[0].equalsIgnoreCase("version")) {
 +            Command verCmd = org.bukkit.Bukkit.getServer().getCommandMap().getCommand("version");
 +            if (verCmd != null) {

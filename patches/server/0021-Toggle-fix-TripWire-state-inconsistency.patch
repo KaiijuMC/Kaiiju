@@ -6,7 +6,7 @@ Subject: [PATCH] Toggle fix TripWire state inconsistency
 This allow string duplication
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index 43c8e95454cfe831f69858eb3b520f9958280b54..8026f9ac95cd54e74ff7e161fe4768830f8e0d30 100644
+index ab56f61e9f77f743caabbd49d1e028e8ce296355..c344ceee85cd7fe3d8e68df49e7e57db497a5c4b 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 @@ -151,6 +151,7 @@ public class KaiijuWorldConfig {
@@ -24,7 +24,6 @@ index 43c8e95454cfe831f69858eb3b520f9958280b54..8026f9ac95cd54e74ff7e161fe476883
 +        fixTripWireStateInconsistency = getBoolean("gameplay.fix-tripwire-state-inconsistency", fixTripWireStateInconsistency);
      }
  }
-\ No newline at end of file
 diff --git a/src/main/java/net/minecraft/world/level/block/TripWireBlock.java b/src/main/java/net/minecraft/world/level/block/TripWireBlock.java
 index 7f60175bf671d282c11e9084670d2bb900968255..baa6d2bb3a4bec920cb8b57cb08d706929985ea9 100644
 --- a/src/main/java/net/minecraft/world/level/block/TripWireBlock.java
