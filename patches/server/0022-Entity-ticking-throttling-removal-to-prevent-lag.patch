@@ -18,10 +18,10 @@ index 0851203a4bed670242afc5ac86562075f32693ab..e9b07e51aa5cd8a88b2cb3a2942247f0
      implementation("net.minecrell:terminalconsoleappender:1.3.0")
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuEntityLimits.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuEntityLimits.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..71832948d4478901a274c20fc08bd1213d5fc1ad
+index 0000000000000000000000000000000000000000..887ea85ca2a03796bfa5bf62f27d1a7abd7fbc29
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuEntityLimits.java
-@@ -0,0 +1,155 @@
+@@ -0,0 +1,139 @@
 +package dev.kaiijumc.kaiiju;
 +
 +import java.io.File;
@@ -106,7 +106,7 @@ index 0000000000000000000000000000000000000000..71832948d4478901a274c20fc08bd121
 +        }
 +
 +        entityLimits = new Object2ObjectOpenHashMap<>();
-+        try (ScanResult scanResult = new ClassGraph().enableAllInfo().whitelistPackages("net.minecraft.world.entity").scan()) {
++        try (ScanResult scanResult = new ClassGraph().enableAllInfo().acceptPackages("net.minecraft.world.entity").scan()) {
 +            Map<String, ClassInfo> entityClasses = new HashMap<>();
 +            for (ClassInfo classInfo : scanResult.getAllClasses()) {
 +                Class<?> entityClass = Class.forName(classInfo.getName());
@@ -118,7 +118,7 @@ index 0000000000000000000000000000000000000000..71832948d4478901a274c20fc08bd121
 +
 +            for (String key : entityLimitsConfig.getKeys(false)) {
 +                if (!entityClasses.containsKey(key)) {
-+                    LOGGER.error("Unknown entity '" + key + "' in kaiiju_entity_limits.yml, skipping");
++                    LOGGER.error("Unknown entity '" + key + "' in kaiiju-entity-limits.yml, skipping");
 +                    continue;
 +                }
 +                int limit = entityLimitsConfig.getInt(key + ".limit");
@@ -128,7 +128,7 @@ index 0000000000000000000000000000000000000000..71832948d4478901a274c20fc08bd121
 +                    LOGGER.error(key + " has a limit less than the minimum of 1, ignoring");
 +                    continue;
 +                }
-+                if (removal <= limit) {
++                if (removal <= limit && removal != -1) {
 +                    LOGGER.error(key + " has a removal limit that is less than or equal to its limit, setting removal to limit * 10");
 +                    removal = limit * 10;
 +                }
@@ -154,23 +154,7 @@ index 0000000000000000000000000000000000000000..71832948d4478901a274c20fc08bd121
 +        }
 +    }
 +
-+    public static class EntityLimit {
-+        private final int limit;
-+        private final int removal;
-+
-+        public EntityLimit(int limit, int removal) {
-+            this.limit = limit;
-+            this.removal = removal;
-+        }
-+
-+        public int getLimit() {
-+            return limit;
-+        }
-+
-+        public int getRemoval() {
-+            return removal;
-+        }
-+
++    public record EntityLimit(int limit, int removal) {
 +        @Override
 +        public String toString() {
 +            return "EntityLimit{limit=" + limit + ", removal=" + removal + "}";
@@ -179,7 +163,7 @@ index 0000000000000000000000000000000000000000..71832948d4478901a274c20fc08bd121
 +}
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuEntityThrottler.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuEntityThrottler.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..c97f0ea480849e1cd2aa39d184228d87c88a98f5
+index 0000000000000000000000000000000000000000..eb690efacf083e4ff3e321578b12c534e6a40196
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuEntityThrottler.java
 @@ -0,0 +1,84 @@
@@ -202,7 +186,7 @@ index 0000000000000000000000000000000000000000..c97f0ea480849e1cd2aa39d184228d87
 +        public boolean remove;
 +    }
 +
-+    private Object2ObjectOpenHashMap<KaiijuEntityLimits.EntityLimit, TickInfo> entityLimitTickInfoMap = new Object2ObjectOpenHashMap<>();
++    private final Object2ObjectOpenHashMap<KaiijuEntityLimits.EntityLimit, TickInfo> entityLimitTickInfoMap = new Object2ObjectOpenHashMap<>();
 +
 +    public void tickLimiterStart() {
 +        for (TickInfo tickInfo : entityLimitTickInfoMap.values()) {
@@ -218,12 +202,12 @@ index 0000000000000000000000000000000000000000..c97f0ea480849e1cd2aa39d184228d87
 +        if (entityLimit != null) {
 +            TickInfo tickInfo = entityLimitTickInfoMap.computeIfAbsent(entityLimit, el -> {
 +                TickInfo newTickInfo = new TickInfo();
-+                newTickInfo.toTick = entityLimit.getLimit();
++                newTickInfo.toTick = entityLimit.limit();
 +                return newTickInfo;
 +            });
 +
 +            tickInfo.currentTick++;
-+            if (tickInfo.currentTick <= tickInfo.toRemove) {
++            if (tickInfo.currentTick <= tickInfo.toRemove && entityLimit.removal() > 0) {
 +                retVal.skip = false;
 +                retVal.remove = true;
 +                return retVal;
@@ -253,14 +237,14 @@ index 0000000000000000000000000000000000000000..c97f0ea480849e1cd2aa39d184228d87
 +            int additionals = 0;
 +            int nextContinueFrom = tickInfo.continueFrom + tickInfo.toTick;
 +            if (nextContinueFrom >= tickInfo.currentTick) {
-+                additionals = entityLimit.getLimit() - (tickInfo.currentTick - tickInfo.continueFrom);
++                additionals = entityLimit.limit() - (tickInfo.currentTick - tickInfo.continueFrom);
 +                nextContinueFrom = 0;
 +            }
 +            tickInfo.continueFrom = nextContinueFrom;
-+            tickInfo.toTick = entityLimit.getLimit() + additionals;
++            tickInfo.toTick = entityLimit.limit() + additionals;
 +
-+            if (tickInfo.toRemove == 0 && tickInfo.currentTick > entityLimit.getRemoval()) {
-+                tickInfo.toRemove = tickInfo.currentTick - entityLimit.getRemoval();
++            if (tickInfo.toRemove == 0 && tickInfo.currentTick > entityLimit.removal()) {
++                tickInfo.toRemove = tickInfo.currentTick - entityLimit.removal();
 +            } else if (tickInfo.toRemove != 0) {
 +                tickInfo.toRemove = 0;
 +            }
