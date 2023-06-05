@@ -5,21 +5,17 @@ Subject: [PATCH] Entity ticking throttling & removal to prevent lag.
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 0851203a4bed670242afc5ac86562075f32693ab..07d502f5d4335c7e94e8c7ed85df8ce908ebee3f 100644
+index 0851203a4bed670242afc5ac86562075f32693ab..e9b07e51aa5cd8a88b2cb3a2942247f06882d117 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -13,9 +13,10 @@ dependencies {
-         exclude("io.papermc.paper", "paper-api")
-     }
-     // Folia end
--    // Kaiiju start - Linear format
-+    // Kaiiju start
+@@ -17,6 +17,7 @@ dependencies {
      implementation("com.github.luben:zstd-jni:1.5.4-1")
      implementation("org.lz4:lz4-java:1.8.0")
-+    implementation("io.github.classgraph:classgraph:4.8.158")
      // Kaiiju end
++    implementation("io.github.classgraph:classgraph:4.8.158") // Kaiiju - Entity throttling & Removal
      // Paper start
      implementation("org.jline:jline-terminal-jansi:3.21.0")
+     implementation("net.minecrell:terminalconsoleappender:1.3.0")
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuEntityLimits.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuEntityLimits.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..71832948d4478901a274c20fc08bd1213d5fc1ad
@@ -272,7 +268,7 @@ index 0000000000000000000000000000000000000000..c97f0ea480849e1cd2aa39d184228d87
 +    }
 +}
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index 8026f9ac95cd54e74ff7e161fe4768830f8e0d30..9c73b96aa1ff2210925fd12b5d5691c327234c92 100644
+index 776d3bfc7c976eef5fab7374499fba99554795fc..13c0792725ae51a45bed87adb9c539a3065865f3 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 @@ -152,6 +152,7 @@ public class KaiijuWorldConfig {
@@ -341,10 +337,10 @@ index 5272164b18c2ca999c4744aede32f4a4c72525ed..4cf41c7a27527e9a3c2fb8b530209f96
          dev.kaiijumc.kaiiju.KaiijuConfig.registerCommands();
          // Kaiiju end
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 2fcd607c8200ca88e8f56cbe26c275915d3bc74d..73bfc20fe0a5f50778d36e1d9477aaf9656a36e5 100644
+index cbb7dce873f0aa1ae7f85a6f0985bbe8d66a54ae..ee6db05a09a6fc6662a30f80791948f48ccefb66 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
-@@ -767,6 +767,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -768,6 +768,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
                  } // Folia end - region threading
              }
  
@@ -352,7 +348,7 @@ index 2fcd607c8200ca88e8f56cbe26c275915d3bc74d..73bfc20fe0a5f50778d36e1d9477aaf9
              org.spigotmc.ActivationRange.activateEntities(this); // Spigot
              timings.entityTick.startTiming(); // Spigot
              regionizedWorldData.forEachTickingEntity((entity) -> { // Folia - regionised ticking
-@@ -789,6 +790,13 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -790,6 +791,13 @@ public class ServerLevel extends Level implements WorldGenLevel {
                                  entity.stopRiding();
                              }
  
@@ -366,7 +362,7 @@ index 2fcd607c8200ca88e8f56cbe26c275915d3bc74d..73bfc20fe0a5f50778d36e1d9477aaf9
                              gameprofilerfiller.push("tick");
                              this.guardEntityTick(this::tickNonPassenger, entity);
                              gameprofilerfiller.pop();
-@@ -796,6 +804,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -797,6 +805,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
                      }
                  }
              });

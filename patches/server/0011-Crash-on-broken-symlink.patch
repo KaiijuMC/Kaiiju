@@ -5,13 +5,13 @@ Subject: [PATCH] Crash on broken symlink
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index bac11b0e30a86d0689693ff129b53bcad7c2034c..0f0cfd958f7d2c6d2ca4192be1b986900a2bfa53 100644
+index c96af96bc3716a420e188739cfcb3f7f355aad36..1bedca8a975bb836083d592bb666824259fb6b66 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 @@ -127,6 +127,7 @@ public class KaiijuWorldConfig {
+     }
  
-     public List<String> regionFormatList = Arrays.asList("ANVIL", "LINEAR");
-     public String regionFormatName = "ANVIL";
+     public RegionFileFormat regionFormatName = RegionFileFormat.ANVIL;
 +    public boolean linearCrashOnBrokenSymlink = true;
      public int regionFormatLinearCompressionLevel = 1;
  
@@ -25,12 +25,12 @@ index bac11b0e30a86d0689693ff129b53bcad7c2034c..0f0cfd958f7d2c6d2ca4192be1b98690
  
      public boolean shulkerBoxDropContentsWhenDestroyed = true;
 diff --git a/src/main/java/io/papermc/paper/world/ThreadedWorldUpgrader.java b/src/main/java/io/papermc/paper/world/ThreadedWorldUpgrader.java
-index a62a1b281bd0b6ad7d59b45b9470d84f496f6539..7f87dfa131ab7d40a94cf6355765478f2961342e 100644
+index abf5e2a06af9853b58ac9107cd6e9787c4185c66..389c68c0becd2f69dc1004d0b383f1a8784214c0 100644
 --- a/src/main/java/io/papermc/paper/world/ThreadedWorldUpgrader.java
 +++ b/src/main/java/io/papermc/paper/world/ThreadedWorldUpgrader.java
-@@ -86,10 +86,11 @@ public class ThreadedWorldUpgrader {
+@@ -87,10 +87,11 @@ public class ThreadedWorldUpgrader {
          // Kaiiju start
-         String formatName = ((org.bukkit.craftbukkit.CraftWorld) org.bukkit.Bukkit.getWorld(worldName)).getHandle().kaiijuConfig.regionFormatName;
+         dev.kaiijumc.kaiiju.region.RegionFileFormat formatName = ((org.bukkit.craftbukkit.CraftWorld) org.bukkit.Bukkit.getWorld(worldName)).getHandle().kaiijuConfig.regionFormatName;
          int linearCompression = ((org.bukkit.craftbukkit.CraftWorld) org.bukkit.Bukkit.getWorld(worldName)).getHandle().kaiijuConfig.regionFormatLinearCompressionLevel;
 +        boolean linearCrashOnBrokenSymlink = ((org.bukkit.craftbukkit.CraftWorld) org.bukkit.Bukkit.getWorld(worldName)).getHandle().kaiijuConfig.linearCrashOnBrokenSymlink;
          LOGGER.info("Using format " + formatName + " (" + linearCompression + ")");
@@ -64,21 +64,21 @@ index 5ad209fed6aef1992af0472ac0af0911d178a260..0ef89e0bc214364fd904c3e5022c660b
          // Paper start
          this.dataRegionManager = new io.papermc.paper.chunk.SingleThreadChunkRegionManager(this.level, 2, (1.0 / 3.0), 1, 6, "Data", DataRegionData::new, DataRegionSectionData::new);
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 20359c63b19c7e0c703ef1562fb774803d631c41..35ae624be25b66d5615dc19cbe7eb8785c7029b5 100644
+index b6b6ce1c1bda836cc7ea37bcc5388e8295bf2a71..c9cfbde14bfde9fa24835ff29b7aa802c2fd1c87 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
-@@ -425,8 +425,8 @@ public class ServerLevel extends Level implements WorldGenLevel {
-     private final EntityRegionFileStorage entityStorage;
+@@ -426,8 +426,8 @@ public class ServerLevel extends Level implements WorldGenLevel {
  
      private static final class EntityRegionFileStorage extends net.minecraft.world.level.chunk.storage.RegionFileStorage {
+ 
 -        public EntityRegionFileStorage(String format, int linearCompression, Path directory, boolean dsync) { // Kaiiju
 -            super(format, linearCompression, directory, dsync); // Kaiiju
-+        public EntityRegionFileStorage(String format, int linearCompression, boolean linearCrashOnBrokenSymlink, Path directory, boolean dsync) { // Kaiiju
++        public EntityRegionFileStorage(dev.kaiijumc.kaiiju.region.RegionFileFormat format, int linearCompression, boolean linearCrashOnBrokenSymlink, Path directory, boolean dsync) { // Kaiiju
 +            super(format, linearCompression, linearCrashOnBrokenSymlink, directory, dsync); // Kaiiju
          }
  
          protected void write(ChunkPos pos, net.minecraft.nbt.CompoundTag nbt) throws IOException {
-@@ -632,7 +632,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -633,7 +633,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
          // CraftBukkit end
          boolean flag2 = minecraftserver.forceSynchronousWrites();
          DataFixer datafixer = minecraftserver.getFixerUpper();
@@ -88,12 +88,12 @@ index 20359c63b19c7e0c703ef1562fb774803d631c41..35ae624be25b66d5615dc19cbe7eb878
          // this.entityManager = new PersistentEntitySectionManager<>(Entity.class, new ServerLevel.EntityCallbacks(), entitypersistentstorage, this.entitySliceManager); // Paper // Paper - rewrite chunk system
          StructureTemplateManager structuretemplatemanager = minecraftserver.getStructureManager();
 diff --git a/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java b/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
-index 469802b9c454c5e98c0a55ba89559d9d8ba0c4c0..1652398c211c4366dde1d973bdb8e9d2c5c67ff4 100644
+index ac35e7eb8cb5f19391a18eb9d6b5ba26769ce2f6..a9c6ca7c621bb2431bcf0ae879b192f748bf931b 100644
 --- a/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
 +++ b/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
-@@ -119,7 +119,8 @@ public class WorldUpgrader {
+@@ -120,7 +120,8 @@ public class WorldUpgrader {
                  String worldName = this.levelStorage.getLevelId();
-                 String formatName = ((org.bukkit.craftbukkit.CraftWorld) org.bukkit.Bukkit.getWorld(worldName)).getHandle().kaiijuConfig.regionFormatName;
+                 dev.kaiijumc.kaiiju.region.RegionFileFormat formatName = ((org.bukkit.craftbukkit.CraftWorld) org.bukkit.Bukkit.getWorld(worldName)).getHandle().kaiijuConfig.regionFormatName;
                  int linearCompression = ((org.bukkit.craftbukkit.CraftWorld) org.bukkit.Bukkit.getWorld(worldName)).getHandle().kaiijuConfig.regionFormatLinearCompressionLevel;
 -                builder1.put(resourcekey1, new ChunkStorage(formatName, linearCompression, path.resolve("region"), this.dataFixer, true));
 +                boolean linearCrashOnBrokenSymlink = ((org.bukkit.craftbukkit.CraftWorld) org.bukkit.Bukkit.getWorld(worldName)).getHandle().kaiijuConfig.linearCrashOnBrokenSymlink;
@@ -102,32 +102,31 @@ index 469802b9c454c5e98c0a55ba89559d9d8ba0c4c0..1652398c211c4366dde1d973bdb8e9d2
              }
  
 diff --git a/src/main/java/net/minecraft/world/entity/ai/village/poi/PoiManager.java b/src/main/java/net/minecraft/world/entity/ai/village/poi/PoiManager.java
-index f560aa13c6c8ffecb456f478687dc6a9eb5e8017..f0354203f974a8d7440407a5561ffa0fcb63182d 100644
+index 0868e164e4e2516c3f61387798adee914bb84131..52381c34920f442333a72df637d021fa2627b0c4 100644
 --- a/src/main/java/net/minecraft/world/entity/ai/village/poi/PoiManager.java
 +++ b/src/main/java/net/minecraft/world/entity/ai/village/poi/PoiManager.java
 @@ -59,8 +59,8 @@ public class PoiManager extends SectionStorage<PoiSection> {
      // Paper end - rewrite chunk system
  
  
--    public PoiManager(String formatName, int linearCompression, Path path, DataFixer dataFixer, boolean dsync, RegistryAccess registryManager, LevelHeightAccessor world) { // Kaiiju
+-    public PoiManager(dev.kaiijumc.kaiiju.region.RegionFileFormat formatName, int linearCompression, Path path, DataFixer dataFixer, boolean dsync, RegistryAccess registryManager, LevelHeightAccessor world) { // Kaiiju
 -        super(formatName, linearCompression, path, PoiSection::codec, PoiSection::new, dataFixer, DataFixTypes.POI_CHUNK, dsync, registryManager, world); // Kaiiju
-+    public PoiManager(String formatName, int linearCompression, boolean linearCrashOnBrokenSymlink, Path path, DataFixer dataFixer, boolean dsync, RegistryAccess registryManager, LevelHeightAccessor world) { // Kaiiju
++    public PoiManager(dev.kaiijumc.kaiiju.region.RegionFileFormat formatName, int linearCompression, boolean linearCrashOnBrokenSymlink, Path path, DataFixer dataFixer, boolean dsync, RegistryAccess registryManager, LevelHeightAccessor world) { // Kaiiju
 +        super(formatName, linearCompression, linearCrashOnBrokenSymlink, path, PoiSection::codec, PoiSection::new, dataFixer, DataFixTypes.POI_CHUNK, dsync, registryManager, world); // Kaiiju
          this.world = (net.minecraft.server.level.ServerLevel)world; // Paper - rewrite chunk system
      }
  
 diff --git a/src/main/java/net/minecraft/world/level/chunk/storage/ChunkStorage.java b/src/main/java/net/minecraft/world/level/chunk/storage/ChunkStorage.java
-index 52c2e0fe73a5af18535a2b0b9a506919e3f93003..ea54af3f68c6534ff5a71ca0b7a99d126557868e 100644
+index 617389f3304b3d8f6ad9a80474a29bf22e86a331..763b3e1c44f109d2fbbf1314f900c265d3b24e06 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/storage/ChunkStorage.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/storage/ChunkStorage.java
-@@ -37,12 +37,12 @@ public class ChunkStorage implements AutoCloseable {
+@@ -37,11 +37,11 @@ public class ChunkStorage implements AutoCloseable {
      public final RegionFileStorage regionFileCache;
      // Paper end - async chunk loading
  
--    public ChunkStorage(String format, int linearCompression, Path directory, DataFixer dataFixer, boolean dsync) { // Kaiiju
-+    public ChunkStorage(String format, int linearCompression, boolean linearCrashOnBrokenSymlink, Path directory, DataFixer dataFixer, boolean dsync) { // Kaiiju
+-    public ChunkStorage(dev.kaiijumc.kaiiju.region.RegionFileFormat format, int linearCompression, Path directory, DataFixer dataFixer, boolean dsync) { // Kaiiju
++    public ChunkStorage(dev.kaiijumc.kaiiju.region.RegionFileFormat format, int linearCompression, boolean linearCrashOnBrokenSymlink, Path directory, DataFixer dataFixer, boolean dsync) { // Kaiiju
          this.fixerUpper = dataFixer;
- 
          // Paper start - async chunk io
          // remove IO worker
 -        this.regionFileCache = new RegionFileStorage(format, linearCompression, directory, dsync, true); // Paper - nuke IOWorker // Paper
@@ -136,7 +135,7 @@ index 52c2e0fe73a5af18535a2b0b9a506919e3f93003..ea54af3f68c6534ff5a71ca0b7a99d12
      }
  
 diff --git a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
-index c9fbba6f709ed0540dcc22b41e50ce9d01a6381c..70e3ee306283263cdcdb7a66c80fc23484385aac 100644
+index 150b1cde868c4220aeeb33ae333e96e788c277a6..e490450419e5739f76093f2ea62f38622490dec2 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 @@ -20,6 +20,7 @@ import net.minecraft.world.level.ChunkPos;
@@ -149,7 +148,7 @@ index c9fbba6f709ed0540dcc22b41e50ce9d01a6381c..70e3ee306283263cdcdb7a66c80fc234
      public final Long2ObjectLinkedOpenHashMap<dev.kaiijumc.kaiiju.region.AbstractRegionFile> regionCache = new Long2ObjectLinkedOpenHashMap(); // Kaiiju
 @@ -28,6 +29,7 @@ public class RegionFileStorage implements AutoCloseable {
      // Kaiiju start - Per world chunk format
-     public final String format;
+     public final dev.kaiijumc.kaiiju.region.RegionFileFormat format;
      public final int linearCompression;
 +    public final boolean linearCrashOnBrokenSymlink;
      // Kaiiju end
@@ -159,14 +158,14 @@ index c9fbba6f709ed0540dcc22b41e50ce9d01a6381c..70e3ee306283263cdcdb7a66c80fc234
      }
      // Paper end - cache regionfile does not exist state
  
--    protected RegionFileStorage(String format, int linearCompression, Path directory, boolean dsync) { // Paper - protected constructor
-+    protected RegionFileStorage(String format, int linearCompression, boolean linearCrashOnBrokenSymlink, Path directory, boolean dsync) { // Paper - protected constructor
+-    protected RegionFileStorage(dev.kaiijumc.kaiiju.region.RegionFileFormat format, int linearCompression, Path directory, boolean dsync) { // Paper - protected constructor
++    protected RegionFileStorage(dev.kaiijumc.kaiiju.region.RegionFileFormat format, int linearCompression, boolean linearCrashOnBrokenSymlink, Path directory, boolean dsync) { // Paper - protected constructor
          // Paper start - add isChunkData param
 -        this(format, linearCompression, directory, dsync, false);
 +        this(format, linearCompression, linearCrashOnBrokenSymlink, directory, dsync, false);
      }
--    RegionFileStorage(String format, int linearCompression, Path directory, boolean dsync, boolean isChunkData) { // Kaiiju
-+    RegionFileStorage(String format, int linearCompression, boolean linearCrashOnBrokenSymlink, Path directory, boolean dsync, boolean isChunkData) { // Kaiiju
+-    RegionFileStorage(dev.kaiijumc.kaiiju.region.RegionFileFormat format, int linearCompression, Path directory, boolean dsync, boolean isChunkData) { // Kaiiju
++    RegionFileStorage(dev.kaiijumc.kaiiju.region.RegionFileFormat format, int linearCompression, boolean linearCrashOnBrokenSymlink, Path directory, boolean dsync, boolean isChunkData) { // Kaiiju
          // Kaiiju start
          this.format = format;
          this.linearCompression = linearCompression;
@@ -203,25 +202,25 @@ index c9fbba6f709ed0540dcc22b41e50ce9d01a6381c..70e3ee306283263cdcdb7a66c80fc234
                  if (java.nio.file.Files.exists(anvil)) path1 = anvil;
                  else if (java.nio.file.Files.exists(linear)) path1 = linear;
                  else {
-@@ -156,6 +174,7 @@ public class RegionFileStorage implements AutoCloseable {
-                     default -> "mca";
+@@ -159,6 +177,7 @@ public class RegionFileStorage implements AutoCloseable {
                  };
                  path1 = path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + "." + extension);
-+                guardAgainstBrokenSymlinks(path1);
+                 // Kaiiju end
++                guardAgainstBrokenSymlinks(path1); // Kaiiju - Crash on broken symlink
                  this.createRegionFile(regionPos);
              }
-             if (dev.kaiijumc.kaiiju.KaiijuConfig.regionFormatDebug)
+             // Kaiiju start - Polyglot
 diff --git a/src/main/java/net/minecraft/world/level/chunk/storage/SectionStorage.java b/src/main/java/net/minecraft/world/level/chunk/storage/SectionStorage.java
-index 414aa3ae00c2d28e754235e3e93b6b623d4fd180..15e376fac063430e4355c6ffcd25c35a8ce20c5b 100644
+index 9394d191c56aab78e63fd3f283efedd69384e323..dcfe4a285cc5865be3b0c1b8104b722895135dd0 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/storage/SectionStorage.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/storage/SectionStorage.java
 @@ -47,8 +47,8 @@ public class SectionStorage<R> extends RegionFileStorage implements AutoCloseabl
      public final RegistryAccess registryAccess; // Paper - rewrite chunk system
      protected final LevelHeightAccessor levelHeightAccessor;
  
--    public SectionStorage(String format, int linearCompression, Path path, Function<Runnable, Codec<R>> codecFactory, Function<Runnable, R> factory, DataFixer dataFixer, DataFixTypes dataFixTypes, boolean dsync, RegistryAccess dynamicRegistryManager, LevelHeightAccessor world) { // Kaiiju
+-    public SectionStorage(dev.kaiijumc.kaiiju.region.RegionFileFormat format, int linearCompression, Path path, Function<Runnable, Codec<R>> codecFactory, Function<Runnable, R> factory, DataFixer dataFixer, DataFixTypes dataFixTypes, boolean dsync, RegistryAccess dynamicRegistryManager, LevelHeightAccessor world) { // Kaiiju
 -        super(format, linearCompression, path, dsync); // Paper - remove mojang I/O thread // Kaiiju
-+    public SectionStorage(String format, int linearCompression, boolean linearCrashOnBrokenSymlink, Path path, Function<Runnable, Codec<R>> codecFactory, Function<Runnable, R> factory, DataFixer dataFixer, DataFixTypes dataFixTypes, boolean dsync, RegistryAccess dynamicRegistryManager, LevelHeightAccessor world) { // Kaiiju
++    public SectionStorage(dev.kaiijumc.kaiiju.region.RegionFileFormat format, int linearCompression, boolean linearCrashOnBrokenSymlink, Path path, Function<Runnable, Codec<R>> codecFactory, Function<Runnable, R> factory, DataFixer dataFixer, DataFixTypes dataFixTypes, boolean dsync, RegistryAccess dynamicRegistryManager, LevelHeightAccessor world) { // Kaiiju
 +        super(format, linearCompression, linearCrashOnBrokenSymlink, path, dsync); // Paper - remove mojang I/O thread // Kaiiju
          this.codec = codecFactory;
          this.factory = factory;

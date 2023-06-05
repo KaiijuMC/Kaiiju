@@ -5,7 +5,7 @@ Subject: [PATCH] Toggle tick level when empty
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index 2624e074e0a14f5e05aca8fa910b5e5d71f320a9..b674bad0ace0aba53f1f3e76e6c891421aaac2a5 100644
+index 3ec0d59235f573a0a39a575d0291a765b660c96c..2e86eea51be217d03e62163654c8d1a7a6c5036f 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 @@ -149,10 +149,12 @@ public class KaiijuWorldConfig {
@@ -23,10 +23,10 @@ index 2624e074e0a14f5e05aca8fa910b5e5d71f320a9..b674bad0ace0aba53f1f3e76e6c89142
  }
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 92cc38353d25f3749186dbc062402c9bafb25fca..2fcd607c8200ca88e8f56cbe26c275915d3bc74d 100644
+index 9ad16476bedc9ac3d44cd3fbecbf9cf326d6f1be..cbb7dce873f0aa1ae7f85a6f0985bbe8d66a54ae 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
-@@ -743,7 +743,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -744,7 +744,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
          timings.doSounds.stopTiming(); // Spigot
          regionizedWorldData.setHandlingTick(false); // Folia - regionised ticking
          gameprofilerfiller.pop();

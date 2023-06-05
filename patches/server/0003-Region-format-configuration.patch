@@ -20,10 +20,14 @@ index 7da7e0aeb5eac9ac73a3570e716f1ceb11fd7027..b86c90cc3601e666998cfa12f44515f6
 +    }
  }
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index dd4c3ca77acb3aeefc69b8eb948b8b202ff87a19..b194f4dbebcbbf5bb4e026a0169e2d24806b46ec 100644
+index dd4c3ca77acb3aeefc69b8eb948b8b202ff87a19..02943e11574fcee1d342cd9308b21e9cf2884b94 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-@@ -4,9 +4,11 @@ import org.apache.commons.lang.BooleanUtils;
+@@ -1,12 +1,15 @@
+ package dev.kaiijumc.kaiiju;
+ 
++import dev.kaiijumc.kaiiju.region.RegionFileFormat;
+ import org.apache.commons.lang.BooleanUtils;
  import org.bukkit.World;
  import org.bukkit.configuration.ConfigurationSection;
  
@@ -35,21 +39,20 @@ index dd4c3ca77acb3aeefc69b8eb948b8b202ff87a19..b194f4dbebcbbf5bb4e026a0169e2d24
  
  import static dev.kaiijumc.kaiiju.KaiijuConfig.log;
  
-@@ -122,4 +124,23 @@ public class KaiijuWorldConfig {
+@@ -122,4 +125,22 @@ public class KaiijuWorldConfig {
          final Map<String, Object> value = getMap("world-settings." + worldName + "." + path, null);
          return value.isEmpty() ? fallback : value;
      }
 +
-+    public List<String> regionFormatList = Arrays.asList("ANVIL", "LINEAR");
-+    public String regionFormatName = "ANVIL";
++    public RegionFileFormat regionFormatName = RegionFileFormat.ANVIL;
 +    public int regionFormatLinearCompressionLevel = 1;
 +
 +    private void regionFormatSettings() {
-+        regionFormatName = getString("region-format.format", regionFormatName).toUpperCase();
-+        if (!regionFormatList.contains(regionFormatName)) {
++        regionFormatName = RegionFileFormat.fromString(getString("region-format.format", regionFormatName.name()));
++        if (regionFormatName.equals(RegionFileFormat.INVALID)) {
 +            log(Level.SEVERE, "Unknown region format in kaiiju.yml: " + regionFormatName);
 +            log(Level.SEVERE, "Falling back to ANVIL region file format.");
-+            regionFormatName = "ANVIL";
++            regionFormatName = RegionFileFormat.ANVIL;
 +        }
 +        regionFormatLinearCompressionLevel = getInt("region-format.linear.compression-level", regionFormatLinearCompressionLevel);
 +        if (regionFormatLinearCompressionLevel > 23 || regionFormatLinearCompressionLevel < 1) {
@@ -60,8 +63,30 @@ index dd4c3ca77acb3aeefc69b8eb948b8b202ff87a19..b194f4dbebcbbf5bb4e026a0169e2d24
 +    }
  }
 \ No newline at end of file
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/region/RegionFileFormat.java b/src/main/java/dev/kaiijumc/kaiiju/region/RegionFileFormat.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..7164d9cd03186f0657783f83de3d6435cda2b17e
+--- /dev/null
++++ b/src/main/java/dev/kaiijumc/kaiiju/region/RegionFileFormat.java
+@@ -0,0 +1,16 @@
++package dev.kaiijumc.kaiiju.region;
++
++public enum RegionFileFormat {
++    ANVIL,
++    LINEAR,
++    INVALID;
++
++    public static RegionFileFormat fromString(String format) {
++        for (RegionFileFormat rff : values()) {
++            if (rff.name().equalsIgnoreCase(format)) {
++                return rff;
++            }
++        }
++        return RegionFileFormat.INVALID;
++    }
++}
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 0696ad97437726fd6a13badfe7db0617dfbfb1ad..a7233bcc99e9bf148348ebb36bbb15b2eadb381f 100644
+index 19d6b811dccdc2b7a22054d3fe72b3981a6aae3a..a2cb5aae38e8666da8c8f3b5095d426c62371a3b 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -897,7 +897,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
