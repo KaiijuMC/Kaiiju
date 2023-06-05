@@ -18,7 +18,8 @@
 
 ### Notable
 - **Optimize Hopper**: Enable/Disable Paper "Optimize Hopper" patch that break a lot of redstone farms.
-- **Fix void trading**: Enable/Disable void trading.
+- **Entity throttling & removal**: Tweak entity tick frequency & max entity per region.
+- **Sand duplication**: Toggle sand duplication on Folia.
 
 ### Configuration
 
