@@ -23,7 +23,7 @@ index 6f785078ca5123eb06913f95183475584116ebf5..a2eaa6d58ff7cbb88716d26996d2842c
      }
  }
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 44c6d7484a87523e635492053b326f819b8f71c5..15087f575427ecdeee105060575fb6b6741f4586 100644
+index 44c6d7484a87523e635492053b326f819b8f71c5..6f9ae8348f250d27931910de3a387922e24c7757 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -2838,7 +2838,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
@@ -31,7 +31,7 @@ index 44c6d7484a87523e635492053b326f819b8f71c5..15087f575427ecdeee105060575fb6b6
              if (entity.getBukkitEntity() instanceof org.bukkit.inventory.InventoryHolder && (!(entity instanceof ServerPlayer) || entity.getRemovalReason() != Entity.RemovalReason.KILLED)) { // SPIGOT-6876: closeInventory clears death message
                  // Paper start
 -                if (entity.getBukkitEntity() instanceof org.bukkit.inventory.Merchant merchant && merchant.getTrader() != null) {
-+                if (entity.level.kaiijuConfig.fixVoidTrading && entity.getBukkitEntity() instanceof org.bukkit.inventory.Merchant merchant && merchant.getTrader() != null) { // Kaiiju
++                if (entity.level().kaiijuConfig.fixVoidTrading && entity.getBukkitEntity() instanceof org.bukkit.inventory.Merchant merchant && merchant.getTrader() != null) { // Kaiiju
                      merchant.getTrader().closeInventory(org.bukkit.event.inventory.InventoryCloseEvent.Reason.UNLOADED);
                  }
                  // Paper end

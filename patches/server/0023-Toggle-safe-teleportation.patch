@@ -36,7 +36,7 @@ index 532cb2aab7617319ffa0606b75b62f2414eabdb3..02a4dbaa8e316a7966cd02c54ea7eda0
          ServerLevel world = this.portalWorld;
          this.portalBlock = null;
 diff --git a/src/main/java/net/minecraft/world/level/block/EndPortalBlock.java b/src/main/java/net/minecraft/world/level/block/EndPortalBlock.java
-index 41d7cff39fc37955877668337689b4b26cd8c7cf..aee4ae51a73ac3c74bf4b3db23247b0eb45c2d7a 100644
+index 41d7cff39fc37955877668337689b4b26cd8c7cf..fe21ef0a2c451564694de915f6f4e61dbfeed712 100644
 --- a/src/main/java/net/minecraft/world/level/block/EndPortalBlock.java
 +++ b/src/main/java/net/minecraft/world/level/block/EndPortalBlock.java
 @@ -53,6 +53,13 @@ public class EndPortalBlock extends BaseEntityBlock {
@@ -44,7 +44,7 @@ index 41d7cff39fc37955877668337689b4b26cd8c7cf..aee4ae51a73ac3c74bf4b3db23247b0e
              }
  
 +            // Kaiiju start - Unsafe teleportation
-+            if (!entity.level.kaiijuConfig.safeTeleporting && !(entity instanceof net.minecraft.world.entity.player.Player)) {
++            if (!entity.level().kaiijuConfig.safeTeleporting && !(entity instanceof net.minecraft.world.entity.player.Player)) {
 +                entity.endPortalLogicAsync();
 +                return;
 +            }

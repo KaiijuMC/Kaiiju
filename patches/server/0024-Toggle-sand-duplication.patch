@@ -24,7 +24,7 @@ index 915ac0ab2fc4ee2cdeeaac821a28ed861f9e6c12..91749e471488233dd4f2515b1ff51331
      }
  }
 diff --git a/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java b/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java
-index c8d125955754e27da54d95fb5b1cea39ca54b618..ffe82c153602babb679dee29d20e807a771a00ce 100644
+index 6e35afb9e5314de69e78d819913418ab144bec52..6cff3410c2851aeb808994a4bf830a0db32a9a37 100644
 --- a/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java
 +++ b/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java
 @@ -131,7 +131,7 @@ public class FallingBlockEntity extends Entity {
@@ -32,7 +32,7 @@ index c8d125955754e27da54d95fb5b1cea39ca54b618..ffe82c153602babb679dee29d20e807a
      public void tick() {
          // Paper start - fix sand duping
 -        if (this.isRemoved()) {
-+        if (!this.level.kaiijuConfig.sandDuplication && this.isRemoved()) { // Kaiiju - Toggle sand duplication
++        if (!this.level().kaiijuConfig.sandDuplication && this.isRemoved()) { // Kaiiju - Toggle sand duplication
              return;
          }
          // Paper end - fix sand duping
@@ -41,7 +41,7 @@ index c8d125955754e27da54d95fb5b1cea39ca54b618..ffe82c153602babb679dee29d20e807a
  
              // Paper start - fix sand duping
 -            if (this.isRemoved()) {
-+            if (!this.level.kaiijuConfig.sandDuplication && this.isRemoved()) { // Kaiiju - Toggle sand duplication
++            if (!this.level().kaiijuConfig.sandDuplication && this.isRemoved()) { // Kaiiju - Toggle sand duplication
                  return;
              }
              // Paper end - fix sand duping
