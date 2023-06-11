@@ -7,23 +7,23 @@ This has been benchmarked on a huge gold farm.
 Resulting in significative performance improvements.
 
 diff --git a/src/main/java/net/minecraft/world/entity/LivingEntity.java b/src/main/java/net/minecraft/world/entity/LivingEntity.java
-index 49716190b784339b80c8a3ac8e5b13bc450284ee..440735caab3be903546638a3d01903720225c553 100644
+index 5b5473ff1a87b5f82d9179e54ae448120eb763a3..51df621afb364dd5d0c471436d697296755e996f 100644
 --- a/src/main/java/net/minecraft/world/entity/LivingEntity.java
 +++ b/src/main/java/net/minecraft/world/entity/LivingEntity.java
-@@ -3612,7 +3612,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
+@@ -3660,7 +3660,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
              Vec3 vec3d1 = new Vec3(entity.getX(), entity.getEyeY(), entity.getZ());
  
              // Paper - diff on change - used in CraftLivingEntity#hasLineOfSight(Location) and CraftWorld#lineOfSightExists
--            return vec3d1.distanceToSqr(vec3d) > 128D * 128D ? false : this.level.clip(new ClipContext(vec3d, vec3d1, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this)).getType() == HitResult.Type.MISS; // Paper - use distanceToSqr
-+            return !(vec3d1.distanceToSqr(vec3d) > 128D * 128D) && this.level.rayTraceDirect(vec3d, vec3d1, net.minecraft.world.phys.shapes.CollisionContext.of(this)) == net.minecraft.world.phys.BlockHitResult.Type.MISS; // Paper - use distanceToSqr // Kaiiju - Pufferfish - Strip raytracing
+-            return vec3d1.distanceToSqr(vec3d) > 128D * 128D ? false : this.level().clip(new ClipContext(vec3d, vec3d1, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this)).getType() == HitResult.Type.MISS;
++            return !(vec3d1.distanceToSqr(vec3d) > 128D * 128D) && this.level().rayTraceDirect(vec3d, vec3d1, net.minecraft.world.phys.shapes.CollisionContext.of(this)) == net.minecraft.world.phys.BlockHitResult.Type.MISS; // Paper - use distanceToSqr // Kaiiju - Pufferfish - Strip raytracing
          }
      }
  
 diff --git a/src/main/java/net/minecraft/world/level/BlockGetter.java b/src/main/java/net/minecraft/world/level/BlockGetter.java
-index 2ee9e8e3c1a28c1823de8e1fe421cc1f3e72f384..d99d77536e4d49b53575ae30614c0ab5fdbd3f73 100644
+index 0e8746759752b692668886370181aa5db1fd0bb0..5e2f5e9c21009a71f671955df7a4135ce5cf5b08 100644
 --- a/src/main/java/net/minecraft/world/level/BlockGetter.java
 +++ b/src/main/java/net/minecraft/world/level/BlockGetter.java
-@@ -73,6 +73,17 @@ public interface BlockGetter extends LevelHeightAccessor {
+@@ -68,6 +68,17 @@ public interface BlockGetter extends LevelHeightAccessor {
          });
      }
  
@@ -42,10 +42,10 @@ index 2ee9e8e3c1a28c1823de8e1fe421cc1f3e72f384..d99d77536e4d49b53575ae30614c0ab5
      default BlockHitResult clip(ClipContext raytrace1, BlockPos blockposition) {
              // Paper start - Prevent raytrace from loading chunks
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index a3b4b49ca8612a61bc2e7a1e2d2e942e7ebe1883..933373aaa7b1fa07862e2146e079abe91d126263 100644
+index fb71843793e699b2ccfaa3b7e4c2bb7d4826a706..42727a50ae11cd4d4aa65eb57638bfb164f1e4ac 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
-@@ -433,6 +433,91 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -432,6 +432,91 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
          return null;
      }
  

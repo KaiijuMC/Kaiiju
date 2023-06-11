@@ -22,10 +22,10 @@ index 01f194cfbd6f0e371f410c94aaecf1595acb22d8..657a56a8cfa134943f8503e413b4eaf5
      }
  }
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 9ad16476bedc9ac3d44cd3fbecbf9cf326d6f1be..cbb7dce873f0aa1ae7f85a6f0985bbe8d66a54ae 100644
+index 15087f575427ecdeee105060575fb6b6741f4586..a4d9c586f096a885b33840e8c1a7406821afb4df 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
-@@ -744,7 +744,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -798,7 +798,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
          timings.doSounds.stopTiming(); // Spigot
          regionizedWorldData.setHandlingTick(false); // Folia - regionised ticking
          gameprofilerfiller.pop();

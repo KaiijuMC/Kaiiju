@@ -24,22 +24,22 @@ index 657a56a8cfa134943f8503e413b4eaf592a83854..ab56f61e9f77f743caabbd49d1e028e8
      }
  }
 diff --git a/src/main/java/net/minecraft/world/level/block/TrapDoorBlock.java b/src/main/java/net/minecraft/world/level/block/TrapDoorBlock.java
-index 4bddb91e289bbfbc75d532e63f935d585e41fc43..f8dba24931bcfa28bde9cdec0201b591f29f9e09 100644
+index b9e3c9cd709d42bced85436720ccc7b9c7e49552..5e6d64408a5da3f337d32bb8ac5ac2532b04490c 100644
 --- a/src/main/java/net/minecraft/world/level/block/TrapDoorBlock.java
 +++ b/src/main/java/net/minecraft/world/level/block/TrapDoorBlock.java
-@@ -126,6 +126,7 @@ public class TrapDoorBlock extends HorizontalDirectionalBlock implements SimpleW
+@@ -125,6 +125,7 @@ public class TrapDoorBlock extends HorizontalDirectionalBlock implements SimpleW
                  }
                  // CraftBukkit end
-                 boolean open = (Boolean) state.getValue(TrapDoorBlock.OPEN) != flag1; // Folia - break redstone on trapdoors early
+                 boolean open = (Boolean) state.getValue(TrapDoorBlock.OPEN) != flag1; // Paper - break redstone on trapdoors early
 +                if (world.kaiijuConfig.breakRedstoneOnTopOfTrapDoorsEarly) { // Kaiiju - trigger break redstone on trapdoors early
-                 // Folia start - break redstone on trapdoors early
+                 // Paper start - break redstone on trapdoors early
                  // note: this must run before any state for this block/its neighborus are written to the world
                  // we allow the redstone event to fire so that plugins can block
-@@ -144,6 +145,7 @@ public class TrapDoorBlock extends HorizontalDirectionalBlock implements SimpleW
+@@ -143,6 +144,7 @@ public class TrapDoorBlock extends HorizontalDirectionalBlock implements SimpleW
                      }
                  }
-                 // Folia end - break redstone on trapdoors early
+                 // Paper end - break redstone on trapdoors early
 +                } // Kaiiju  - trigger break redstone on trapdoors early
-                 if (open) { // Folia - break redstone on trapdoors early
+                 if (open) { // Paper - break redstone on trapdoors early
                      state = (BlockState) state.setValue(TrapDoorBlock.OPEN, flag1);
                      this.playSound((Player) null, world, pos, flag1);

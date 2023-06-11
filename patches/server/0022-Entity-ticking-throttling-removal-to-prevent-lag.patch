@@ -5,7 +5,7 @@ Subject: [PATCH] Entity ticking throttling & removal to prevent lag.
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 0851203a4bed670242afc5ac86562075f32693ab..e9b07e51aa5cd8a88b2cb3a2942247f06882d117 100644
+index e611fb1c25b8287b334c078f93d0fa2f32f5cb39..8340143a97c93c651c1ae424d3969729694ae981 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -17,6 +17,7 @@ dependencies {
@@ -291,7 +291,7 @@ index 6fac162e0ec057af9f3336314d5663554cef0490..efecc7e132c67577577c99bfcf98e2b4
                  level.kaiijuConfig.reload();
              }
 diff --git a/src/main/java/io/papermc/paper/threadedregions/RegionizedWorldData.java b/src/main/java/io/papermc/paper/threadedregions/RegionizedWorldData.java
-index 5f609782fceda0fdc856123ca8d40d3f8b13b10b..cd4be18da781787fd7955b64668aa43136df9f34 100644
+index 65c4e158d81ac5c5788cf4dcb379061aebd23dcd..223bf699d76e53b131b47256df288db60141fd9e 100644
 --- a/src/main/java/io/papermc/paper/threadedregions/RegionizedWorldData.java
 +++ b/src/main/java/io/papermc/paper/threadedregions/RegionizedWorldData.java
 @@ -296,6 +296,7 @@ public final class RegionizedWorldData {
@@ -303,7 +303,7 @@ index 5f609782fceda0fdc856123ca8d40d3f8b13b10b..cd4be18da781787fd7955b64668aa431
      // block ticking
      private final ObjectLinkedOpenHashSet<BlockEventData> blockEvents = new ObjectLinkedOpenHashSet<>();
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index 5272164b18c2ca999c4744aede32f4a4c72525ed..4cf41c7a27527e9a3c2fb8b530209f960b3529b1 100644
+index 991e4c19763a34a6fead88363e007c2d11aad836..24a2d3f496727790f63cb66a2534d4423555fa3c 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -225,6 +225,12 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
@@ -320,10 +320,10 @@ index 5272164b18c2ca999c4744aede32f4a4c72525ed..4cf41c7a27527e9a3c2fb8b530209f96
          dev.kaiijumc.kaiiju.KaiijuConfig.registerCommands();
          // Kaiiju end
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index cbb7dce873f0aa1ae7f85a6f0985bbe8d66a54ae..ee6db05a09a6fc6662a30f80791948f48ccefb66 100644
+index a4d9c586f096a885b33840e8c1a7406821afb4df..240cb8ebc611cae345f6f4a9d22ab8796f28d591 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
-@@ -768,6 +768,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -822,6 +822,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
                  } // Folia end - region threading
              }
  
@@ -331,7 +331,7 @@ index cbb7dce873f0aa1ae7f85a6f0985bbe8d66a54ae..ee6db05a09a6fc6662a30f80791948f4
              org.spigotmc.ActivationRange.activateEntities(this); // Spigot
              timings.entityTick.startTiming(); // Spigot
              regionizedWorldData.forEachTickingEntity((entity) -> { // Folia - regionised ticking
-@@ -790,6 +791,13 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -844,6 +845,13 @@ public class ServerLevel extends Level implements WorldGenLevel {
                                  entity.stopRiding();
                              }
  
@@ -345,7 +345,7 @@ index cbb7dce873f0aa1ae7f85a6f0985bbe8d66a54ae..ee6db05a09a6fc6662a30f80791948f4
                              gameprofilerfiller.push("tick");
                              this.guardEntityTick(this::tickNonPassenger, entity);
                              gameprofilerfiller.pop();
-@@ -797,6 +805,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -851,6 +859,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
                      }
                  }
              });
@@ -354,7 +354,7 @@ index cbb7dce873f0aa1ae7f85a6f0985bbe8d66a54ae..ee6db05a09a6fc6662a30f80791948f4
              timings.tickEntities.stopTiming(); // Spigot
              gameprofilerfiller.pop();
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index 79a004dda72365afddb80fcd730828e351d7cce1..919e6856a966240c7dd4849dd947fb7c1136e643 100644
+index d8ca697663ace353e88bfabc8997b58230d3d811..c3bb81238afeafa3d59147f21c60022052142977 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
 @@ -179,6 +179,11 @@ public class Main {

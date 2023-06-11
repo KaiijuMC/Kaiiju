@@ -5,10 +5,10 @@ Subject: [PATCH] Kick player instead of crashing
 
 
 diff --git a/src/main/java/io/papermc/paper/chunk/system/RegionizedPlayerChunkLoader.java b/src/main/java/io/papermc/paper/chunk/system/RegionizedPlayerChunkLoader.java
-index d52a522fe6d5c4375862691fa32450bc458ca38b..648aff395887d2f13846b1bbe59f4115206ad7cf 100644
+index 5788fc92976c7704bb48dde91b5c9d403abc5cf0..9e7a93c862c8c237a706258b3a3b3d00ddec47e8 100644
 --- a/src/main/java/io/papermc/paper/chunk/system/RegionizedPlayerChunkLoader.java
 +++ b/src/main/java/io/papermc/paper/chunk/system/RegionizedPlayerChunkLoader.java
-@@ -486,7 +486,12 @@ public class RegionizedPlayerChunkLoader {
+@@ -485,7 +485,12 @@ public class RegionizedPlayerChunkLoader {
                      new ChunkPos(chunkX, chunkZ), new MutableObject<>(), false, true); // unloaded, loaded
                  return;
              }
@@ -23,10 +23,10 @@ index d52a522fe6d5c4375862691fa32450bc458ca38b..648aff395887d2f13846b1bbe59f4115
  
          private void sendUnloadChunk(final int chunkX, final int chunkZ) {
 diff --git a/src/main/java/net/minecraft/server/level/ChunkHolder.java b/src/main/java/net/minecraft/server/level/ChunkHolder.java
-index 5ccfc95f51a899b1cd3f34af5e5bb05d902016b8..9c20bd199454b6032a6a90676d12526168b8dd0b 100644
+index 18f438eec03cabc1614ab807081cff6b18fb09a8..df3869d7aee9c1c880319251b40879c8802c72b4 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkHolder.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkHolder.java
-@@ -133,7 +133,12 @@ public class ChunkHolder {
+@@ -129,7 +129,12 @@ public class ChunkHolder {
  
      public void addPlayer(ServerPlayer player) {
          if (!this.playersSentChunkTo.add(player)) {

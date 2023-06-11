@@ -22,10 +22,10 @@ index ab08e11f13921163b8ff1ff51ff9e9b86d2b47c7..b42a3466f145a92608c8746fd4beb529
      }
  }
 diff --git a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index 4963e87adf11c9df90f0dd4b60d360a137c07bc9..5f73e794a248a4d11b58b169831622ca1f61aac6 100644
+index 6f88fbd45217dbbe67f2469040b7c5f621e185c6..43b7dfd10cb5db59f6b58a04f428863767a209e2 100644
 --- a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -261,6 +261,7 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
+@@ -263,6 +263,7 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
      private long keepAliveTime = Util.getMillis();
      private boolean keepAlivePending;
      private long keepAliveChallenge;
@@ -33,7 +33,7 @@ index 4963e87adf11c9df90f0dd4b60d360a137c07bc9..5f73e794a248a4d11b58b169831622ca
      // CraftBukkit start - multithreaded fields
      private final AtomicInteger chatSpamTickCount = new AtomicInteger();
      private final java.util.concurrent.atomic.AtomicInteger tabSpamLimiter = new java.util.concurrent.atomic.AtomicInteger(); // Paper - configurable tab spam limits
-@@ -352,6 +353,20 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
+@@ -355,6 +356,20 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
          long currentTime = Util.getMillis();
          long elapsedTime = currentTime - this.keepAliveTime;
  
@@ -54,7 +54,7 @@ index 4963e87adf11c9df90f0dd4b60d360a137c07bc9..5f73e794a248a4d11b58b169831622ca
          if (this.keepAlivePending) {
              if (!this.processedDisconnect && elapsedTime >= KEEPALIVE_LIMIT) { // check keepalive limit, don't fire if already disconnected
                  ServerGamePacketListenerImpl.LOGGER.warn("{} was kicked due to keepalive timeout!", this.player.getScoreboardName()); // more info
-@@ -3534,6 +3549,16 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
+@@ -3511,6 +3526,16 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
  
      @Override
      public void handleKeepAlive(ServerboundKeepAlivePacket packet) {
@@ -68,6 +68,6 @@ index 4963e87adf11c9df90f0dd4b60d360a137c07bc9..5f73e794a248a4d11b58b169831622ca
 +            }
 +        } else
 +        // Kaiiju end
-         //PacketUtils.ensureRunningOnSameThread(packet, this, this.player.getLevel()); // CraftBukkit // Paper - This shouldn't be on the main thread
+         //PacketUtils.ensureRunningOnSameThread(packet, this, this.player.serverLevel()); // CraftBukkit // Paper - This shouldn't be on the main thread
          if (this.keepAlivePending && packet.getId() == this.keepAliveChallenge) {
              int i = (int) (Util.getMillis() - this.keepAliveTime);

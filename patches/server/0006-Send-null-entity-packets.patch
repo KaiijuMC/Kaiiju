@@ -21,10 +21,10 @@ index 7c6d43d8a360530344ef296f4477750c8a298607..ab08e11f13921163b8ff1ff51ff9e9b8
      }
  }
 diff --git a/src/main/java/net/minecraft/server/level/ServerEntity.java b/src/main/java/net/minecraft/server/level/ServerEntity.java
-index b7fd8e70413c38923d0719aff803449e392383ac..fc778cf828c42065a7928d2f920fc1442aa4d503 100644
+index 6670e657e08e130f7e0368f418379fd1ece00cdf..5558d87ef182f82be7877455dd027082c6a80632 100644
 --- a/src/main/java/net/minecraft/server/level/ServerEntity.java
 +++ b/src/main/java/net/minecraft/server/level/ServerEntity.java
-@@ -205,6 +205,11 @@ public class ServerEntity {
+@@ -201,6 +201,11 @@ public class ServerEntity {
                          flag4 = true;
                          flag5 = true;
                      }
@@ -36,8 +36,8 @@ index b7fd8e70413c38923d0719aff803449e392383ac..fc778cf828c42065a7928d2f920fc144
                  }
  
                  if ((this.trackDelta || this.entity.hasImpulse || this.entity instanceof LivingEntity && ((LivingEntity) this.entity).isFallFlying()) && this.tickCount > 0) {
-@@ -279,6 +284,20 @@ public class ServerEntity {
-         }));
+@@ -273,6 +278,20 @@ public class ServerEntity {
+         });
      }
  
 +    // Kaiiju start - Don't send null move entity packets

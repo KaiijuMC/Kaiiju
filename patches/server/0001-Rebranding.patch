@@ -5,7 +5,7 @@ Subject: [PATCH] Rebranding
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index dd53b1ffaff8dbaea0cf21c489a90162a496a026..6dd416f65755ca0542e6661b8716672264120d59 100644
+index 59bc7ef3d26d3fb3bc7a0d79861acd68e5062fe6..bd014033272237b927179fe7b0621b513de5917a 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -8,7 +8,7 @@ plugins {
@@ -48,15 +48,14 @@ index 58dc84b7b3b04c2d0b00fc5fac5303d3378b3467..a128b1fabd4aadfe26a8375903c0451d
                  metrics.addCustomChart(new Metrics.DrilldownPie("java_version", () -> {
                      Map<String, Map<String, Integer>> map = new HashMap<>();
 diff --git a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
-index 2ce29b6ccb9a3b520b8c1edf53aae2e9769ba252..f675fcae235a8c2722d9bba65d5e1292c5b76deb 100644
+index e2f704c115fd6e00960bb56bb0779f1100c89c17..95bc514df2022dde265b84490d3d0db002685024 100644
 --- a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
 +++ b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
-@@ -19,10 +19,11 @@ import java.util.stream.StreamSupport;
- 
+@@ -20,9 +20,11 @@ import java.util.stream.StreamSupport;
  public class PaperVersionFetcher implements VersionFetcher {
      private static final java.util.regex.Pattern VER_PATTERN = java.util.regex.Pattern.compile("^([0-9\\.]*)\\-.*R"); // R is an anchor, will always give '-R' at end
--    private static final String GITHUB_BRANCH_NAME = "master";
--    private static final String DOWNLOAD_PAGE = "https://papermc.io/downloads";
+     private static final String GITHUB_BRANCH_NAME = "master";
+-    private static final String DOWNLOAD_PAGE = "https://papermc.io/downloads/paper";
 +    // Kaiiju start
 +    private static final String DOWNLOAD_PAGE = "https://github.com/KaiijuMC/Kaiiju/releases";
 +    private static int distance = -2; public int distance() { return distance; }
@@ -66,7 +65,7 @@ index 2ce29b6ccb9a3b520b8c1edf53aae2e9769ba252..f675fcae235a8c2722d9bba65d5e1292
      @Override
      public long getCacheTime() {
          return 720000;
-@@ -31,8 +32,8 @@ public class PaperVersionFetcher implements VersionFetcher {
+@@ -31,8 +33,8 @@ public class PaperVersionFetcher implements VersionFetcher {
      @Nonnull
      @Override
      public Component getVersionMessage(@Nonnull String serverVersion) {
@@ -77,7 +76,7 @@ index 2ce29b6ccb9a3b520b8c1edf53aae2e9769ba252..f675fcae235a8c2722d9bba65d5e1292
          final Component history = getHistory();
  
          return history != null ? TextComponent.ofChildren(updateMessage, Component.newline(), history) : updateMessage;
-@@ -45,7 +46,7 @@ public class PaperVersionFetcher implements VersionFetcher {
+@@ -45,7 +47,7 @@ public class PaperVersionFetcher implements VersionFetcher {
                  String result = matcher.group();
                  mcVer = result.substring(0, result.length() - 2); // strip 'R' anchor and trailing '-'
              } else {
@@ -86,19 +85,19 @@ index 2ce29b6ccb9a3b520b8c1edf53aae2e9769ba252..f675fcae235a8c2722d9bba65d5e1292
                  org.bukkit.Bukkit.getLogger().warning("Pattern: " + VER_PATTERN.toString());
                  org.bukkit.Bukkit.getLogger().warning("Version: " + org.bukkit.Bukkit.getBukkitVersion());
              }
-@@ -56,6 +57,8 @@ public class PaperVersionFetcher implements VersionFetcher {
+@@ -56,6 +58,7 @@ public class PaperVersionFetcher implements VersionFetcher {
  
      private static Component getUpdateStatusMessage(@Nonnull String repo, @Nonnull String branch, @Nonnull String versionInfo) {
          int distance;
-+        // Kaiiju start - disable jenkins/api checking
-+        /*
++        /* // Kaiiju - disable jenkins/api checking
          try {
              int jenkinsBuild = Integer.parseInt(versionInfo);
              distance = fetchDistanceFromSiteApi(jenkinsBuild, getMinecraftVersion());
-@@ -63,6 +66,10 @@ public class PaperVersionFetcher implements VersionFetcher {
+@@ -63,6 +66,11 @@ public class PaperVersionFetcher implements VersionFetcher {
              versionInfo = versionInfo.replace("\"", "");
              distance = fetchDistanceFromGitHub(repo, branch, versionInfo);
          }
++        // Kaiiju start - disable jenkins/api checking
 +        */
 +        versionInfo = versionInfo.replace("\"", "");
 +        distance = fetchDistanceFromGitHub(repo, branch, versionInfo);
@@ -133,10 +132,10 @@ index abe37c7c3c6f5ab73afd738ec78f06d7e4d2ed96..52fc6bb99f6024273c7438d01314b576
          stringbuilder.append(CrashReport.DATE_TIME_FORMATTER.format(ZonedDateTime.now()));
          stringbuilder.append("\n");
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 61bac6fda2d2f4b3db8a3f7e3003f47c84d5c4cd..19d6b811dccdc2b7a22054d3fe72b3981a6aae3a 100644
+index 5b484004488b6b413bd78a1dc6dc1828c89ce046..68359868e6616167cb3ce8df3082d53100bd0ff0 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -999,7 +999,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -997,7 +997,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          shutdownThread = Thread.currentThread();
          org.spigotmc.WatchdogThread.doStop(); // Paper
          if (false && !isSameThread()) { // Folia - region threading
@@ -145,7 +144,7 @@ index 61bac6fda2d2f4b3db8a3f7e3003f47c84d5c4cd..19d6b811dccdc2b7a22054d3fe72b398
              while (this.getRunningThread().isAlive()) {
                  this.getRunningThread().stop();
                  try {
-@@ -1815,7 +1815,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1814,7 +1814,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
      @DontObfuscate
      public String getServerModName() {
@@ -155,10 +154,10 @@ index 61bac6fda2d2f4b3db8a3f7e3003f47c84d5c4cd..19d6b811dccdc2b7a22054d3fe72b398
  
      public SystemReport fillSystemReport(SystemReport details) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 32c9b38036052649b7b5fb25d7c4a49fdd1ca972..176f3acec268dad80cc90029edd88e7a0c3e8885 100644
+index beb4946b582e2d3608dc3adff22089b4c19177ee..c77eea06741c2e25b76e0645e315b41e3fcf2d33 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -256,7 +256,7 @@ import javax.annotation.Nullable; // Paper
+@@ -262,7 +262,7 @@ import javax.annotation.Nullable; // Paper
  import javax.annotation.Nonnull; // Paper
  
  public final class CraftServer implements Server {
@@ -168,10 +167,10 @@ index 32c9b38036052649b7b5fb25d7c4a49fdd1ca972..176f3acec268dad80cc90029edd88e7a
      private final String bukkitVersion = Versioning.getBukkitVersion();
      private final Logger logger = Logger.getLogger("Minecraft");
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java
-index bd115a08512e6f4c13bc30ce2b05c7378754754f..d1b0483448a42f2d790eae353904bf6890178e1b 100644
+index d065dfacb0980c7997b99ef7ed6e61a85a3c3055..a95b950bc1cfb4da6e837ee5b68de92ad243025a 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java
-@@ -891,7 +891,7 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
+@@ -892,7 +892,7 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
              return EntityCategory.WATER;
          }
  
@@ -207,7 +206,7 @@ index e9b6ca3aa25e140467ae866d572483050ea3fa0e..5df2b0fceebaaa863f4f143c8f29e808
  
          if (stream != null) {
 diff --git a/src/main/java/org/spigotmc/WatchdogThread.java b/src/main/java/org/spigotmc/WatchdogThread.java
-index e9fa7faaa4451e36b3908cbcbbe0baf213abde96..eea30035f7ce41f8f3c60afbbd255ae42166a306 100644
+index 98fba0288be9ed2cb18ffba5cf81148157dd4fcf..9c1477cfa1a8074c4b3b8a365bb03c44eaa62972 100644
 --- a/src/main/java/org/spigotmc/WatchdogThread.java
 +++ b/src/main/java/org/spigotmc/WatchdogThread.java
 @@ -155,14 +155,14 @@ public final class WatchdogThread extends io.papermc.paper.util.TickThread // Pa
