@@ -5,7 +5,7 @@ Subject: [PATCH] Rebranding
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 59bc7ef3d26d3fb3bc7a0d79861acd68e5062fe6..bd014033272237b927179fe7b0621b513de5917a 100644
+index 0bbdb3f47b674d0553eaf083b709f1ded3b5bff7..6d6b1973783604369c7ff95d552c43edf149a46a 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -8,7 +8,7 @@ plugins {
@@ -17,7 +17,7 @@ index 59bc7ef3d26d3fb3bc7a0d79861acd68e5062fe6..bd014033272237b927179fe7b0621b51
      implementation("io.papermc.paper:paper-mojangapi:1.19.3-R0.1-SNAPSHOT") {
          exclude("io.papermc.paper", "paper-api")
      }
-@@ -66,7 +66,7 @@ tasks.jar {
+@@ -67,7 +67,7 @@ tasks.jar {
          attributes(
              "Main-Class" to "org.bukkit.craftbukkit.Main",
              "Implementation-Title" to "CraftBukkit",
@@ -132,10 +132,10 @@ index abe37c7c3c6f5ab73afd738ec78f06d7e4d2ed96..52fc6bb99f6024273c7438d01314b576
          stringbuilder.append(CrashReport.DATE_TIME_FORMATTER.format(ZonedDateTime.now()));
          stringbuilder.append("\n");
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 5b484004488b6b413bd78a1dc6dc1828c89ce046..68359868e6616167cb3ce8df3082d53100bd0ff0 100644
+index 11ff1bc559316da426070867f045720ebd8c1962..cc1a7c4d38874ec218f7151685ae6cc00295c2e4 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -997,7 +997,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -995,7 +995,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          shutdownThread = Thread.currentThread();
          org.spigotmc.WatchdogThread.doStop(); // Paper
          if (false && !isSameThread()) { // Folia - region threading
@@ -144,7 +144,7 @@ index 5b484004488b6b413bd78a1dc6dc1828c89ce046..68359868e6616167cb3ce8df3082d531
              while (this.getRunningThread().isAlive()) {
                  this.getRunningThread().stop();
                  try {
-@@ -1814,7 +1814,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1812,7 +1812,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
      @DontObfuscate
      public String getServerModName() {
@@ -154,10 +154,10 @@ index 5b484004488b6b413bd78a1dc6dc1828c89ce046..68359868e6616167cb3ce8df3082d531
  
      public SystemReport fillSystemReport(SystemReport details) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index beb4946b582e2d3608dc3adff22089b4c19177ee..c77eea06741c2e25b76e0645e315b41e3fcf2d33 100644
+index f1e6b90260e0244a6ec9268544fe48449a5a4c80..70c2d9f7519401f6362c16101127d0af51fa77ee 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -262,7 +262,7 @@ import javax.annotation.Nullable; // Paper
+@@ -261,7 +261,7 @@ import javax.annotation.Nullable; // Paper
  import javax.annotation.Nonnull; // Paper
  
  public final class CraftServer implements Server {
@@ -167,10 +167,10 @@ index beb4946b582e2d3608dc3adff22089b4c19177ee..c77eea06741c2e25b76e0645e315b41e
      private final String bukkitVersion = Versioning.getBukkitVersion();
      private final Logger logger = Logger.getLogger("Minecraft");
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java
-index d065dfacb0980c7997b99ef7ed6e61a85a3c3055..a95b950bc1cfb4da6e837ee5b68de92ad243025a 100644
+index 564c72d6351721505dbffaf5af732db2dd3210ac..957ae18874710ad0e10f4210fc819fe555437c01 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java
-@@ -892,7 +892,7 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
+@@ -886,7 +886,7 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
              return EntityCategory.WATER;
          }
  
@@ -180,13 +180,13 @@ index d065dfacb0980c7997b99ef7ed6e61a85a3c3055..a95b950bc1cfb4da6e837ee5b68de92a
  
      @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java
-index 9136fb30db749737e9f189d0901024fcad02e402..ac23657071ac5eb951706374ee16a4274728c5bd 100644
+index eb84a8dd97f92de4a7dd3826d9e124a442cba565..e24d653fafcd88e01786b77539c506bcf3751c2c 100644
 --- a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java
 +++ b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java
-@@ -504,7 +504,7 @@ public class CraftScheduler implements BukkitScheduler {
+@@ -501,7 +501,7 @@ public class CraftScheduler implements BukkitScheduler {
                  this.parsePending();
              } else {
-                 //this.debugTail = this.debugTail.setNext(new CraftAsyncDebugger(currentTick + CraftScheduler.RECENT_TICKS, task.getOwner(), task.getTaskClass())); // Paper
+                 // this.debugTail = this.debugTail.setNext(new CraftAsyncDebugger(currentTick + CraftScheduler.RECENT_TICKS, task.getOwner(), task.getTaskClass())); // Paper
 -                task.getOwner().getLogger().log(Level.SEVERE, "Unexpected Async Task in the Sync Scheduler. Report this to Paper"); // Paper
 +                task.getOwner().getLogger().log(Level.SEVERE, "Unexpected Async Task in the Sync Scheduler. Report this to Kaiiju"); // Paper // Kaiiju
                  // We don't need to parse pending

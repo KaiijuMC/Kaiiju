@@ -9,7 +9,7 @@ This format saves about 50% of disk space.
 Documentation: https://github.com/xymb-endcrystalme/LinearRegionFileFormatTools
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index bd014033272237b927179fe7b0621b513de5917a..cfbacf7dd8e1b7b5c5899affde6890f53c8aaf15 100644
+index 6d6b1973783604369c7ff95d552c43edf149a46a..a26cc214dccab8c9422f9a45e2a5eeda374c0ead 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -13,6 +13,10 @@ dependencies {
@@ -1012,10 +1012,10 @@ index 5561b8499a0503b850974b1dc309edfb80219549..9394d191c56aab78e63fd3f283efedd6
          this.factory = factory;
          this.fixerUpper = dataFixer;
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-index 5e7f8f4cc24bc14e1a2639b60c33a04d8c0ccd85..f0418dc8ca4ec8f1e767cc986f292b6255f2b47f 100644
+index 23b8dde3cd185b372d4adc97201a422cebbbe804..6012ea6d3fb6e731ff491ef134085013c2c6075c 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-@@ -562,7 +562,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -561,7 +561,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
                  return true;
              }
  

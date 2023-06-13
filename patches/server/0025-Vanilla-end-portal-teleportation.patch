@@ -5,10 +5,10 @@ Subject: [PATCH] Vanilla end portal teleportation
 
 
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 02a4dbaa8e316a7966cd02c54ea7eda049a78460..8863a9a75d703f4eb1f5c7d1a2779a8ea9951d14 100644
+index 6941b28b7b5a7ab0e9c950cfa3a5ed224438a65c..7dcba5ed8ad3cda9951c6193273261754e8ef63b 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -4040,10 +4040,15 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+@@ -4041,10 +4041,15 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
                          (chunks) -> {
                              ServerLevel.makeObsidianPlatform(destination, null, targetPos);
  
