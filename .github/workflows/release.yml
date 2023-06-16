@@ -14,7 +14,7 @@ jobs:
         with:
           java-version: '17'
           cache: 'gradle'
-          distribution: 'GraalVM'
+          distribution: 'graalvm'
           github-token: ${{ secrets.GITHUB_TOKEN }}
           version: 'latest'
       - name: Configure Git User Details
