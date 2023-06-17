@@ -1,5 +1,5 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
+From: Xymb <xymb@endcrystal.me>
 Date: Sat, 17 Jun 2023 19:52:29 +0300
 Subject: [PATCH] Swap distanceToSqr and EntitySelector
 
