@@ -1,8 +1,8 @@
 name: Release Jars
 on: [push, workflow_dispatch]
 env:
-  version: '1.19.4'
-  branch: ver/1.19.4
+  version: '1.20.1'
+  branch: ver/1.20.1
 jobs:
   paperclip:
     runs-on: ubuntu-latest
