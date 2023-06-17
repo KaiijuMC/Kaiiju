@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
+Date: Sat, 17 Jun 2023 19:52:29 +0300
+Subject: [PATCH] Swap distanceToSqr and EntitySelector
+
+
+diff --git a/src/main/java/net/minecraft/world/level/EntityGetter.java b/src/main/java/net/minecraft/world/level/EntityGetter.java
+index b1a6a66ed02706c1adc36dcedfa415f5a24a25a0..bed6f316f4186895fd2e72ff114c4db1e0f53cf1 100644
+--- a/src/main/java/net/minecraft/world/level/EntityGetter.java
++++ b/src/main/java/net/minecraft/world/level/EntityGetter.java
+@@ -147,9 +147,10 @@ public interface EntityGetter {
+     // Paper start
+     default boolean hasNearbyAlivePlayerThatAffectsSpawning(double x, double y, double z, double range) {
+         for (Player player : this.getLocalPlayers()) { // Folia - region threading
+-            if (EntitySelector.PLAYER_AFFECTS_SPAWNING.test(player)) { // combines NO_SPECTATORS and LIVING_ENTITY_STILL_ALIVE with an "affects spawning" check
++            if (true || EntitySelector.PLAYER_AFFECTS_SPAWNING.test(player)) { // combines NO_SPECTATORS and LIVING_ENTITY_STILL_ALIVE with an "affects spawning" check // Kaiiju - Move this down
+                 double distanceSqr = player.distanceToSqr(x, y, z);
+                 if (range < 0.0D || distanceSqr < range * range) {
++                    if (EntitySelector.PLAYER_AFFECTS_SPAWNING.test(player)) // Kaiiju
+                     return true;
+                 }
+             }
