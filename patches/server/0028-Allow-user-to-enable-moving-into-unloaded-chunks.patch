@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
+Date: Sun, 18 Jun 2023 18:10:19 +0300
+Subject: [PATCH] Allow user to enable moving into unloaded chunks
+
+
+diff --git a/src/main/java/io/papermc/paper/configuration/WorldConfiguration.java b/src/main/java/io/papermc/paper/configuration/WorldConfiguration.java
+index a00201eca053ef69b8d903fdb9538444baf85465..bb9f088e3b7b90ab38d794433fc5d30d39e12c76 100644
+--- a/src/main/java/io/papermc/paper/configuration/WorldConfiguration.java
++++ b/src/main/java/io/papermc/paper/configuration/WorldConfiguration.java
+@@ -415,14 +415,14 @@ public class WorldConfiguration extends ConfigurationPart {
+     public class Chunks extends Post {
+         @Override
+         public void postProcess() {
+-            this.preventMovingIntoUnloadedChunks = true;
++            //this.preventMovingIntoUnloadedChunks = true; // Kaiiju - Don't
+         }
+         // Folia end - region threading - force prevent moving into unloaded chunks
+ 
+         public AutosavePeriod autoSaveInterval = AutosavePeriod.def();
+         public int maxAutoSaveChunksPerTick = 24;
+         public int fixedChunkInhabitedTime = -1;
+-        public boolean preventMovingIntoUnloadedChunks = false;
++        public boolean preventMovingIntoUnloadedChunks = true; // Kaiiju - True not False
+         public Duration delayChunkUnloadsBy = Duration.of("10s");
+         public Reference2IntMap<EntityType<?>> entityPerChunkSaveLimit = Util.make(new Reference2IntOpenHashMap<>(BuiltInRegistries.ENTITY_TYPE.size()), map -> {
+             map.defaultReturnValue(-1);
