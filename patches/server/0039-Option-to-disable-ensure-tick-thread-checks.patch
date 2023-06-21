@@ -5,32 +5,32 @@ Subject: [PATCH] Option to disable ensure tick thread checks
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index ec71f3f52cb8f7931aabd94619d2e7a24491d7ad..900d319f4ddb17af2275c1a20824648b41d39aac 100644
+index ec71f3f52cb8f7931aabd94619d2e7a24491d7ad..fa2a763e5784e7dae02c94a13751cbf746b6eee8 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 @@ -210,11 +210,13 @@ public class KaiijuConfig {
      public static boolean disableVanishApi = false;
      public static boolean disablePlayerStats = false;
      public static boolean disableArmSwingEvent = false;
-+    public static boolean disableEnsureTickThreadCheck = false;
++    public static boolean disableEnsureTickThreadChecks = false;
  
      private static void optimizationSettings() {
          disableVanishApi = getBoolean("optimization.disable-vanish-api", disableVanishApi);
          disablePlayerStats = getBoolean("optimization.disable-player-stats", disablePlayerStats);
          disableArmSwingEvent = getBoolean("optimization.disable-arm-swing-event", disableArmSwingEvent);
-+        disableEnsureTickThreadCheck = getBoolean("optimization.disable-ensure-tick-thread-check", disableEnsureTickThreadCheck);
++        disableEnsureTickThreadChecks = getBoolean("optimization.disable-ensure-tick-thread-checks", disableEnsureTickThreadChecks);
      }
  
      public static String serverModName = "Kaiiju";
 diff --git a/src/main/java/io/papermc/paper/util/TickThread.java b/src/main/java/io/papermc/paper/util/TickThread.java
-index cb453dd110fc37fae75257a4576512126207763e..6d0c5aa38b6980c80c2021933c4758e2dabed9fd 100644
+index cb453dd110fc37fae75257a4576512126207763e..492e6a512343001d3d772d2d8b427d2d84e89da5 100644
 --- a/src/main/java/io/papermc/paper/util/TickThread.java
 +++ b/src/main/java/io/papermc/paper/util/TickThread.java
 @@ -46,6 +46,7 @@ public class TickThread extends Thread {
       */
      @Deprecated
      public static void ensureTickThread(final String reason) {
-+        if (dev.kaiijumc.kaiiju.KaiijuConfig.disableEnsureTickThreadCheck) return; // Kaiiju
++        if (dev.kaiijumc.kaiiju.KaiijuConfig.disableEnsureTickThreadChecks) return; // Kaiiju
          if (!isTickThread()) {
              MinecraftServer.LOGGER.error("Thread " + Thread.currentThread().getName() + " failed main thread check: " + reason, new Throwable());
              throw new IllegalStateException(reason);
@@ -38,7 +38,7 @@ index cb453dd110fc37fae75257a4576512126207763e..6d0c5aa38b6980c80c2021933c4758e2
      }
  
      public static void ensureTickThread(final ServerLevel world, final BlockPos pos, final String reason) {
-+        if (dev.kaiijumc.kaiiju.KaiijuConfig.disableEnsureTickThreadCheck) return; // Kaiiju
++        if (dev.kaiijumc.kaiiju.KaiijuConfig.disableEnsureTickThreadChecks) return; // Kaiiju
          if (!isTickThreadFor(world, pos)) {
              MinecraftServer.LOGGER.error("Thread " + Thread.currentThread().getName() + " failed main thread check: " + reason, new Throwable());
              throw new IllegalStateException(reason);
@@ -46,7 +46,7 @@ index cb453dd110fc37fae75257a4576512126207763e..6d0c5aa38b6980c80c2021933c4758e2
      }
  
      public static void ensureTickThread(final ServerLevel world, final ChunkPos pos, final String reason) {
-+        if (dev.kaiijumc.kaiiju.KaiijuConfig.disableEnsureTickThreadCheck) return; // Kaiiju
++        if (dev.kaiijumc.kaiiju.KaiijuConfig.disableEnsureTickThreadChecks) return; // Kaiiju
          if (!isTickThreadFor(world, pos)) {
              MinecraftServer.LOGGER.error("Thread " + Thread.currentThread().getName() + " failed main thread check: " + reason, new Throwable());
              throw new IllegalStateException(reason);
@@ -54,7 +54,7 @@ index cb453dd110fc37fae75257a4576512126207763e..6d0c5aa38b6980c80c2021933c4758e2
      }
  
      public static void ensureTickThread(final ServerLevel world, final int chunkX, final int chunkZ, final String reason) {
-+        if (dev.kaiijumc.kaiiju.KaiijuConfig.disableEnsureTickThreadCheck) return; // Kaiiju
++        if (dev.kaiijumc.kaiiju.KaiijuConfig.disableEnsureTickThreadChecks) return; // Kaiiju
          if (!isTickThreadFor(world, chunkX, chunkZ)) {
              MinecraftServer.LOGGER.error("Thread " + Thread.currentThread().getName() + " failed main thread check: " + reason, new Throwable());
              throw new IllegalStateException(reason);
@@ -62,7 +62,7 @@ index cb453dd110fc37fae75257a4576512126207763e..6d0c5aa38b6980c80c2021933c4758e2
      }
  
      public static void ensureTickThread(final Entity entity, final String reason) {
-+        if (dev.kaiijumc.kaiiju.KaiijuConfig.disableEnsureTickThreadCheck) return; // Kaiiju
++        if (dev.kaiijumc.kaiiju.KaiijuConfig.disableEnsureTickThreadChecks) return; // Kaiiju
          if (!isTickThreadFor(entity)) {
              MinecraftServer.LOGGER.error("Thread " + Thread.currentThread().getName() + " failed main thread check: " + reason, new Throwable());
              throw new IllegalStateException(reason);
@@ -70,7 +70,7 @@ index cb453dd110fc37fae75257a4576512126207763e..6d0c5aa38b6980c80c2021933c4758e2
      }
  
      public static void ensureTickThread(final ServerLevel world, final AABB aabb, final String reason) {
-+        if (dev.kaiijumc.kaiiju.KaiijuConfig.disableEnsureTickThreadCheck) return; // Kaiiju
++        if (dev.kaiijumc.kaiiju.KaiijuConfig.disableEnsureTickThreadChecks) return; // Kaiiju
          if (!isTickThreadFor(world, aabb)) {
              MinecraftServer.LOGGER.error("Thread " + Thread.currentThread().getName() + " failed main thread check: " + reason, new Throwable());
              throw new IllegalStateException(reason);
@@ -78,7 +78,7 @@ index cb453dd110fc37fae75257a4576512126207763e..6d0c5aa38b6980c80c2021933c4758e2
      }
  
      public static void ensureTickThread(final ServerLevel world, final double blockX, final double blockZ, final String reason) {
-+        if (dev.kaiijumc.kaiiju.KaiijuConfig.disableEnsureTickThreadCheck) return; // Kaiiju
++        if (dev.kaiijumc.kaiiju.KaiijuConfig.disableEnsureTickThreadChecks) return; // Kaiiju
          if (!isTickThreadFor(world, blockX, blockZ)) {
              MinecraftServer.LOGGER.error("Thread " + Thread.currentThread().getName() + " failed main thread check: " + reason, new Throwable());
              throw new IllegalStateException(reason);

@@ -29,7 +29,7 @@ optimization:
   disable-vanish-api: false
   disable-player-stats: false
   disable-arm-swing-event: false
-  disable-ensure-tick-thread-check: false
+  disable-ensure-tick-thread-checks: false
 gameplay:
   server-mod-name: Kaiiju
   shared-random-for-players: true
