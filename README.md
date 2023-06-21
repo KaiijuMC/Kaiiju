@@ -25,6 +25,11 @@
 network:
   send-null-entity-packets: true
   alternate-keepalive: false
+optimization:
+  disable-vanish-api: false
+  disable-player-stats: false
+  disable-arm-swing-event: false
+  disable-ensure-tick-thread-check: false
 gameplay:
   server-mod-name: Kaiiju
   shared-random-for-players: true
@@ -35,6 +40,12 @@ world-settings:
       linear:
         compression-level: 1
         crash-on-broken-symlink: true
+    optimization:
+      shulker-box-drop-contents-when-destroyed: true
+      enable-entity-throttling: false
+      disable-achievements: false
+      disable-creatures-spawn-events: false
+      disable-dolphin-swim-to-treasure: false
     gameplay:
       fix-void-trading: true
       optimize-hoppers: true
@@ -43,9 +54,6 @@ world-settings:
       fix-tripwire-state-inconsistency: true
       safe-teleportation: true
       sand-duplication: false
-    optimization:
-      shulker-box-drop-contents-when-destroyed: true
-      enable-entity-throttling: false
 ```
 Documentation: [Kaiiju Wiki](https://github.com/KaiijuMC/Kaiiju/wiki/Configuration)
 
