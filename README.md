@@ -1,4 +1,3 @@
-
 <div align="center">
   <img src="https://github.com/kugge/Kaiiju/blob/ver/1.19.3/logo.png?" width="32%" height="32%"/>
   <h1>Kaiiju</h1>
@@ -17,16 +16,12 @@
 - **Auto update**: Automatic upstream updates.
 
 ### Notable
-- **Optimize Hopper**: Enable/Disable Paper "Optimize Hopper" patch that break a lot of redstone farms.
 - **Entity throttling & removal**: Tweak entity tick frequency & max entity per region.
-- **Sand duplication**: Toggle sand duplication on Folia.
+- **Technical Minecraft**: Enable Vanilla exploits such as sand duping, RNG manipulation...
 
 ### Configuration
 
 ```yaml
-verbose: false
-region-format:
-  debug: false
 network:
   send-null-entity-packets: true
   alternate-keepalive: false
@@ -41,12 +36,16 @@ world-settings:
         compression-level: 1
         crash-on-broken-symlink: true
     gameplay:
-      shulker-box-drop-contents-when-destroyed: true
       fix-void-trading: true
       optimize-hoppers: true
       tick-when-empty: true
       break-redstone-on-top-of-trap-doors-early: true
-config-version: 1
+      fix-tripwire-state-inconsistency: true
+      safe-teleportation: true
+      sand-duplication: false
+    optimization:
+      shulker-box-drop-contents-when-destroyed: true
+      enable-entity-throttling: false
 ```
 Documentation: [Kaiiju Wiki](https://github.com/KaiijuMC/Kaiiju/wiki/Configuration)
 
