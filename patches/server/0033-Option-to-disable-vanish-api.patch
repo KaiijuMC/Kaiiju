@@ -1,0 +1,38 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Xymb <xymb@endcrystal.me>
+Date: Thu, 22 Jun 2023 00:14:47 +0200
+Subject: [PATCH] Option to disable vanish api
+
+
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+index c934341c17caf4696065ac6c39bdfef570c62f13..f49510c999ce5241f26dc9ba90a6148bf31467c7 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+@@ -207,7 +207,10 @@ public class KaiijuConfig {
+         alternateKeepAlive = getBoolean("network.alternate-keepalive", alternateKeepAlive);
+     }
+ 
++    public static boolean disableVanishApi = false;
++
+     private static void optimizationSettings() {
++        disableVanishApi = getBoolean("optimization.disable-vanish-api", disableVanishApi);
+     }
+ 
+     public static String serverModName = "Kaiiju";
+diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
+index 24bd63c596c9f61f1e89ec5b001b7cb7a29a09ff..3fc2b4a91d2b9727972d6b43b6d2c04b1df3c698 100644
+--- a/src/main/java/net/minecraft/server/level/ChunkMap.java
++++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
+@@ -1350,7 +1350,11 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+                 boolean flag = d1 <= d2 && this.entity.broadcastToPlayer(player);
+ 
+                 // CraftBukkit start - respect vanish API
+-                if (!io.papermc.paper.util.TickThread.isTickThreadFor(player) || !player.getBukkitEntity().canSee(this.entity.getBukkitEntity())) { // Folia - region threading
++                // Kaiiju start - don't respect vanish API >:D
++                boolean canSee = true;
++                if (!dev.kaiijumc.kaiiju.KaiijuConfig.disableVanishApi) canSee = player.getBukkitEntity().canSee(this.entity.getBukkitEntity());
++                if (!io.papermc.paper.util.TickThread.isTickThreadFor(player) || !canSee) { // Folia - region threading
++                // Kaiiju end
+                     flag = false;
+                 }
+                 // CraftBukkit end

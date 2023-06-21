@@ -5,11 +5,11 @@ Subject: [PATCH] Server mod name
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 6d0e1edfb7d3c020f70f6a194f16e836b462c4de..9fb33b35b4d6842ca8597f77a4116e3983ebfbcb 100644
+index fdc4cdbf34ed10f6523dceac7c1931d3ca4eb522..e1f50adfa216320bc53b460d11666064cb58c969 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -207,6 +207,9 @@ public class KaiijuConfig {
-         alternateKeepAlive = getBoolean("network.alternate-keepalive", alternateKeepAlive);
+@@ -210,6 +210,9 @@ public class KaiijuConfig {
+     private static void optimizationSettings() {
      }
  
 +    public static String serverModName = "Kaiiju";

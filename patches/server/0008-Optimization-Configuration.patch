@@ -4,6 +4,18 @@ Date: Wed, 21 Jun 2023 17:26:24 +0200
 Subject: [PATCH] Optimization Configuration
 
 
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+index b42a3466f145a92608c8746fd4beb529b4a60b01..7b56cc1275319cf07a4a25280e0ff900bdca8afa 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+@@ -206,4 +206,7 @@ public class KaiijuConfig {
+         sendNullEntityPackets = getBoolean("network.send-null-entity-packets", sendNullEntityPackets);
+         alternateKeepAlive = getBoolean("network.alternate-keepalive", alternateKeepAlive);
+     }
++
++    private static void optimizationSettings() {
++    }
+ }
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 index a6e7af5f4148e067660e9f5beeacde3a59a1de9c..6bd14857e0b0ef233f17f1a6e3e0fb313d59f641 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java

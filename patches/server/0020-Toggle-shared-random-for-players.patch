@@ -5,10 +5,10 @@ Subject: [PATCH] Toggle shared random for players
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 9fb33b35b4d6842ca8597f77a4116e3983ebfbcb..51a49fc98147eef7bb50e7a2c71e0e8ed75e3dd6 100644
+index e1f50adfa216320bc53b460d11666064cb58c969..c934341c17caf4696065ac6c39bdfef570c62f13 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -208,8 +208,10 @@ public class KaiijuConfig {
+@@ -211,8 +211,10 @@ public class KaiijuConfig {
      }
  
      public static String serverModName = "Kaiiju";
