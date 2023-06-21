@@ -1,0 +1,18 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
+Date: Wed, 21 Jun 2023 04:15:44 +0300
+Subject: [PATCH] Fix visual respawn issue
+
+
+diff --git a/src/main/java/net/minecraft/world/entity/LivingEntity.java b/src/main/java/net/minecraft/world/entity/LivingEntity.java
+index 10c7f5c6fc0e5cb8aafbe125dd68635a37b7b1b9..6f589e7e4bbed0b2fa87403c86f18d36672cf1d0 100644
+--- a/src/main/java/net/minecraft/world/entity/LivingEntity.java
++++ b/src/main/java/net/minecraft/world/entity/LivingEntity.java
+@@ -633,6 +633,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
+         ++this.deathTime;
+         if (this.deathTime >= 20 && !this.level().isClientSide() && !this.isRemoved() && !this.broadcastedDeath) { // Folia - region threading
+             this.level().broadcastEntityEvent(this, (byte) 60);
++            this.broadcastedDeath = true; // Kaiiju - Fix respawn issue / Visual bug
+             if (!(this instanceof ServerPlayer)) this.remove(Entity.RemovalReason.KILLED); // Folia - region threading - don't remove, we want the tick scheduler to be running
+             if ((this instanceof ServerPlayer)) this.unRide(); // Folia - region threading - unmount player when dead
+         }
