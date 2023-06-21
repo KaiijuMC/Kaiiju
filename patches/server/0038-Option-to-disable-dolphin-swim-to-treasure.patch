@@ -1,0 +1,38 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Xymb <xymb@endcrystal.me>
+Date: Thu, 22 Jun 2023 00:52:00 +0200
+Subject: [PATCH] Option to disable dolphin swim to treasure
+
+
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
+index 58b0725fea8d2216242a949b9ed2b3d9e93ef1f3..87887a6d266767fd46f4d65d89dfb9d853089db4 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
+@@ -150,12 +150,14 @@ public class KaiijuWorldConfig {
+     public boolean enableEntityThrottling = false;
+     public boolean disableAchievements = false;
+     public boolean disableCreaturesSpawnEvents = false;
++    public boolean disableDolphinSwimToTreasure = false;
+ 
+     private void optimizationSettings() {
+         shulkerBoxDropContentsWhenDestroyed = getBoolean("optimization.shulker-box-drop-contents-when-destroyed", shulkerBoxDropContentsWhenDestroyed);
+         enableEntityThrottling = getBoolean("optimization.enable-entity-throttling", enableEntityThrottling);
+         disableAchievements = getBoolean("optimization.disable-achievements", disableAchievements);
+         disableCreaturesSpawnEvents = getBoolean("optimization.disable-creatures-spawn-events", disableCreaturesSpawnEvents);
++        disableDolphinSwimToTreasure = getBoolean("optimization.disable-dolphin-swim-to-treasure", disableDolphinSwimToTreasure);
+     }
+ 
+     public boolean fixVoidTrading = true;
+diff --git a/src/main/java/net/minecraft/world/entity/animal/Dolphin.java b/src/main/java/net/minecraft/world/entity/animal/Dolphin.java
+index 501e6cb4aa83f81c1f657e41f4e7f11d19d46831..8240b8e27d5f5e941049f269718670db0510f497 100644
+--- a/src/main/java/net/minecraft/world/entity/animal/Dolphin.java
++++ b/src/main/java/net/minecraft/world/entity/animal/Dolphin.java
+@@ -160,7 +160,7 @@ public class Dolphin extends WaterAnimal {
+     protected void registerGoals() {
+         this.goalSelector.addGoal(0, new BreathAirGoal(this));
+         this.goalSelector.addGoal(0, new TryFindWaterGoal(this));
+-        this.goalSelector.addGoal(1, new Dolphin.DolphinSwimToTreasureGoal(this));
++        if (!this.level().kaiijuConfig.disableDolphinSwimToTreasure) this.goalSelector.addGoal(1, new Dolphin.DolphinSwimToTreasureGoal(this)); // Kaiiju
+         this.goalSelector.addGoal(2, new Dolphin.DolphinSwimWithPlayerGoal(this, 4.0D));
+         this.goalSelector.addGoal(4, new RandomSwimmingGoal(this, 1.0D, 10));
+         this.goalSelector.addGoal(4, new RandomLookAroundGoal(this));

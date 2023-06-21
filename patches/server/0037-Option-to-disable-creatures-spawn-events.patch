@@ -1,0 +1,61 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Xymb <xymb@endcrystal.me>
+Date: Thu, 22 Jun 2023 00:47:57 +0200
+Subject: [PATCH] Option to disable creatures spawn events
+
+
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
+index 27a0f1d81161adb86339f4b829c3628c1022271b..58b0725fea8d2216242a949b9ed2b3d9e93ef1f3 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
+@@ -149,11 +149,13 @@ public class KaiijuWorldConfig {
+     public boolean shulkerBoxDropContentsWhenDestroyed = true;
+     public boolean enableEntityThrottling = false;
+     public boolean disableAchievements = false;
++    public boolean disableCreaturesSpawnEvents = false;
+ 
+     private void optimizationSettings() {
+         shulkerBoxDropContentsWhenDestroyed = getBoolean("optimization.shulker-box-drop-contents-when-destroyed", shulkerBoxDropContentsWhenDestroyed);
+         enableEntityThrottling = getBoolean("optimization.enable-entity-throttling", enableEntityThrottling);
+         disableAchievements = getBoolean("optimization.disable-achievements", disableAchievements);
++        disableCreaturesSpawnEvents = getBoolean("optimization.disable-creatures-spawn-events", disableCreaturesSpawnEvents);
+     }
+ 
+     public boolean fixVoidTrading = true;
+diff --git a/src/main/java/net/minecraft/server/level/ServerChunkCache.java b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
+index af35fd63b090aa3d89bc60cb9cb7694b5f502681..e5dded0363b14608e834e63e678563b1423d66e7 100644
+--- a/src/main/java/net/minecraft/server/level/ServerChunkCache.java
++++ b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
+@@ -486,21 +486,29 @@ public class ServerChunkCache extends ChunkSource {
+                 chunkRange = (chunkRange > viewDistance) ? (byte)viewDistance : chunkRange;
+                 chunkRange = (chunkRange > DistanceManager.MOB_SPAWN_RANGE) ? DistanceManager.MOB_SPAWN_RANGE : chunkRange;
+ 
+-                com.destroystokyo.paper.event.entity.PlayerNaturallySpawnCreaturesEvent event = new com.destroystokyo.paper.event.entity.PlayerNaturallySpawnCreaturesEvent(player.getBukkitEntity(), (byte)chunkRange);
++                // Kaiiju start - disable creatures spawn events
++                com.destroystokyo.paper.event.entity.PlayerNaturallySpawnCreaturesEvent event = null;
++                if (!this.level.kaiijuConfig.disableCreaturesSpawnEvents) {
++                event = new com.destroystokyo.paper.event.entity.PlayerNaturallySpawnCreaturesEvent(player.getBukkitEntity(), (byte)chunkRange);
++                // Kaiiju end
+                 event.callEvent();
+                 if (event.isCancelled() || event.getSpawnRadius() < 0) { // Folia - region threading
+                     player.lastEntitySpawnRadiusSquared = -1.0; player.playerNaturallySpawnedEvent = null;  // Folia - region threading
+                     regionizedWorldData.mobSpawnMap.remove(player); // Folia - region threading
+                     continue;
+                 }
++                // Kaiiju start - disable creatures spawn events
++                chunkRange = Math.min(event.getSpawnRadius(), 32);
++                }
++                // Kaiiju end
+ 
+-                int range = Math.min(event.getSpawnRadius(), 32); // limit to max view distance
++                int range = chunkRange; // limit to max view distance // Kaiiju
+                 int chunkX = io.papermc.paper.util.MCUtil.getChunkCoordinate(player.getX());
+                 int chunkZ = io.papermc.paper.util.MCUtil.getChunkCoordinate(player.getZ());
+ 
+                 regionizedWorldData.mobSpawnMap.addOrUpdate(player, chunkX, chunkZ, range); // Folia - region threading
+                 player.lastEntitySpawnRadiusSquared = (double)((range << 4) * (range << 4)); // used in anyPlayerCloseEnoughForSpawning
+-                player.playerNaturallySpawnedEvent = event;
++                if (!this.level.kaiijuConfig.disableCreaturesSpawnEvents) player.playerNaturallySpawnedEvent = event; // Kaiiju
+             }
+             // Paper end - optimize isOutisdeRange
+             LevelData worlddata = this.level.getLevelData();
