@@ -17,12 +17,12 @@ index b42a3466f145a92608c8746fd4beb529b4a60b01..6d0e1edfb7d3c020f70f6a194f16e836
 +    }
  }
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index a6e7af5f4148e067660e9f5beeacde3a59a1de9c..6a700b5b15da394f42461b59f85eb8918c2121ad 100644
+index 6bd14857e0b0ef233f17f1a6e3e0fb313d59f641..05f9c01131e78927d88f1170c3eda4adf25ac8ba 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-@@ -143,4 +143,7 @@ public class KaiijuWorldConfig {
-             regionFormatLinearCompressionLevel = 1;
-         }
+@@ -146,4 +146,7 @@ public class KaiijuWorldConfig {
+ 
+     private void optimizationSettings() {
      }
 +
 +    private void gameplaySettings() {

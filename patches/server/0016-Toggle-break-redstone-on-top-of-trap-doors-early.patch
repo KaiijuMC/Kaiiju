@@ -6,17 +6,16 @@ Subject: [PATCH] Toggle break redstone on top of trap doors early
 That patch break vanilla mechanics such as portal slicing.
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index 657a56a8cfa134943f8503e413b4eaf592a83854..ab56f61e9f77f743caabbd49d1e028e8ce296355 100644
+index 9802039d34eb1717b712c9041fd9f602fccae236..3355935bbf8059d8a539dcefb84e3c0785314ce2 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-@@ -150,11 +150,13 @@ public class KaiijuWorldConfig {
+@@ -155,10 +155,12 @@ public class KaiijuWorldConfig {
      public boolean fixVoidTrading = true;
      public boolean optimizeHoppers = true;
      public boolean tickWhenEmpty = true;
 +    public boolean breakRedstoneOnTopOfTrapDoorsEarly = true;
  
      private void gameplaySettings() {
-         shulkerBoxDropContentsWhenDestroyed = getBoolean("gameplay.shulker-box-drop-contents-when-destroyed", shulkerBoxDropContentsWhenDestroyed);
          fixVoidTrading = getBoolean("gameplay.fix-void-trading", fixVoidTrading);
          optimizeHoppers = getBoolean("gameplay.optimize-hoppers", optimizeHoppers);
          tickWhenEmpty = getBoolean("gameplay.tick-when-empty", tickWhenEmpty);

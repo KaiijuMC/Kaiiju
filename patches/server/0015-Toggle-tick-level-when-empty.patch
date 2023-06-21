@@ -5,24 +5,23 @@ Subject: [PATCH] Toggle tick level when empty
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index 01f194cfbd6f0e371f410c94aaecf1595acb22d8..657a56a8cfa134943f8503e413b4eaf592a83854 100644
+index 72bcf8e35593bb54079b6cbd9238acdcd43c3e46..9802039d34eb1717b712c9041fd9f602fccae236 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-@@ -149,10 +149,12 @@ public class KaiijuWorldConfig {
-     public boolean shulkerBoxDropContentsWhenDestroyed = true;
+@@ -154,9 +154,11 @@ public class KaiijuWorldConfig {
+ 
      public boolean fixVoidTrading = true;
      public boolean optimizeHoppers = true;
 +    public boolean tickWhenEmpty = true;
  
      private void gameplaySettings() {
-         shulkerBoxDropContentsWhenDestroyed = getBoolean("gameplay.shulker-box-drop-contents-when-destroyed", shulkerBoxDropContentsWhenDestroyed);
          fixVoidTrading = getBoolean("gameplay.fix-void-trading", fixVoidTrading);
          optimizeHoppers = getBoolean("gameplay.optimize-hoppers", optimizeHoppers);
 +        tickWhenEmpty = getBoolean("gameplay.tick-when-empty", tickWhenEmpty);
      }
  }
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 15087f575427ecdeee105060575fb6b6741f4586..a4d9c586f096a885b33840e8c1a7406821afb4df 100644
+index 7f39e36037d55278d15399196459e51b885c5d1e..66509fa23bfcde70abd3917eb774cf48d5d6da93 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -798,7 +798,7 @@ public class ServerLevel extends Level implements WorldGenLevel {

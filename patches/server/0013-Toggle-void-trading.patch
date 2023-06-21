@@ -8,22 +8,21 @@ You should set chunk-unloads to 0s in paper config file to enable void
 trading. Or use Kaiivoid plugin.
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index 6f785078ca5123eb06913f95183475584116ebf5..a2eaa6d58ff7cbb88716d26996d2842cddfee560 100644
+index f3f824d0ab1a2a72825c40b67192386479a0b34c..95ed6cb7b94797187d1011cab344e187b39d9193 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-@@ -147,8 +147,10 @@ public class KaiijuWorldConfig {
+@@ -152,6 +152,9 @@ public class KaiijuWorldConfig {
+         shulkerBoxDropContentsWhenDestroyed = getBoolean("optimization.shulker-box-drop-contents-when-destroyed", shulkerBoxDropContentsWhenDestroyed);
      }
  
-     public boolean shulkerBoxDropContentsWhenDestroyed = true;
 +    public boolean fixVoidTrading = true;
- 
++
      private void gameplaySettings() {
-         shulkerBoxDropContentsWhenDestroyed = getBoolean("gameplay.shulker-box-drop-contents-when-destroyed", shulkerBoxDropContentsWhenDestroyed);
 +        fixVoidTrading = getBoolean("gameplay.fix-void-trading", fixVoidTrading);
      }
  }
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 44c6d7484a87523e635492053b326f819b8f71c5..6f9ae8348f250d27931910de3a387922e24c7757 100644
+index 1bbd8b475cdc57fb15ca05ffe122220a5539da10..7f39e36037d55278d15399196459e51b885c5d1e 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -2838,7 +2838,7 @@ public class ServerLevel extends Level implements WorldGenLevel {

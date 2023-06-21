@@ -5,7 +5,7 @@ Subject: [PATCH] Fix off thread spider addEffect
 
 
 diff --git a/src/main/java/net/minecraft/world/entity/monster/Spider.java b/src/main/java/net/minecraft/world/entity/monster/Spider.java
-index 0c36bb47bd7040f1544817810e1c87157cdaff96..089c7bc00b8b4354d795cd864dc2c310bcf6de86 100644
+index 05432184077752b1d0cb764a5e39ed875748b2d6..74a68ae68e3c774a63d0a5478dfcda6e7894a514 100644
 --- a/src/main/java/net/minecraft/world/entity/monster/Spider.java
 +++ b/src/main/java/net/minecraft/world/entity/monster/Spider.java
 @@ -180,7 +180,9 @@ public class Spider extends Monster {

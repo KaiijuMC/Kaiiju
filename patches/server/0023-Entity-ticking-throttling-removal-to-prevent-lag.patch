@@ -5,7 +5,7 @@ Subject: [PATCH] Entity ticking throttling & removal to prevent lag.
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index e611fb1c25b8287b334c078f93d0fa2f32f5cb39..8340143a97c93c651c1ae424d3969729694ae981 100644
+index 1615346024037f2abe0fcfcfc5ea7713505bebca..d24f5fdc6a8c34774933a5cd8bfed8571299bd35 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -17,6 +17,7 @@ dependencies {
@@ -252,24 +252,21 @@ index 0000000000000000000000000000000000000000..eb690efacf083e4ff3e321578b12c534
 +    }
 +}
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index c344ceee85cd7fe3d8e68df49e7e57db497a5c4b..2cc57d5a759ac3edcd2c3724f7f7b022b3e42f0f 100644
+index 5c87df0fd68e4971201836b6301d526378271af5..ecae04b0cc317b154b29ca80a7246dc19e5d67ba 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-@@ -152,6 +152,7 @@ public class KaiijuWorldConfig {
-     public boolean tickWhenEmpty = true;
-     public boolean breakRedstoneOnTopOfTrapDoorsEarly = true;
-     public boolean fixTripWireStateInconsistency = true;
+@@ -147,9 +147,11 @@ public class KaiijuWorldConfig {
+     }
+ 
+     public boolean shulkerBoxDropContentsWhenDestroyed = true;
 +    public boolean enableEntityThrottling = false;
  
-     private void gameplaySettings() {
-         shulkerBoxDropContentsWhenDestroyed = getBoolean("gameplay.shulker-box-drop-contents-when-destroyed", shulkerBoxDropContentsWhenDestroyed);
-@@ -160,5 +161,6 @@ public class KaiijuWorldConfig {
-         tickWhenEmpty = getBoolean("gameplay.tick-when-empty", tickWhenEmpty);
-         breakRedstoneOnTopOfTrapDoorsEarly = getBoolean("gameplay.break-redstone-on-top-of-trap-doors-early", breakRedstoneOnTopOfTrapDoorsEarly);
-         fixTripWireStateInconsistency = getBoolean("gameplay.fix-tripwire-state-inconsistency", fixTripWireStateInconsistency);
-+        enableEntityThrottling = getBoolean("gameplay.enable-entity-throttling", enableEntityThrottling);
+     private void optimizationSettings() {
+         shulkerBoxDropContentsWhenDestroyed = getBoolean("optimization.shulker-box-drop-contents-when-destroyed", shulkerBoxDropContentsWhenDestroyed);
++        enableEntityThrottling = getBoolean("optimization.enable-entity-throttling", enableEntityThrottling);
      }
- }
+ 
+     public boolean fixVoidTrading = true;
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/command/KaiijuCommand.java b/src/main/java/dev/kaiijumc/kaiiju/command/KaiijuCommand.java
 index 6fac162e0ec057af9f3336314d5663554cef0490..efecc7e132c67577577c99bfcf98e2b4ddae14ab 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/command/KaiijuCommand.java
@@ -320,7 +317,7 @@ index 991e4c19763a34a6fead88363e007c2d11aad836..24a2d3f496727790f63cb66a2534d442
          dev.kaiijumc.kaiiju.KaiijuConfig.registerCommands();
          // Kaiiju end
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index a4d9c586f096a885b33840e8c1a7406821afb4df..240cb8ebc611cae345f6f4a9d22ab8796f28d591 100644
+index 66509fa23bfcde70abd3917eb774cf48d5d6da93..8fd9e3cee5a671ef8425311371cde57449ef1d8e 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -822,6 +822,7 @@ public class ServerLevel extends Level implements WorldGenLevel {

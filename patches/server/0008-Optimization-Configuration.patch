@@ -1,0 +1,18 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: kugge <sofiane.djerbi38@gmail.com>
+Date: Wed, 21 Jun 2023 17:26:24 +0200
+Subject: [PATCH] Optimization Configuration
+
+
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
+index a6e7af5f4148e067660e9f5beeacde3a59a1de9c..6bd14857e0b0ef233f17f1a6e3e0fb313d59f641 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
+@@ -143,4 +143,7 @@ public class KaiijuWorldConfig {
+             regionFormatLinearCompressionLevel = 1;
+         }
+     }
++
++    private void optimizationSettings() {
++    }
+ }

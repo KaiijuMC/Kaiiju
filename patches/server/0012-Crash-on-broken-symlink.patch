@@ -5,7 +5,7 @@ Subject: [PATCH] Crash on broken symlink
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index c3347922439153bb4377d322fc3da2d16255d885..6f785078ca5123eb06913f95183475584116ebf5 100644
+index 55dcbb48450b24f80e0a04bedeb54f64e94ebb9e..f3f824d0ab1a2a72825c40b67192386479a0b34c 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 @@ -127,6 +127,7 @@ public class KaiijuWorldConfig {
@@ -64,7 +64,7 @@ index 61c6bc2859235874aefac71e9e55162f0a89f29f..24bd63c596c9f61f1e89ec5b001b7cb7
          // Paper start
          this.dataRegionManager = new io.papermc.paper.chunk.SingleThreadChunkRegionManager(this.level, 2, (1.0 / 3.0), 1, 6, "Data", DataRegionData::new, DataRegionSectionData::new);
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 19fb8ca8a6f699ce596103070db726fcb427865e..44c6d7484a87523e635492053b326f819b8f71c5 100644
+index 4774d3f357d62b0818b4713f8085d05be09eaa5c..1bbd8b475cdc57fb15ca05ffe122220a5539da10 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -426,8 +426,8 @@ public class ServerLevel extends Level implements WorldGenLevel {

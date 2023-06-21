@@ -6,23 +6,22 @@ Subject: [PATCH] Toggle optimize hoppers
 Paper optimize hoppers patch break a lot of technical redstone farms because of piston updates. (Example: twiti888 wood farm)
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index a2eaa6d58ff7cbb88716d26996d2842cddfee560..01f194cfbd6f0e371f410c94aaecf1595acb22d8 100644
+index 95ed6cb7b94797187d1011cab344e187b39d9193..72bcf8e35593bb54079b6cbd9238acdcd43c3e46 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-@@ -148,9 +148,11 @@ public class KaiijuWorldConfig {
+@@ -153,8 +153,10 @@ public class KaiijuWorldConfig {
+     }
  
-     public boolean shulkerBoxDropContentsWhenDestroyed = true;
      public boolean fixVoidTrading = true;
 +    public boolean optimizeHoppers = true;
  
      private void gameplaySettings() {
-         shulkerBoxDropContentsWhenDestroyed = getBoolean("gameplay.shulker-box-drop-contents-when-destroyed", shulkerBoxDropContentsWhenDestroyed);
          fixVoidTrading = getBoolean("gameplay.fix-void-trading", fixVoidTrading);
 +        optimizeHoppers = getBoolean("gameplay.optimize-hoppers", optimizeHoppers);
      }
  }
 diff --git a/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-index 0134370081182260d578ee1d8a16d544c03b6a0d..555d86f0a9132c2292470c60f263e59082f0c26e 100644
+index 4825a74ce4893dafdb70ae1badf3d2e1930d01a1..762b763f271c3208b4f8a7e346897207ec5beb6c 100644
 --- a/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 @@ -401,49 +401,51 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen

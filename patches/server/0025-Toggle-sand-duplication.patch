@@ -5,20 +5,20 @@ Subject: [PATCH] Toggle sand duplication
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index 915ac0ab2fc4ee2cdeeaac821a28ed861f9e6c12..91749e471488233dd4f2515b1ff51331dea90f53 100644
+index 68074cc41c1e4cd06f2562d44947b63722d5af50..be32a516c1ee0f95790b8a96c465045ca4355c76 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-@@ -154,6 +154,7 @@ public class KaiijuWorldConfig {
+@@ -160,6 +160,7 @@ public class KaiijuWorldConfig {
+     public boolean breakRedstoneOnTopOfTrapDoorsEarly = true;
      public boolean fixTripWireStateInconsistency = true;
-     public boolean enableEntityThrottling = false;
      public boolean safeTeleporting = true;
 +    public boolean sandDuplication = false;
  
      private void gameplaySettings() {
-         shulkerBoxDropContentsWhenDestroyed = getBoolean("gameplay.shulker-box-drop-contents-when-destroyed", shulkerBoxDropContentsWhenDestroyed);
-@@ -164,5 +165,6 @@ public class KaiijuWorldConfig {
+         fixVoidTrading = getBoolean("gameplay.fix-void-trading", fixVoidTrading);
+@@ -168,5 +169,6 @@ public class KaiijuWorldConfig {
+         breakRedstoneOnTopOfTrapDoorsEarly = getBoolean("gameplay.break-redstone-on-top-of-trap-doors-early", breakRedstoneOnTopOfTrapDoorsEarly);
          fixTripWireStateInconsistency = getBoolean("gameplay.fix-tripwire-state-inconsistency", fixTripWireStateInconsistency);
-         enableEntityThrottling = getBoolean("gameplay.enable-entity-throttling", enableEntityThrottling);
          safeTeleporting = getBoolean("gameplay.safe-teleportation", safeTeleporting);
 +        sandDuplication = getBoolean("gameplay.sand-duplication", sandDuplication);
      }
