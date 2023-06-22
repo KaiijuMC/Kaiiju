@@ -6,19 +6,17 @@ Subject: [PATCH] Toggle fix TripWire state inconsistency
 This allow string duplication
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index 3355935bbf8059d8a539dcefb84e3c0785314ce2..5c87df0fd68e4971201836b6301d526378271af5 100644
+index e7ee85b09aa4438868e068551280b13e84cdfdb8..8d7821d8b1a3615eaef1073d9dab690559b85f81 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-@@ -156,11 +156,13 @@ public class KaiijuWorldConfig {
-     public boolean optimizeHoppers = true;
-     public boolean tickWhenEmpty = true;
+@@ -158,9 +158,11 @@ public class KaiijuWorldConfig {
+ 
+     public boolean fixVoidTrading = true;
      public boolean breakRedstoneOnTopOfTrapDoorsEarly = true;
 +    public boolean fixTripWireStateInconsistency = true;
  
      private void gameplaySettings() {
          fixVoidTrading = getBoolean("gameplay.fix-void-trading", fixVoidTrading);
-         optimizeHoppers = getBoolean("gameplay.optimize-hoppers", optimizeHoppers);
-         tickWhenEmpty = getBoolean("gameplay.tick-when-empty", tickWhenEmpty);
          breakRedstoneOnTopOfTrapDoorsEarly = getBoolean("gameplay.break-redstone-on-top-of-trap-doors-early", breakRedstoneOnTopOfTrapDoorsEarly);
 +        fixTripWireStateInconsistency = getBoolean("gameplay.fix-tripwire-state-inconsistency", fixTripWireStateInconsistency);
      }

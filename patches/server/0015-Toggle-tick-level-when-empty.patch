@@ -5,21 +5,22 @@ Subject: [PATCH] Toggle tick level when empty
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index 72bcf8e35593bb54079b6cbd9238acdcd43c3e46..9802039d34eb1717b712c9041fd9f602fccae236 100644
+index 6d7356cc07da58b1cef8d8963e790251d765de2c..601b9867d839f4928ba993ee8f00df9c330a0fe3 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-@@ -154,9 +154,11 @@ public class KaiijuWorldConfig {
+@@ -148,10 +148,12 @@ public class KaiijuWorldConfig {
  
-     public boolean fixVoidTrading = true;
+     public boolean shulkerBoxDropContentsWhenDestroyed = true;
      public boolean optimizeHoppers = true;
 +    public boolean tickWhenEmpty = true;
  
-     private void gameplaySettings() {
-         fixVoidTrading = getBoolean("gameplay.fix-void-trading", fixVoidTrading);
-         optimizeHoppers = getBoolean("gameplay.optimize-hoppers", optimizeHoppers);
-+        tickWhenEmpty = getBoolean("gameplay.tick-when-empty", tickWhenEmpty);
+     private void optimizationSettings() {
+         shulkerBoxDropContentsWhenDestroyed = getBoolean("optimization.shulker-box-drop-contents-when-destroyed", shulkerBoxDropContentsWhenDestroyed);
+         optimizeHoppers = getBoolean("optimization.optimize-hoppers", optimizeHoppers);
++        tickWhenEmpty = getBoolean("optimization.tick-when-empty", tickWhenEmpty);
      }
- }
+ 
+     public boolean fixVoidTrading = true;
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
 index 7f39e36037d55278d15399196459e51b885c5d1e..66509fa23bfcde70abd3917eb774cf48d5d6da93 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java

@@ -252,17 +252,19 @@ index 0000000000000000000000000000000000000000..eb690efacf083e4ff3e321578b12c534
 +    }
 +}
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index 5c87df0fd68e4971201836b6301d526378271af5..ecae04b0cc317b154b29ca80a7246dc19e5d67ba 100644
+index 8d7821d8b1a3615eaef1073d9dab690559b85f81..816db23fa64aab69e3034484c00645ebd0479978 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-@@ -147,9 +147,11 @@ public class KaiijuWorldConfig {
-     }
- 
+@@ -149,11 +149,13 @@ public class KaiijuWorldConfig {
      public boolean shulkerBoxDropContentsWhenDestroyed = true;
+     public boolean optimizeHoppers = true;
+     public boolean tickWhenEmpty = true;
 +    public boolean enableEntityThrottling = false;
  
      private void optimizationSettings() {
          shulkerBoxDropContentsWhenDestroyed = getBoolean("optimization.shulker-box-drop-contents-when-destroyed", shulkerBoxDropContentsWhenDestroyed);
+         optimizeHoppers = getBoolean("optimization.optimize-hoppers", optimizeHoppers);
+         tickWhenEmpty = getBoolean("optimization.tick-when-empty", tickWhenEmpty);
 +        enableEntityThrottling = getBoolean("optimization.enable-entity-throttling", enableEntityThrottling);
      }
  

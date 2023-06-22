@@ -5,10 +5,10 @@ Subject: [PATCH] Option to disable dolphin swim to treasure
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index 58b0725fea8d2216242a949b9ed2b3d9e93ef1f3..87887a6d266767fd46f4d65d89dfb9d853089db4 100644
+index c9830912019079369268bfbf2c95de18ad598f52..e2fb7d7a7b3126d386b46442c115085d1974ac4e 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-@@ -150,12 +150,14 @@ public class KaiijuWorldConfig {
+@@ -152,6 +152,7 @@ public class KaiijuWorldConfig {
      public boolean enableEntityThrottling = false;
      public boolean disableAchievements = false;
      public boolean disableCreaturesSpawnEvents = false;
@@ -16,6 +16,7 @@ index 58b0725fea8d2216242a949b9ed2b3d9e93ef1f3..87887a6d266767fd46f4d65d89dfb9d8
  
      private void optimizationSettings() {
          shulkerBoxDropContentsWhenDestroyed = getBoolean("optimization.shulker-box-drop-contents-when-destroyed", shulkerBoxDropContentsWhenDestroyed);
+@@ -160,6 +161,7 @@ public class KaiijuWorldConfig {
          enableEntityThrottling = getBoolean("optimization.enable-entity-throttling", enableEntityThrottling);
          disableAchievements = getBoolean("optimization.disable-achievements", disableAchievements);
          disableCreaturesSpawnEvents = getBoolean("optimization.disable-creatures-spawn-events", disableCreaturesSpawnEvents);

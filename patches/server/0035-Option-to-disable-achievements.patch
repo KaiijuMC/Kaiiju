@@ -5,17 +5,19 @@ Subject: [PATCH] Option to disable achievements
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index be32a516c1ee0f95790b8a96c465045ca4355c76..27a0f1d81161adb86339f4b829c3628c1022271b 100644
+index 9f0095f2196133a8bcffd5306aa9ac0b99b2f8d7..31d66bb2fcf4bb7262df2d8006e307fee92660ea 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-@@ -148,10 +148,12 @@ public class KaiijuWorldConfig {
- 
-     public boolean shulkerBoxDropContentsWhenDestroyed = true;
+@@ -150,12 +150,14 @@ public class KaiijuWorldConfig {
+     public boolean optimizeHoppers = true;
+     public boolean tickWhenEmpty = true;
      public boolean enableEntityThrottling = false;
 +    public boolean disableAchievements = false;
  
      private void optimizationSettings() {
          shulkerBoxDropContentsWhenDestroyed = getBoolean("optimization.shulker-box-drop-contents-when-destroyed", shulkerBoxDropContentsWhenDestroyed);
+         optimizeHoppers = getBoolean("optimization.optimize-hoppers", optimizeHoppers);
+         tickWhenEmpty = getBoolean("optimization.tick-when-empty", tickWhenEmpty);
          enableEntityThrottling = getBoolean("optimization.enable-entity-throttling", enableEntityThrottling);
 +        disableAchievements = getBoolean("optimization.disable-achievements", disableAchievements);
      }

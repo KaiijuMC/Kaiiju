@@ -5,19 +5,17 @@ Subject: [PATCH] Toggle safe teleportation
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-index ecae04b0cc317b154b29ca80a7246dc19e5d67ba..68074cc41c1e4cd06f2562d44947b63722d5af50 100644
+index 816db23fa64aab69e3034484c00645ebd0479978..7c6c74f95c2534624a928ccf6b0a4b9d2a5486ad 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
-@@ -159,6 +159,7 @@ public class KaiijuWorldConfig {
-     public boolean tickWhenEmpty = true;
+@@ -161,10 +161,12 @@ public class KaiijuWorldConfig {
+     public boolean fixVoidTrading = true;
      public boolean breakRedstoneOnTopOfTrapDoorsEarly = true;
      public boolean fixTripWireStateInconsistency = true;
 +    public boolean safeTeleporting = true;
  
      private void gameplaySettings() {
          fixVoidTrading = getBoolean("gameplay.fix-void-trading", fixVoidTrading);
-@@ -166,5 +167,6 @@ public class KaiijuWorldConfig {
-         tickWhenEmpty = getBoolean("gameplay.tick-when-empty", tickWhenEmpty);
          breakRedstoneOnTopOfTrapDoorsEarly = getBoolean("gameplay.break-redstone-on-top-of-trap-doors-early", breakRedstoneOnTopOfTrapDoorsEarly);
          fixTripWireStateInconsistency = getBoolean("gameplay.fix-tripwire-state-inconsistency", fixTripWireStateInconsistency);
 +        safeTeleporting = getBoolean("gameplay.safe-teleportation", safeTeleporting);
