@@ -1,0 +1,39 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: kugge <sofiane.djerbi38@gmail.com>
+Date: Thu, 22 Jun 2023 18:27:54 +0200
+Subject: [PATCH] Optimize getEffectiveRange()
+
+
+diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
+index 3fc2b4a91d2b9727972d6b43b6d2c04b1df3c698..5cda4179246956d8d3ce452da7d53689b0d591c2 100644
+--- a/src/main/java/net/minecraft/server/level/ChunkMap.java
++++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
+@@ -1374,12 +1374,27 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+             }
+         }
+ 
++        // Kaiiju start - Cache scaled range
++        int scaledMemory = -1; // Kaiiju
++        int scaledAsked = -1; // Kaiiju
++        short scaledRecalculateCounter = 0; // Kaiiju
++        // Kaiiju end
++
+         private int scaledRange(int initialDistance) {
+-            return ChunkMap.this.level.getServer().getScaledTrackingDistance(initialDistance);
++            // Kaiiju start - Cache scaled range
++           if (scaledAsked == initialDistance && --scaledRecalculateCounter > 0) {
++                return scaledMemory;
++            }
++            scaledRecalculateCounter = 10000; // TODO: Play with this value
++            scaledMemory = ChunkMap.this.level.getServer().getScaledTrackingDistance(initialDistance);
++            scaledAsked = initialDistance;
++            return scaledMemory;
++            // Kaiiju end
+         }
+ 
+         private int getEffectiveRange() {
+             int i = this.range;
++            if (this.entity.passengers.isEmpty()) return this.scaledRange(i); // Kaiiju - Optimize getEffectiveRange()
+             Iterator iterator = this.entity.getIndirectPassengers().iterator();
+ 
+             while (iterator.hasNext()) {
