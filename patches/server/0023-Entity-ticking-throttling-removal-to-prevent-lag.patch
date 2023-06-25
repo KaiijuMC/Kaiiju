@@ -18,7 +18,7 @@ index 1615346024037f2abe0fcfcfc5ea7713505bebca..d24f5fdc6a8c34774933a5cd8bfed857
      implementation("net.minecrell:terminalconsoleappender:1.3.0")
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuEntityLimits.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuEntityLimits.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..887ea85ca2a03796bfa5bf62f27d1a7abd7fbc29
+index 0000000000000000000000000000000000000000..9fc0823faa2a27a470adb24d688b2f9e60f628eb
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuEntityLimits.java
 @@ -0,0 +1,139 @@
@@ -86,16 +86,16 @@ index 0000000000000000000000000000000000000000..887ea85ca2a03796bfa5bf62f27d1a7a
 +            try {
 +                entityLimitsConfig.load(ENTITY_LIMITS_FILE);
 +            } catch (InvalidConfigurationException ex) {
-+                Bukkit.getLogger().log(Level.SEVERE, "Could not load kaiiju_entity_limits.yml, please correct your syntax errors", ex);
++                Bukkit.getLogger().log(Level.SEVERE, "Could not load kaiiju-entity-limits.yml, please correct your syntax errors", ex);
 +                throw Throwables.propagate(ex);
 +            } catch (IOException ignore) {}
 +        } else {
 +            if (setup) {
 +                entityLimitsConfig.options().header(HEADER);
 +                entityLimitsConfig.options().copyDefaults(true);
-+                entityLimitsConfig.set("Wither.limit", 1000);
++                entityLimitsConfig.set("Wither.tick-throttle", 1000);
 +                entityLimitsConfig.set("Wither.removal", 5000);
-+                entityLimitsConfig.set("Axolotl.limit", 1000);
++                entityLimitsConfig.set("Axolotl.tick-throttle", 1000);
 +                entityLimitsConfig.set("Axolotl.removal", 5000);
 +                try {
 +                    entityLimitsConfig.save(ENTITY_LIMITS_FILE);
@@ -121,19 +121,19 @@ index 0000000000000000000000000000000000000000..887ea85ca2a03796bfa5bf62f27d1a7a
 +                    LOGGER.error("Unknown entity '" + key + "' in kaiiju-entity-limits.yml, skipping");
 +                    continue;
 +                }
-+                int limit = entityLimitsConfig.getInt(key + ".limit");
++                int tickThrottle = entityLimitsConfig.getInt(key + ".tick-throttle");
 +                int removal = entityLimitsConfig.getInt(key + ".removal");
 +
-+                if (limit < 1) {
-+                    LOGGER.error(key + " has a limit less than the minimum of 1, ignoring");
++                if (tickThrottle < 1) {
++                    LOGGER.error(key + " has a tick-throttle less than the minimum of 1, ignoring");
 +                    continue;
 +                }
-+                if (removal <= limit && removal != -1) {
++                if (removal <= tickThrottle && removal != -1) {
 +                    LOGGER.error(key + " has a removal limit that is less than or equal to its limit, setting removal to limit * 10");
-+                    removal = limit * 10;
++                    removal = tickThrottle * 10;
 +                }
 +
-+                entityLimits.put((Class<? extends Entity>) Class.forName(entityClasses.get(key).getName()), new EntityLimit(limit, removal));
++                entityLimits.put((Class<? extends Entity>) Class.forName(entityClasses.get(key).getName()), new EntityLimit(tickThrottle, removal));
 +            }
 +        } catch (ClassNotFoundException e) {
 +            e.printStackTrace();
@@ -154,10 +154,10 @@ index 0000000000000000000000000000000000000000..887ea85ca2a03796bfa5bf62f27d1a7a
 +        }
 +    }
 +
-+    public record EntityLimit(int limit, int removal) {
++    public record EntityLimit(int tickThrottle, int removal) {
 +        @Override
 +        public String toString() {
-+            return "EntityLimit{limit=" + limit + ", removal=" + removal + "}";
++            return "EntityLimit{tickThrottle=" + tickThrottle + ", removal=" + removal + "}";
 +        }
 +    }
 +}

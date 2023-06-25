@@ -1,0 +1,416 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: kugge <sofiane.djerbi38@gmail.com>
+Date: Sun, 25 Jun 2023 12:51:07 +0200
+Subject: [PATCH] Stashes
+
+
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuEntityLimits.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuEntityLimits.java
+index 9fc0823faa2a27a470adb24d688b2f9e60f628eb..a6dd123915434f9fea22e95adab5c805ce069dee 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuEntityLimits.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuEntityLimits.java
+@@ -2,11 +2,10 @@ package dev.kaiijumc.kaiiju;
+ 
+ import java.io.File;
+ import java.io.IOException;
+-import java.util.Map;
++import java.util.Arrays;import java.util.List;import java.util.Map;
+ import java.util.HashMap;
+ import java.util.logging.Level;
+ 
+-import com.google.common.base.Throwables;
+ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+ import io.github.classgraph.ClassGraph;
+ import io.github.classgraph.ClassInfo;
+@@ -23,11 +22,11 @@ import org.bukkit.configuration.file.YamlConfiguration;
+ public class KaiijuEntityLimits {
+     private static final Logger LOGGER = LogUtils.getLogger();
+ 
+-    protected static final String HEADER =
+-        "Per region entity limits for Kaiiju.\n"
+-        + "If there are more of particular entity type in a region than limit, entity ticking will be throttled.\n"
+-        + "Example: for Wither limit 100 & 300 Withers in a region -> 100 Withers tick every tick & every Wither ticks every 3 ticks.\n"
+-        + "Available entities: GlowSquid, Ambient, Bat, Animal, Bee, Cat, Chicken, Cod, Cow, Dolphin, Fish, FishSchool, Fox, Golem, IronGolem, "
++    protected static final List<String> HEADER = Arrays.asList(
++        "Per region entity limits for Kaiiju.",
++        "If there are more of particular entity type in a region than limit, entity ticking will be throttled.",
++        "Example: for Wither limit 100 & 300 Withers in a region -> 100 Withers tick every tick & every Wither ticks every 3 ticks.",
++        "Available entities: GlowSquid, Ambient, Bat, Animal, Bee, Cat, Chicken, Cod, Cow, Dolphin, Fish, FishSchool, Fox, Golem, IronGolem,"
+         + "MushroomCow, Ocelot, Panda, Parrot, Perchable, Pig, PolarBear, PufferFish, Rabbit, Salmon, Sheep, Snowman, Squid, TropicalFish, Turtle, "
+         + "WaterAnimal, Wolf, Allay, Axolotl, Camel, Frog, Tadpole, Goat, Horse, HorseAbstract, HorseChestedAbstract, HorseDonkey, HorseMule, "
+         + "HorseSkeleton, HorseZombie, Llama, LlamaTrader, Sniffer, EnderCrystal, EnderDragon, Wither, ArmorStand, Hanging, ItemFrame, Leash, "
+@@ -38,8 +37,7 @@ public class KaiijuEntityLimits {
+         + "VillagerTrader, Arrow, DragonFireball, Egg, EnderPearl, EnderSignal, EvokerFangs, Fireball, FireballFireball, Fireworks, FishingHook, "
+         + "LargeFireball, LlamaSpit, Potion, Projectile, ProjectileThrowable, ShulkerBullet, SmallFireball, Snowball, SpectralArrow, ThrownExpBottle, "
+         + "ThrownTrident, TippedArrow, WitherSkull, Raider, ChestBoat, Boat, MinecartAbstract, MinecartChest, MinecartCommandBlock, MinecartContainer, "
+-        + "MinecartFurnace, MinecartHopper, MinecartMobSpawner, MinecartRideable, MinecartTNT\n";
+-    protected static File ENTITY_LIMITS_FILE;
++        + "MinecartFurnace, MinecartHopper, MinecartMobSpawner, MinecartRideable, MinecartTNT");
+     public static YamlConfiguration entityLimitsConfig;
+ 
+     protected static Map<Class<? extends Entity>, EntityLimit> entityLimits;
+@@ -54,36 +52,37 @@ public class KaiijuEntityLimits {
+         init(entityLimitsFile, false);
+     }
+ 
+-    private static void init(File entityLimitsFile, boolean setup) {
+-        ENTITY_LIMITS_FILE = entityLimitsFile;
+-        entityLimitsConfig = new YamlConfiguration();
++    private static void setDefaultEntityLimits(YamlConfiguration config) {
++        config.options().setHeader(HEADER);
++        config.options().copyDefaults(true);
++        config.set("Wither.brain-throttle", 50);
++        config.set("Wither.tick-throttle", 100);
++        config.set("Wither.removal", 500);
++        config.set("Axolotl.brain-throttle", 100);
++        config.set("Axolotl.tick-throttle", 200);
++        config.set("Axolotl.removal", 1000);
++    }
+ 
+-        if (entityLimitsFile.exists()) {
+-            try {
+-                entityLimitsConfig.load(ENTITY_LIMITS_FILE);
+-            } catch (InvalidConfigurationException ex) {
+-                Bukkit.getLogger().log(Level.SEVERE, "Could not load kaiiju-entity-limits.yml, please correct your syntax errors", ex);
+-                throw Throwables.propagate(ex);
+-            } catch (IOException ignore) {}
+-        } else {
+-            if (setup) {
+-                entityLimitsConfig.options().header(HEADER);
+-                entityLimitsConfig.options().copyDefaults(true);
+-                entityLimitsConfig.set("Wither.tick-throttle", 1000);
+-                entityLimitsConfig.set("Wither.removal", 5000);
+-                entityLimitsConfig.set("Axolotl.tick-throttle", 1000);
+-                entityLimitsConfig.set("Axolotl.removal", 5000);
+-                try {
+-                    entityLimitsConfig.save(ENTITY_LIMITS_FILE);
+-                } catch (IOException ex) {
+-                    Bukkit.getLogger().log(Level.SEVERE, "Could not save " + ENTITY_LIMITS_FILE, ex);
+-                }
+-            }
++    private static void saveEntityLimitsConfig(File entityLimitsFile) {
++        try {
++            entityLimitsConfig.save(entityLimitsFile);
++        } catch (IOException ex) {
++            Bukkit.getLogger().log(Level.SEVERE, "Could not save " + entityLimitsFile, ex);
+         }
++    }
+ 
+-        entityLimits = new Object2ObjectOpenHashMap<>();
++    private static void loadEntityLimitsConfig(File entityLimitsFile) {
++        try {
++            entityLimitsConfig.load(entityLimitsFile);
++        } catch (InvalidConfigurationException ex) {
++            Bukkit.getLogger().log(Level.SEVERE, "Could not load kaiiju-entity-limits.yml, please correct your syntax errors", ex);
++            throw new RuntimeException(ex);
++        } catch (IOException ignore) {}
++    }
++
++    private static Map<String, ClassInfo> scanEntityClasses() {
++        Map<String, ClassInfo> entityClasses = new HashMap<>();
+         try (ScanResult scanResult = new ClassGraph().enableAllInfo().acceptPackages("net.minecraft.world.entity").scan()) {
+-            Map<String, ClassInfo> entityClasses = new HashMap<>();
+             for (ClassInfo classInfo : scanResult.getAllClasses()) {
+                 Class<?> entityClass = Class.forName(classInfo.getName());
+                 if (Entity.class.isAssignableFrom(entityClass)) {
+@@ -91,28 +90,42 @@ public class KaiijuEntityLimits {
+                     entityClasses.put(entityName, classInfo);
+                 }
+             }
++        } catch (ClassNotFoundException e) {
++            e.printStackTrace();
++        }
++        return entityClasses;
++    }
+ 
+-            for (String key : entityLimitsConfig.getKeys(false)) {
+-                if (!entityClasses.containsKey(key)) {
+-                    LOGGER.error("Unknown entity '" + key + "' in kaiiju-entity-limits.yml, skipping");
+-                    continue;
+-                }
+-                int tickThrottle = entityLimitsConfig.getInt(key + ".tick-throttle");
+-                int removal = entityLimitsConfig.getInt(key + ".removal");
++    private static void init(File entityLimitsFile, boolean setup) {
++        entityLimitsConfig = new YamlConfiguration();
++
++        if (entityLimitsFile.exists()) {
++            loadEntityLimitsConfig(entityLimitsFile);
++        } else if (setup) {
++            setDefaultEntityLimits(entityLimitsConfig);
++            saveEntityLimitsConfig(entityLimitsFile);
++        }
++
++        entityLimits = new Object2ObjectOpenHashMap<>();
++        Map<String, ClassInfo> entityClasses = scanEntityClasses();
+ 
+-                if (tickThrottle < 1) {
+-                    LOGGER.error(key + " has a tick-throttle less than the minimum of 1, ignoring");
+-                    continue;
+-                }
+-                if (removal <= tickThrottle && removal != -1) {
+-                    LOGGER.error(key + " has a removal limit that is less than or equal to its limit, setting removal to limit * 10");
+-                    removal = tickThrottle * 10;
+-                }
+ 
+-                entityLimits.put((Class<? extends Entity>) Class.forName(entityClasses.get(key).getName()), new EntityLimit(tickThrottle, removal));
++        for (String key : entityLimitsConfig.getKeys(false)) {
++            if (!entityClasses.containsKey(key)) {
++                LOGGER.error("Unknown entity '" + key + "' in kaiiju-entity-limits.yml, skipping");
++                continue;
++            }
++
++            int brainThrottle = entityLimitsConfig.getInt(key + ".brain-throttle");
++            int tickThrottle = entityLimitsConfig.getInt(key + ".tick-throttle");
++            int removal = entityLimitsConfig.getInt(key + ".removal");
++
++            try {
++                entityLimits.put((Class<? extends Entity>) Class.forName(entityClasses.get(key).getName()),
++                                 new EntityLimit(brainThrottle, tickThrottle, removal));
++            } catch (ClassNotFoundException e) {
++                e.printStackTrace();
+             }
+-        } catch (ClassNotFoundException e) {
+-            e.printStackTrace();
+         }
+     }
+ 
+@@ -130,10 +143,12 @@ public class KaiijuEntityLimits {
+         }
+     }
+ 
+-    public record EntityLimit(int tickThrottle, int removal) {
++    public record EntityLimit(int brainThrottle, int tickThrottle, int removal) {
+         @Override
+         public String toString() {
+-            return "EntityLimit{tickThrottle=" + tickThrottle + ", removal=" + removal + "}";
++            return "EntityLimit{brainThrottle=" + brainThrottle
++                           + ", tickThrottle=" + tickThrottle
++                           + ", removal=" + removal + "}";
+         }
+     }
+ }
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuEntityThrottler.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuEntityThrottler.java
+index eb690efacf083e4ff3e321578b12c534e6a40196..a89a421db9cd06bb165afd1ec28fac9b02e9b5a5 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuEntityThrottler.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuEntityThrottler.java
+@@ -1,79 +1,84 @@
+ package dev.kaiijumc.kaiiju;
+ 
++import io.papermc.paper.threadedregions.RegionizedWorldData;
+ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+ import net.minecraft.world.entity.Entity;
+-import io.papermc.paper.threadedregions.RegionizedWorldData;
++import java.util.Map;
+ 
+ public class KaiijuEntityThrottler {
+     private static class TickInfo {
+         int currentTick;
+         int continueFrom;
++        int continueFromBrain;
+         int toTick;
++        int toTickBrain;
+         int toRemove;
+     }
+ 
+-    public static class EntityThrottlerReturn {
+-        public boolean skip;
+-        public boolean remove;
++    public record EntityThrottlerReturn(boolean skipBrain, boolean skipTick, boolean remove) {
++        public EntityThrottlerReturn() {
++            this(false, false, false);
++        }
+     }
+ 
+-    private final Object2ObjectOpenHashMap<KaiijuEntityLimits.EntityLimit, TickInfo> entityLimitTickInfoMap = new Object2ObjectOpenHashMap<>();
++    private final Map<KaiijuEntityLimits.EntityLimit, TickInfo> entityLimitTickInfoMap = new Object2ObjectOpenHashMap<>();
++    private final Map<KaiijuEntityLimits.EntityLimit, EntityThrottlerReturn> entityLimitReturnMap = new Object2ObjectOpenHashMap<>();
+ 
+     public void tickLimiterStart() {
+-        for (TickInfo tickInfo : entityLimitTickInfoMap.values()) {
+-            tickInfo.currentTick = 0;
+-        }
++        entityLimitTickInfoMap.values().forEach(tickInfo -> tickInfo.currentTick = 0);
+     }
+ 
+-    public EntityThrottlerReturn tickLimiterShouldSkip(Entity entity) {
+-        EntityThrottlerReturn retVal = new EntityThrottlerReturn();
+-        if (entity.isRemoved()) return retVal;
++    public EntityThrottlerReturn tickLimiterShouldSkip(Entity entity, boolean compute) {
++        if (entity.isRemoved()) return new EntityThrottlerReturn(true, true, true);
+         KaiijuEntityLimits.EntityLimit entityLimit = KaiijuEntityLimits.getEntityLimit(entity);
+ 
+-        if (entityLimit != null) {
+-            TickInfo tickInfo = entityLimitTickInfoMap.computeIfAbsent(entityLimit, el -> {
+-                TickInfo newTickInfo = new TickInfo();
+-                newTickInfo.toTick = entityLimit.limit();
+-                return newTickInfo;
+-            });
++        if (entityLimit == null) return new EntityThrottlerReturn();
+ 
+-            tickInfo.currentTick++;
+-            if (tickInfo.currentTick <= tickInfo.toRemove && entityLimit.removal() > 0) {
+-                retVal.skip = false;
+-                retVal.remove = true;
+-                return retVal;
+-            }
++        TickInfo tickInfo = entityLimitTickInfoMap.computeIfAbsent(entityLimit, el -> {
++            TickInfo newTickInfo = new TickInfo();
++            newTickInfo.toTick = entityLimit.tickThrottle();
++            return newTickInfo;
++        });
+ 
+-            if (tickInfo.currentTick < tickInfo.continueFrom) {
+-                retVal.skip = true;
+-                return retVal;
+-            }
+-            if (tickInfo.currentTick - tickInfo.continueFrom < tickInfo.toTick) {
+-                retVal.skip = false;
+-                return retVal;
+-            }
+-            retVal.skip = true;
+-            return retVal;
+-        } else {
+-            retVal.skip = false;
+-            return retVal;
++        if (compute) {
++            tickInfo.currentTick++;
++            entityLimitReturnMap.put(entityLimit, processTickInfo(tickInfo, entityLimit));
+         }
++
++        return entityLimitReturnMap.get(entityLimit);
++    }
++
++    public EntityThrottlerReturn processTickInfo(TickInfo tickInfo, KaiijuEntityLimits.EntityLimit entityLimit) {
++        if (tickInfo.currentTick <= tickInfo.toRemove && entityLimit.removal() > 0) // Remove
++            return new EntityThrottlerReturn(false, false, true);
++
++        if (tickInfo.currentTick < tickInfo.continueFrom) // Skip tick
++             return new EntityThrottlerReturn(false, true, false);
++
++        if (tickInfo.currentTick - tickInfo.continueFrom < tickInfo.toTick) // Don't skip
++            return new EntityThrottlerReturn();
++
++        return new EntityThrottlerReturn(false, true, false);
+     }
+ 
+-    public void tickLimiterFinish(RegionizedWorldData regionizedWorldData) {
++    public void tickLimiterFinish() {
+         for (var entry : entityLimitTickInfoMap.entrySet()) {
+             KaiijuEntityLimits.EntityLimit entityLimit = entry.getKey();
+             TickInfo tickInfo = entry.getValue();
+ 
+-            int additionals = 0;
++            int additionalsTick = 0;
++            int additionalsBrain = 0;
+             int nextContinueFrom = tickInfo.continueFrom + tickInfo.toTick;
++
+             if (nextContinueFrom >= tickInfo.currentTick) {
+-                additionals = entityLimit.limit() - (tickInfo.currentTick - tickInfo.continueFrom);
++                additionalsTick = entityLimit.tickThrottle() - (tickInfo.currentTick - tickInfo.continueFrom);
++                additionalsBrain = entityLimit.brainThrottle() - (tickInfo.currentTick - tickInfo.continueFrom);
+                 nextContinueFrom = 0;
+             }
+-            tickInfo.continueFrom = nextContinueFrom;
+-            tickInfo.toTick = entityLimit.limit() + additionals;
+ 
++            tickInfo.continueFrom = nextContinueFrom;
++            tickInfo.toTick = entityLimit.tickThrottle() + additionalsTick;
++            tickInfo.toTickBrain = entityLimit.brainThrottle() + additionalsBrain;
+             if (tickInfo.toRemove == 0 && tickInfo.currentTick > entityLimit.removal()) {
+                 tickInfo.toRemove = tickInfo.currentTick - entityLimit.removal();
+             } else if (tickInfo.toRemove != 0) {
+@@ -81,4 +86,30 @@ public class KaiijuEntityThrottler {
+             }
+         }
+     }
++    public void tickLimiterFinish() {
++        for (var entry : entityLimitTickInfoMap.entrySet()) {
++            KaiijuEntityLimits.EntityLimit entityLimit = entry.getKey();
++            TickInfo tickInfo = entry.getValue();
++
++            int additionalsTick = 0;
++            int additionalsBrain = 0;
++            int nextContinueFromTick = tickInfo.continueFrom + tickInfo.toTick;
++            int nextContinueFromBrain = tickInfo.continueFromBrain + tickInfo.toTickBrain;
++
++            if (nextContinueFromTick >= tickInfo.currentTick) {
++                additionalsTick = entityLimit.tickThrottle() - tickDiff;
++                nextContinueFromTick = 0;
++            }
++            if (nextContinueFromBrain >= tickInfo.currentTick) {
++                additionalsBrain = entityLimit.brainThrottle() - tickDiff;
++                int tickDiff = tickInfo.currentTick - tickInfo.continueFrom;
++            }
++
++            tickInfo.continueFrom = nextContinueFromTick;
++            tickInfo.toTick = entityLimit.tickThrottle() + additionalsTick;
++            tickInfo.toTickBrain = entityLimit.brainThrottle() + additionalsBrain;
++            tickInfo.toRemove = (tickInfo.toRemove == 0 && tickInfo.currentTick > entityLimit.removal()) ? tickInfo.currentTick - entityLimit.removal() : 0;
++        }
++    }
++
+ }
+diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
+index 8fd9e3cee5a671ef8425311371cde57449ef1d8e..7d29574850329205c7f989094f4e762197ccffd0 100644
+--- a/src/main/java/net/minecraft/server/level/ServerLevel.java
++++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
+@@ -14,7 +14,6 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
+ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+ import it.unimi.dsi.fastutil.objects.ObjectIterator;
+-import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
+ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+ import java.io.BufferedWriter;
+ import java.io.IOException;
+@@ -132,12 +131,9 @@ import net.minecraft.world.level.chunk.storage.EntityStorage;
+ import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
+ import net.minecraft.world.level.dimension.LevelStem;
+ import net.minecraft.world.level.dimension.end.EndDragonFight;
+-import net.minecraft.world.level.entity.EntityPersistentStorage;
+-import net.minecraft.world.level.entity.EntityTickList;
+ import net.minecraft.world.level.entity.EntityTypeTest;
+ import net.minecraft.world.level.entity.LevelCallback;
+ import net.minecraft.world.level.entity.LevelEntityGetter;
+-import net.minecraft.world.level.entity.PersistentEntitySectionManager;
+ import net.minecraft.world.level.gameevent.DynamicGameEventListener;
+ import net.minecraft.world.level.gameevent.GameEvent;
+ import net.minecraft.world.level.gameevent.GameEventDispatcher;
+@@ -168,15 +164,13 @@ import org.bukkit.Location;
+ import org.bukkit.WeatherType;
+ import org.bukkit.craftbukkit.event.CraftEventFactory;
+ import org.bukkit.craftbukkit.generator.CustomWorldChunkManager;
+-import org.bukkit.craftbukkit.util.CraftNamespacedKey;
+ import org.bukkit.craftbukkit.util.WorldUUID;
+ import org.bukkit.event.entity.CreatureSpawnEvent;
+ import org.bukkit.event.server.MapInitializeEvent;
+ import org.bukkit.event.weather.LightningStrikeEvent;
+-import org.bukkit.event.world.GenericGameEvent;
+ import org.bukkit.event.world.TimeSkipEvent;
+ // CraftBukkit end
+-import it.unimi.dsi.fastutil.ints.IntArrayList; // Paper
++
+ 
+ public class ServerLevel extends Level implements WorldGenLevel {
+ 
+@@ -848,8 +842,11 @@ public class ServerLevel extends Level implements WorldGenLevel {
+                             // Kaiiju start
+                             if (kaiijuConfig.enableEntityThrottling) {
+                                 dev.kaiijumc.kaiiju.KaiijuEntityThrottler.EntityThrottlerReturn throttle = regionizedWorldData.entityThrottler.tickLimiterShouldSkip(entity);
+-                                if (throttle.remove) entity.remove(Entity.RemovalReason.DISCARDED);
+-                                if (throttle.skip) return;
++                                if (throttle.remove) {
++                                    entity.remove(Entity.RemovalReason.DISCARDED);
++                                    return;
++                                }
++                                if (throttle.skipTick) return;
+                             }
+                             // Kaiiju end
+                             gameprofilerfiller.push("tick");
+@@ -859,7 +856,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+                     }
+                 }
+             });
+-            if (kaiijuConfig.enableEntityThrottling) regionizedWorldData.entityThrottler.tickLimiterFinish(regionizedWorldData); // Kaiiju
++            if (kaiijuConfig.enableEntityThrottling) regionizedWorldData.entityThrottler.tickLimiterFinish(); // Kaiiju
+             timings.entityTick.stopTiming(); // Spigot
+             timings.tickEntities.stopTiming(); // Spigot
+             gameprofilerfiller.pop();
