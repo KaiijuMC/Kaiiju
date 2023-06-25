@@ -20,7 +20,7 @@ index c934341c17caf4696065ac6c39bdfef570c62f13..f49510c999ce5241f26dc9ba90a6148b
  
      public static String serverModName = "Kaiiju";
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index 24bd63c596c9f61f1e89ec5b001b7cb7a29a09ff..3fc2b4a91d2b9727972d6b43b6d2c04b1df3c698 100644
+index f50507ab85282d261985ce9b186581f5a7a50f79..4fb7ee801173c3f4621d7f09fcefe7c24da5f001 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
 @@ -1350,7 +1350,11 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
