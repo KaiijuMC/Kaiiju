@@ -7,10 +7,10 @@ This has been benchmarked on a huge gold farm.
 Resulting in significative performance improvements.
 
 diff --git a/src/main/java/net/minecraft/world/entity/LivingEntity.java b/src/main/java/net/minecraft/world/entity/LivingEntity.java
-index 3c60ad621019c1daad5a0a379f7f925ce44d2d38..d8024d67b5422f1592d16af0db41276f35beaba4 100644
+index f185aac0a944d561d394aa6a3907ec4999996686..e0b83e083c2dce52b47f31d2e067fb59464c92b1 100644
 --- a/src/main/java/net/minecraft/world/entity/LivingEntity.java
 +++ b/src/main/java/net/minecraft/world/entity/LivingEntity.java
-@@ -3664,7 +3664,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
+@@ -3671,7 +3671,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
              Vec3 vec3d1 = new Vec3(entity.getX(), entity.getEyeY(), entity.getZ());
  
              // Paper - diff on change - used in CraftLivingEntity#hasLineOfSight(Location) and CraftWorld#lineOfSightExists
