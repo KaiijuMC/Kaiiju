@@ -22,7 +22,7 @@ index b23f2df433d7ebc871f4009081c28ed9054d91c7..ec71f3f52cb8f7931aabd94619d2e7a2
  
      public static String serverModName = "Kaiiju";
 diff --git a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index b2ed157a17cada4887e543a23ee65642eb54637e..a238a3f62a92748d1dfb11fcf8938d33409b7a0c 100644
+index 399dd9e47838af7063680f68870611db7a0f8fb3..48555018e76b8983b8c7b66e404ac02c8f3bc1f7 100644
 --- a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 @@ -2647,6 +2647,7 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic

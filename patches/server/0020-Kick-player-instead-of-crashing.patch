@@ -5,7 +5,7 @@ Subject: [PATCH] Kick player instead of crashing
 
 
 diff --git a/src/main/java/io/papermc/paper/chunk/system/RegionizedPlayerChunkLoader.java b/src/main/java/io/papermc/paper/chunk/system/RegionizedPlayerChunkLoader.java
-index 7b664f32868028758d0c6ee1eaa82efcd83661d2..8b325c764df7003f8e6984a85267cd78fc7672ed 100644
+index c5df121d6194a97b20dc390698991b9c72dba538..9990fccc741a139c57528f70157ae63dbe3fd8e8 100644
 --- a/src/main/java/io/papermc/paper/chunk/system/RegionizedPlayerChunkLoader.java
 +++ b/src/main/java/io/papermc/paper/chunk/system/RegionizedPlayerChunkLoader.java
 @@ -485,7 +485,12 @@ public class RegionizedPlayerChunkLoader {

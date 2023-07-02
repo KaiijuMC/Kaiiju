@@ -319,7 +319,7 @@ index 991e4c19763a34a6fead88363e007c2d11aad836..24a2d3f496727790f63cb66a2534d442
          dev.kaiijumc.kaiiju.KaiijuConfig.registerCommands();
          // Kaiiju end
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 66509fa23bfcde70abd3917eb774cf48d5d6da93..8fd9e3cee5a671ef8425311371cde57449ef1d8e 100644
+index 245c3e63588379f51780963ba91bc6bf0a3feda6..761019f86983daaea4fface519e052f8fb6de1cd 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -822,6 +822,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
