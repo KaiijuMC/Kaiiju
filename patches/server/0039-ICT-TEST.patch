@@ -1,0 +1,19 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MineSunshineone <107391209+MineSunshineone@users.noreply.github.com>
+Date: Sun, 2 Jul 2023 19:17:13 +0800
+Subject: [PATCH] ICT-TEST
+
+
+diff --git a/src/main/java/net/minecraft/server/level/ServerEntity.java b/src/main/java/net/minecraft/server/level/ServerEntity.java
+index 5558d87ef182f82be7877455dd027082c6a80632..a0a88f0049305ff6224f89195cd2a6a780e146c9 100644
+--- a/src/main/java/net/minecraft/server/level/ServerEntity.java
++++ b/src/main/java/net/minecraft/server/level/ServerEntity.java
+@@ -108,7 +108,7 @@ public class ServerEntity {
+ 
+         Entity entity = this.entity;
+ 
+-        if (entity instanceof ItemFrame) {
++        if (!this.trackedPlayers.isEmpty() && entity instanceof ItemFrame) { // ICT - Only tick item frames if players can see it
+             ItemFrame entityitemframe = (ItemFrame) entity;
+ 
+             if (true || this.tickCount % 10 == 0) { // CraftBukkit - Moved below, should always enter this block

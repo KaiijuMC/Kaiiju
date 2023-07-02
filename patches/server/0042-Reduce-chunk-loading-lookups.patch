@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MineSunshineone <107391209+MineSunshineone@users.noreply.github.com>
+Date: Sun, 2 Jul 2023 21:26:01 +0800
+Subject: [PATCH] Reduce chunk loading & lookups
+
+
+diff --git a/src/main/java/net/minecraft/world/entity/monster/EnderMan.java b/src/main/java/net/minecraft/world/entity/monster/EnderMan.java
+index 5519ccf558c09f32e19b35f4b403fc9ed966ed65..84eb2a670f25fc33fa0c58561e37619595ba3c74 100644
+--- a/src/main/java/net/minecraft/world/entity/monster/EnderMan.java
++++ b/src/main/java/net/minecraft/world/entity/monster/EnderMan.java
+@@ -322,11 +322,17 @@ public class EnderMan extends Monster implements NeutralMob {
+     private boolean teleport(double x, double y, double z) {
+         BlockPos.MutableBlockPos blockposition_mutableblockposition = new BlockPos.MutableBlockPos(x, y, z);
+ 
+-        while (blockposition_mutableblockposition.getY() > this.level().getMinBuildHeight() && !this.level().getBlockState(blockposition_mutableblockposition).blocksMotion()) {
+-            blockposition_mutableblockposition.move(Direction.DOWN);
++            // ICT start - single chunk lookup
++            net.minecraft.world.level.chunk.LevelChunk chunk = this.level().getChunkIfLoaded(blockposition_mutableblockposition);
++            if (chunk == null) {
++                return false;
++            }
++            // ICT end
++            while (blockposition_mutableblockposition.getY() > this.level().getMinBuildHeight() && !chunk.getBlockState(blockposition_mutableblockposition).blocksMotion()) { // ICT
++                blockposition_mutableblockposition.move(Direction.DOWN);
+         }
+ 
+-        BlockState iblockdata = this.level().getBlockState(blockposition_mutableblockposition);
++        BlockState iblockdata = chunk.getBlockState(blockposition_mutableblockposition); // ICT
+         boolean flag = iblockdata.blocksMotion();
+         boolean flag1 = iblockdata.getFluidState().is(FluidTags.WATER);
+ 
