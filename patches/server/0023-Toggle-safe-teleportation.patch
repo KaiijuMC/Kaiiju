@@ -22,10 +22,10 @@ index 816db23fa64aab69e3034484c00645ebd0479978..7c6c74f95c2534624a928ccf6b0a4b9d
      }
  }
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index fc6279a39fd5e1bd02b2d9e77f451cd9ba1baf78..4921015506b52bc97c4ccbc7cb05c9a083188504 100644
+index 13f03fed1e353fc57062f7084958c6f1cbf9ea6e..a73f2d85caad3639def29c4289dbe941acb2fd2f 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -3960,6 +3960,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+@@ -3939,6 +3939,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
  
      protected boolean tryEndPortal() {
          io.papermc.paper.util.TickThread.ensureTickThread(this, "Cannot portal entity async");

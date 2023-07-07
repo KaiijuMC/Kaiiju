@@ -23,10 +23,10 @@ index 7c6c74f95c2534624a928ccf6b0a4b9d2a5486ad..9f0095f2196133a8bcffd5306aa9ac0b
      }
  }
 diff --git a/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java b/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java
-index 6e35afb9e5314de69e78d819913418ab144bec52..6cff3410c2851aeb808994a4bf830a0db32a9a37 100644
+index 34b3541603b8cca16c7d62f3981d7ce3e8be0dbe..87d08f4d5bdec0ef96c0e4a91a2f595d2b0f0026 100644
 --- a/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java
 +++ b/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java
-@@ -131,7 +131,7 @@ public class FallingBlockEntity extends Entity {
+@@ -133,7 +133,7 @@ public class FallingBlockEntity extends Entity {
      @Override
      public void tick() {
          // Paper start - fix sand duping
@@ -35,7 +35,7 @@ index 6e35afb9e5314de69e78d819913418ab144bec52..6cff3410c2851aeb808994a4bf830a0d
              return;
          }
          // Paper end - fix sand duping
-@@ -148,7 +148,7 @@ public class FallingBlockEntity extends Entity {
+@@ -150,7 +150,7 @@ public class FallingBlockEntity extends Entity {
              this.move(MoverType.SELF, this.getDeltaMovement());
  
              // Paper start - fix sand duping

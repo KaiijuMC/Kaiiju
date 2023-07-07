@@ -1,0 +1,46 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
+Date: Sun, 2 Jul 2023 19:13:14 +0300
+Subject: [PATCH] Don't kick player on bad packet
+
+
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+index fa2a763e5784e7dae02c94a13751cbf746b6eee8..ebfa9e1dcca5ea8272e796f0409902d92b59ee76 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+@@ -201,10 +201,12 @@ public class KaiijuConfig {
+     
+     public static boolean sendNullEntityPackets = true;
+     public static boolean alternateKeepAlive = false;
++    public static boolean kickPlayerOnBadPacket = true;
+ 
+     private static void networkSettings() {
+         sendNullEntityPackets = getBoolean("network.send-null-entity-packets", sendNullEntityPackets);
+         alternateKeepAlive = getBoolean("network.alternate-keepalive", alternateKeepAlive);
++        kickPlayerOnBadPacket = getBoolean("network.kick-player-on-bad-packet", kickPlayerOnBadPacket);
+     }
+ 
+     public static boolean disableVanishApi = false;
+diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
+index f6ccb6eab566b44c3460376d46df1f2cf3d7b19d..13e5aeb0c04d27408ffbc6b11582426a7f2eb0f0 100644
+--- a/src/main/java/net/minecraft/network/Connection.java
++++ b/src/main/java/net/minecraft/network/Connection.java
+@@ -271,12 +271,18 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+                         ConnectionProtocol enumprotocol = this.getCurrentProtocol();
+                         Packet<?> packet = enumprotocol == ConnectionProtocol.LOGIN ? new ClientboundLoginDisconnectPacket(ichatmutablecomponent) : new ClientboundDisconnectPacket(ichatmutablecomponent);
+ 
++                        // Kaiiju start - Don't kick player on bad packet
++                        if (dev.kaiijumc.kaiiju.KaiijuConfig.kickPlayerOnBadPacket
++                            || throwable instanceof io.netty.channel.unix.Errors.NativeIoException) {
++                        // Kaiiju end
+                         this.send((Packet) packet, PacketSendListener.thenRun(() -> {
+                             this.disconnect(ichatmutablecomponent);
+                         }));
+                         this.setReadOnly();
++                        } // Kaiiju - Don't kick player on bad packet
+                     } else {
+                         Connection.LOGGER.debug("Double fault", throwable);
++                        if (dev.kaiijumc.kaiiju.KaiijuConfig.kickPlayerOnBadPacket) // Kaiiju - Don't kick player on bad packet
+                         this.disconnect(ichatmutablecomponent);
+                     }
+                 }

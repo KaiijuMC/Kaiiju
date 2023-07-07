@@ -5,10 +5,10 @@ Subject: [PATCH] Entity ticking throttling & removal to prevent lag.
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 1615346024037f2abe0fcfcfc5ea7713505bebca..d24f5fdc6a8c34774933a5cd8bfed8571299bd35 100644
+index a151ca3a0803a5e653674e51e8d41a2f38b1f3df..30da22816eecfce179d365fa4de2b979438a302a 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -17,6 +17,7 @@ dependencies {
+@@ -23,6 +23,7 @@ dependencies {
      implementation("com.github.luben:zstd-jni:1.5.4-1")
      implementation("org.lz4:lz4-java:1.8.0")
      // Kaiiju end
@@ -353,7 +353,7 @@ index 245c3e63588379f51780963ba91bc6bf0a3feda6..761019f86983daaea4fface519e052f8
              timings.tickEntities.stopTiming(); // Spigot
              gameprofilerfiller.pop();
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index d8ca697663ace353e88bfabc8997b58230d3d811..c3bb81238afeafa3d59147f21c60022052142977 100644
+index 1f194f5324ab5efc5ae11d248dd09f875624559c..641d27bdc711f5d1cdf39637f8ad032d46575216 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
 @@ -179,6 +179,11 @@ public class Main {

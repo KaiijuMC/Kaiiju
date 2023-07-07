@@ -9,10 +9,10 @@ This format saves about 50% of disk space.
 Documentation: https://github.com/xymb-endcrystalme/LinearRegionFileFormatTools
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 6d6b1973783604369c7ff95d552c43edf149a46a..a26cc214dccab8c9422f9a45e2a5eeda374c0ead 100644
+index 6d1d7a99a9ab2f165970d7da33702c16d7b18fd8..164678d8c7f0a0a66adc957a86849fa927b7cb73 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -13,6 +13,10 @@ dependencies {
+@@ -19,6 +19,10 @@ dependencies {
          exclude("io.papermc.paper", "paper-api")
      }
      // Folia end
@@ -540,7 +540,7 @@ index 513833c2ea23df5b079d157bc5cb89d5c9754c0b..abf5e2a06af9853b58ac9107cd6e9787
          long expectedChunks = (long)regionFiles.length * (32L * 32L);
  
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index 916bfdfb13d8f8093e1908a7c35344b83d0ee0ac..61c6bc2859235874aefac71e9e55162f0a89f29f 100644
+index 25fe439c8d1e88a86e85ac9a4761425d98ee6c4f..c4d28d887b4cc71dc713b1e3f46bc80f4484a95d 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
 @@ -269,7 +269,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
@@ -587,7 +587,7 @@ index 916bfdfb13d8f8093e1908a7c35344b83d0ee0ac..61c6bc2859235874aefac71e9e55162f
          regionFile.setStatus(chunkPos.x, chunkPos.z, ChunkSerializer.getStatus(compound));
      }
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index b126435b07572e7b8f41647a0179164b680e9e64..19fb8ca8a6f699ce596103070db726fcb427865e 100644
+index 042ca6b3faae5249210567f2c26dff404974e1ff..7099a44a2322ab390c21e74668c8657dcc9e5e87 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -426,8 +426,8 @@ public class ServerLevel extends Level implements WorldGenLevel {
@@ -1012,7 +1012,7 @@ index 5561b8499a0503b850974b1dc309edfb80219549..9394d191c56aab78e63fd3f283efedd6
          this.factory = factory;
          this.fixerUpper = dataFixer;
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-index 23b8dde3cd185b372d4adc97201a422cebbbe804..6012ea6d3fb6e731ff491ef134085013c2c6075c 100644
+index 723ae4b75c84fe952377c02d42cf7a710f7047ea..1bda5bf6d69bd3b7ceda03c48760629b1366e792 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 @@ -561,7 +561,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
