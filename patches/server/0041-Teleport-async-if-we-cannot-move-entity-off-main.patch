@@ -1,0 +1,54 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
+Date: Sat, 8 Jul 2023 03:31:04 +0300
+Subject: [PATCH] Teleport async if we cannot move entity off-main
+
+Entities with huge velocity (100k+ velocity anarchy travel exploit) might disappear / crash the server because they travel a region each tick.
+TODO: Entities with huge velocity still throw stacktraces because they are ticked in "null" regions.
+
+diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
+index ea246b52b913b40a7d359eb3656b09cca14538a3..ea260c79cbc35829a7213630886abc085c63040f 100644
+--- a/src/main/java/net/minecraft/world/entity/Entity.java
++++ b/src/main/java/net/minecraft/world/entity/Entity.java
+@@ -1126,7 +1126,18 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+                     }
+                 }
+ 
++                try { // Kaiiju - Teleport async if we cannot move entity off-main
+                 this.setPos(this.getX() + vec3d1.x, this.getY() + vec3d1.y, this.getZ() + vec3d1.z);
++                // Kaiiju start - Teleport async if we cannot move entity off-main
++                } catch (IllegalStateException e) {
++                    this.teleportAsync((ServerLevel) this.level(), this.position().add(vec3d1),
++                                       this.getYRot(), this.getXRot(),
++                                       Vec3.ZERO, PlayerTeleportEvent.TeleportCause.UNKNOWN,
++                                       Entity.TELEPORT_FLAG_LOAD_CHUNK | Entity.TELEPORT_FLAG_TELEPORT_PASSENGERS,
++                                       null
++                    );
++                }
++                // Kaiiju end
+             }
+ 
+             this.level().getProfiler().pop();
+@@ -3864,13 +3875,15 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+         // check for same region
+         if (destination == this.level()) {
+             Vec3 currPos = this.position();
+-            if (
+-                destination.regioniser.getRegionAtUnsynchronised(
+-                    io.papermc.paper.util.CoordinateUtils.getChunkX(currPos), io.papermc.paper.util.CoordinateUtils.getChunkZ(currPos)
+-                ) == destination.regioniser.getRegionAtUnsynchronised(
+-                    io.papermc.paper.util.CoordinateUtils.getChunkX(pos), io.papermc.paper.util.CoordinateUtils.getChunkZ(pos)
+-                )
+-            ) {
++            // Kaiiju start - We shouldn't teleport when regions are null
++            io.papermc.paper.threadedregions.ThreadedRegionizer.ThreadedRegion<io.papermc.paper.threadedregions.TickRegions.TickRegionData,
++                                                                               io.papermc.paper.threadedregions.TickRegions.TickRegionSectionData>
++            currRegion = destination.regioniser.getRegionAtUnsynchronised(io.papermc.paper.util.CoordinateUtils.getChunkX(currPos), io.papermc.paper.util.CoordinateUtils.getChunkZ(currPos));
++            io.papermc.paper.threadedregions.ThreadedRegionizer.ThreadedRegion<io.papermc.paper.threadedregions.TickRegions.TickRegionData,
++                                                                               io.papermc.paper.threadedregions.TickRegions.TickRegionSectionData>
++            destRegion = destination.regioniser.getRegionAtUnsynchronised(io.papermc.paper.util.CoordinateUtils.getChunkX(pos), io.papermc.paper.util.CoordinateUtils.getChunkZ(pos));
++            if (currRegion == destRegion && currRegion != null) {
++            // Kaiiju end
+                 EntityTreeNode passengerTree = this.detachPassengers();
+                 // Note: The client does not accept position updates for controlled entities. So, we must
+                 // perform a lot of tracker updates here to make it all work out.
