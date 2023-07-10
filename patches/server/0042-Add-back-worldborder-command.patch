@@ -1,0 +1,19 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Sofiane H. Djerbi" <46628754+kugge@users.noreply.github.com>
+Date: Sun, 9 Jul 2023 19:17:40 +0300
+Subject: [PATCH] Add back worldborder command
+
+
+diff --git a/src/main/java/net/minecraft/commands/Commands.java b/src/main/java/net/minecraft/commands/Commands.java
+index 681cd79ce24fe5d952e987d46e2fd8df07a0f8a1..68af43ed4d667648df0e45ffc899d3e4b7b1a69d 100644
+--- a/src/main/java/net/minecraft/commands/Commands.java
++++ b/src/main/java/net/minecraft/commands/Commands.java
+@@ -199,7 +199,7 @@ public class Commands {
+         TitleCommand.register(this.dispatcher);
+         //TriggerCommand.register(this.dispatcher); // Folia - region threading - TODO later
+         WeatherCommand.register(this.dispatcher);
+-        //WorldBorderCommand.register(this.dispatcher); // Folia - region threading - TODO later
++        WorldBorderCommand.register(this.dispatcher); // Folia - region threading - TODO later // Kaiiju
+         if (JvmProfiler.INSTANCE.isAvailable()) {
+             JfrCommand.register(this.dispatcher);
+         }
