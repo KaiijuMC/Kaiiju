@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Xymb <xymb@endcrystal.me>
+Date: Thu, 22 Jun 2023 02:03:13 +0200
+Subject: [PATCH] Make ender pearls not despawn on death
+
+
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+index ebfa9e1dcca5ea8272e796f0409902d92b59ee76..0d9338f61e5a5385f99099242205062030ce347b 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+@@ -223,9 +223,11 @@ public class KaiijuConfig {
+ 
+     public static String serverModName = "Kaiiju";
+     public static boolean sharedRandomForPlayers = true;
++    public static boolean enderPearlsDespawnOnPlayerDeath = true;
+ 
+     private static void gameplaySettings() {
+         serverModName = getString("gameplay.server-mod-name", serverModName);
+         sharedRandomForPlayers = getBoolean("gameplay.shared-random-for-players", sharedRandomForPlayers);
++        enderPearlsDespawnOnPlayerDeath = getBoolean("gameplay.ender-pearls-despawn-on-player-death", enderPearlsDespawnOnPlayerDeath);
+     }
+ }
+diff --git a/src/main/java/net/minecraft/world/entity/projectile/ThrownEnderpearl.java b/src/main/java/net/minecraft/world/entity/projectile/ThrownEnderpearl.java
+index f1d291165fe6cb4160801d9bf2952e06a81287f9..80f2abafdf98f522bf60d662355229014063ba07 100644
+--- a/src/main/java/net/minecraft/world/entity/projectile/ThrownEnderpearl.java
++++ b/src/main/java/net/minecraft/world/entity/projectile/ThrownEnderpearl.java
+@@ -174,7 +174,7 @@ public class ThrownEnderpearl extends ThrowableItemProjectile {
+         Entity entity = this.getOwner();
+ 
+         if (entity instanceof Player && !entity.isAlive()) {
+-            this.discard();
++            if (dev.kaiijumc.kaiiju.KaiijuConfig.enderPearlsDespawnOnPlayerDeath) this.discard();
+         } else {
+             super.tick();
+         }
