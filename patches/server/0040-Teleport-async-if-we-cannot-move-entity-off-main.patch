@@ -6,11 +6,30 @@ Subject: [PATCH] Teleport async if we cannot move entity off-main
 Entities with huge velocity (100k+ velocity anarchy travel exploit) might disappear / crash the server because they travel a region each tick.
 TODO: Entities with huge velocity still throw stacktraces because they are ticked in "null" regions.
 
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
+index e2fb7d7a7b3126d386b46442c115085d1974ac4e..44f5540a6a5733cf6f10f6b04fc9611ac4e53685 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
+@@ -169,6 +169,7 @@ public class KaiijuWorldConfig {
+     public boolean fixTripWireStateInconsistency = true;
+     public boolean safeTeleporting = true;
+     public boolean sandDuplication = false;
++    public boolean teleportAsyncOnHighVelocity = false;
+ 
+     private void gameplaySettings() {
+         fixVoidTrading = getBoolean("gameplay.fix-void-trading", fixVoidTrading);
+@@ -176,5 +177,6 @@ public class KaiijuWorldConfig {
+         fixTripWireStateInconsistency = getBoolean("gameplay.fix-tripwire-state-inconsistency", fixTripWireStateInconsistency);
+         safeTeleporting = getBoolean("gameplay.safe-teleportation", safeTeleporting);
+         sandDuplication = getBoolean("gameplay.sand-duplication", sandDuplication);
++        teleportAsyncOnHighVelocity = getBoolean("gameplay.teleport-async-on-high-velocity", teleportAsyncOnHighVelocity);
+     }
+ }
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 135573308662845ecc73fde1c620345e1f372538..3a8684ce5820dd766237ead4ba030f735e1484df 100644
+index 135573308662845ecc73fde1c620345e1f372538..e171691c499551dc579745f13b2f717087d7f992 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -1126,7 +1126,18 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+@@ -1126,7 +1126,19 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
                      }
                  }
  
@@ -18,6 +37,7 @@ index 135573308662845ecc73fde1c620345e1f372538..3a8684ce5820dd766237ead4ba030f73
                  this.setPos(this.getX() + vec3d1.x, this.getY() + vec3d1.y, this.getZ() + vec3d1.z);
 +                // Kaiiju start - Teleport async if we cannot move entity off-main
 +                } catch (IllegalStateException e) {
++                    if (this.level().kaiijuConfig.teleportAsyncOnHighVelocity)
 +                    this.teleportAsync((ServerLevel) this.level(), this.position().add(vec3d1),
 +                                       this.getYRot(), this.getXRot(),
 +                                       Vec3.ZERO, PlayerTeleportEvent.TeleportCause.UNKNOWN,
@@ -29,7 +49,7 @@ index 135573308662845ecc73fde1c620345e1f372538..3a8684ce5820dd766237ead4ba030f73
              }
  
              this.level().getProfiler().pop();
-@@ -3868,13 +3879,15 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+@@ -3868,13 +3880,15 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
          // check for same region
          if (destination == this.level()) {
              Vec3 currPos = this.position();
