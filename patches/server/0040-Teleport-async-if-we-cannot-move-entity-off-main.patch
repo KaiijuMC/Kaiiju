@@ -7,7 +7,7 @@ Entities with huge velocity (100k+ velocity anarchy travel exploit) might disapp
 TODO: Entities with huge velocity still throw stacktraces because they are ticked in "null" regions.
 
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index ea246b52b913b40a7d359eb3656b09cca14538a3..ea260c79cbc35829a7213630886abc085c63040f 100644
+index 135573308662845ecc73fde1c620345e1f372538..3a8684ce5820dd766237ead4ba030f735e1484df 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -1126,7 +1126,18 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
@@ -29,7 +29,7 @@ index ea246b52b913b40a7d359eb3656b09cca14538a3..ea260c79cbc35829a7213630886abc08
              }
  
              this.level().getProfiler().pop();
-@@ -3864,13 +3875,15 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+@@ -3868,13 +3879,15 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
          // check for same region
          if (destination == this.level()) {
              Vec3 currPos = this.position();
