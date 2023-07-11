@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: SoftikLord <dimap9986@gmail.com>
+Date: Tue, 11 Jul 2023 12:17:10 +0500
+Subject: [PATCH] SPIGOT-5988 Fix bed respawn location not resetting
+
+
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+index 95920a55c254925fec9f6218d7a28b297bf63ca0..6394c934bbb3fb9c6dfb7be2a4f1c8ef7a32002b 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+@@ -226,10 +226,12 @@ public class KaiijuConfig {
+     public static String serverModName = "Kaiiju";
+     public static boolean sharedRandomForPlayers = true;
+     public static boolean enderPearlsDespawnOnPlayerDeath = true;
++    public static boolean fixBedRespawns = true;
+ 
+     private static void gameplaySettings() {
+         serverModName = getString("gameplay.server-mod-name", serverModName);
+         sharedRandomForPlayers = getBoolean("gameplay.shared-random-for-players", sharedRandomForPlayers);
+         enderPearlsDespawnOnPlayerDeath = getBoolean("gameplay.ender-pearls-despawn-on-player-death", enderPearlsDespawnOnPlayerDeath);
++        fixBedRespawns = getBoolean("gameplay.blocks.bed.fix-spigot-5988", fixBedRespawns);
+     }
+ }
+diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
+index ffb5332310e9b2d10292fe01c37fd48552fedffc..5a88cf3b0b30207c071b4d71a4202464f7f8a1f8 100644
+--- a/src/main/java/net/minecraft/server/players/PlayerList.java
++++ b/src/main/java/net/minecraft/server/players/PlayerList.java
+@@ -8,6 +8,7 @@ import com.mojang.authlib.GameProfile;
+ import com.mojang.logging.LogUtils;
+ import com.mojang.serialization.DataResult;
+ import com.mojang.serialization.Dynamic;
++import dev.kaiijumc.kaiiju.KaiijuConfig;
+ import io.netty.buffer.Unpooled;
+ import io.papermc.paper.adventure.PaperAdventure;
+ import java.io.File;
+@@ -960,7 +961,7 @@ public abstract class PlayerList {
+                     location = CraftLocation.toBukkit(vec3d, worldserver1.getWorld(), f1, 0.0F);
+                 } else if (blockposition != null) {
+                     entityplayer1.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.NO_RESPAWN_BLOCK_AVAILABLE, 0.0F));
+-                    entityplayer1.setRespawnPosition(null, null, 0f, false, false, com.destroystokyo.paper.event.player.PlayerSetSpawnEvent.Cause.PLAYER_RESPAWN); // CraftBukkit - SPIGOT-5988: Clear respawn location when obstructed // Paper - PlayerSetSpawnEvent
++                    if (KaiijuConfig.fixBedRespawns) entityplayer1.setRespawnPosition(null, null, 0f, false, false, com.destroystokyo.paper.event.player.PlayerSetSpawnEvent.Cause.PLAYER_RESPAWN); // CraftBukkit - SPIGOT-5988: Clear respawn location when obstructed // Paper - PlayerSetSpawnEvent // Kaiiju - Fix bed respawn location not resetting
+                 }
+             }
+ 
