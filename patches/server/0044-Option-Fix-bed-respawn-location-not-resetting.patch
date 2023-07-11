@@ -52,12 +52,12 @@ index 6bbbd7d4a409140df65f52f36e413c67ebac5561..8374167334faa0d08df874c0c979869b
 -                            null, null, 0f, false, false,
 -                            com.destroystokyo.paper.event.player.PlayerSetSpawnEvent.Cause.PLAYER_RESPAWN
 -                        );
-+                        if (KaiijuConfig.fixBedRespawns) {
++                        if (KaiijuConfig.fixBedRespawns) { // Kaiiju - Fix bed respawn location not resetting
 +                            ServerPlayer.this.setRespawnPosition(
 +                                    null, null, 0f, false, false,
 +                                    com.destroystokyo.paper.event.player.PlayerSetSpawnEvent.Cause.PLAYER_RESPAWN
 +                            );
-+                        }
++                        } // Kaiiju - Fix bed respawn location not resetting
                          // default to regular spawn
                          fudgeSpawnLocation(this.server.getLevel(Level.OVERWORLD), this, spawnPosComplete);
                          return;
@@ -99,7 +99,7 @@ index 66f4e0578e7682d732ba4b36f5c3344d1d0e3d68..41c17c8d4b54473b9eb73d54ec4bedf5
      @Override
      public void setBedSpawnLocation(Location location, boolean override) {
 -        if (location == null) {
-+        if (location == null && KaiijuConfig.fixBedRespawns) {
++        if (location == null && KaiijuConfig.fixBedRespawns) { // Kaiiju - Fix bed respawn location not resetting
              this.getHandle().setRespawnPosition(null, null, 0.0F, override, false, com.destroystokyo.paper.event.player.PlayerSetSpawnEvent.Cause.PLUGIN); // Paper - PlayerSetSpawnEvent
          } else {
              this.getHandle().setRespawnPosition(((CraftWorld) location.getWorld()).getHandle().dimension(), CraftLocation.toBlockPosition(location), location.getYaw(), override, false, com.destroystokyo.paper.event.player.PlayerSetSpawnEvent.Cause.PLUGIN); // Paper - PlayerSetSpawnEvent
