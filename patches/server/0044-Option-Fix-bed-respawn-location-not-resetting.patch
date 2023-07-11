@@ -9,6 +9,10 @@ After some manipulations, it turned out to be a simple mechanism that allowed th
 This bug persisted from the Spigot server to Paper and all its forks until October 2021, after which it was fixed by the Spigot development team. 
 Attempts by players to reach out to Spigot to allow them to disable the patch that fixes the SPIGOT-5988 bug have failed.
 
+Demonstration of how the patch works
+fix-bed-respawn-location-not-resetting: false
+https://www.youtube.com/watch?v=d-Zbl3aXaIY
+
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 index 0d9338f61e5a5385f99099242205062030ce347b..89f46e0a9c9429a05752fcce6ddfec853235a510 100644
