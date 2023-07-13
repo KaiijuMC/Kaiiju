@@ -26,10 +26,10 @@ index e2fb7d7a7b3126d386b46442c115085d1974ac4e..44f5540a6a5733cf6f10f6b04fc9611a
      }
  }
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 135573308662845ecc73fde1c620345e1f372538..e171691c499551dc579745f13b2f717087d7f992 100644
+index 135573308662845ecc73fde1c620345e1f372538..812b2c216003b8decedef1353acab1b44d146e08 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -1126,7 +1126,19 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+@@ -1126,7 +1126,20 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
                      }
                  }
  
@@ -40,16 +40,17 @@ index 135573308662845ecc73fde1c620345e1f372538..e171691c499551dc579745f13b2f7170
 +                    if (this.level().kaiijuConfig.teleportAsyncOnHighVelocity)
 +                    this.teleportAsync((ServerLevel) this.level(), this.position().add(vec3d1),
 +                                       this.getYRot(), this.getXRot(),
-+                                       Vec3.ZERO, PlayerTeleportEvent.TeleportCause.UNKNOWN,
++                                       null, PlayerTeleportEvent.TeleportCause.UNKNOWN,
 +                                       Entity.TELEPORT_FLAG_LOAD_CHUNK | Entity.TELEPORT_FLAG_TELEPORT_PASSENGERS,
 +                                       null
 +                    );
++                    else LOGGER.error("High velocity entity caused off-main setPos: ", e);
 +                }
 +                // Kaiiju end
              }
  
              this.level().getProfiler().pop();
-@@ -3868,13 +3880,15 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+@@ -3868,13 +3881,15 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
          // check for same region
          if (destination == this.level()) {
              Vec3 currPos = this.position();
