@@ -318,7 +318,7 @@ index 0000000000000000000000000000000000000000..6b91852238f80d236fc44f766b115267
 +}
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/path/AsyncPathProcessor.java b/src/main/java/dev/kaiijumc/kaiiju/path/AsyncPathProcessor.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..72890653f6d8d1ff03c32a92bb96c0665e7f94ec
+index 0000000000000000000000000000000000000000..593a285a92431b7ebeaab0e965aa36bd3ef3d161
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/path/AsyncPathProcessor.java
 @@ -0,0 +1,44 @@
@@ -340,7 +340,6 @@ index 0000000000000000000000000000000000000000..72890653f6d8d1ff03c32a92bb96c066
 + */
 +public class AsyncPathProcessor {
 +
-+    private static final Executor mainThreadExecutor = MinecraftServer.getServer();
 +    private static final Executor pathProcessingExecutor = Executors.newCachedThreadPool(new ThreadFactoryBuilder()
 +            .setNameFormat("petal-path-processor-%d")
 +            .setPriority(Thread.NORM_PRIORITY - 2)
@@ -360,7 +359,8 @@ index 0000000000000000000000000000000000000000..72890653f6d8d1ff03c32a92bb96c066
 +     */
 +    public static void awaitProcessing(@Nullable Path path, Consumer<@Nullable Path> afterProcessing) {
 +        if (path != null && !path.isProcessed() && path instanceof AsyncPath asyncPath) {
-+            asyncPath.postProcessing(() -> mainThreadExecutor.execute(() -> afterProcessing.accept(path)));
++            // It should be mainThreadExecutor.execute() in here, but that's absent in Folia
++            asyncPath.postProcessing(() -> pathProcessingExecutor.execute(() -> afterProcessing.accept(path)));
 +        } else {
 +            afterProcessing.accept(path);
 +        }
