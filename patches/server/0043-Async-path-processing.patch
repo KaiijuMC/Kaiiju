@@ -720,10 +720,10 @@ index acd0b946cab86eb173e713535194d3a9347c7d48..04ce85188c3b5bceb2ec9976a3f50005
          if (!this.isDone()) {
              if (this.canUpdatePath()) {
 diff --git a/src/main/java/net/minecraft/world/entity/ai/navigation/GroundPathNavigation.java b/src/main/java/net/minecraft/world/entity/ai/navigation/GroundPathNavigation.java
-index 71934af2dc4d209a9fbccfd36b5f2815ec196892..61945ebd8b30d39d4ef0fa3deafae1f32322f3ae 100644
+index 71934af2dc4d209a9fbccfd36b5f2815ec196892..1d1f8a7c3c8fd5a28bb339f8095c281aa485dc4b 100644
 --- a/src/main/java/net/minecraft/world/entity/ai/navigation/GroundPathNavigation.java
 +++ b/src/main/java/net/minecraft/world/entity/ai/navigation/GroundPathNavigation.java
-@@ -21,10 +21,23 @@ public class GroundPathNavigation extends PathNavigation {
+@@ -21,10 +21,24 @@ public class GroundPathNavigation extends PathNavigation {
          super(entity, world);
      }
  
@@ -731,6 +731,7 @@ index 71934af2dc4d209a9fbccfd36b5f2815ec196892..61945ebd8b30d39d4ef0fa3deafae1f3
 +    private static final dev.kaiijumc.kaiiju.path.NodeEvaluatorGenerator nodeEvaluatorGenerator = () -> {
 +        var nodeEvaluator = new WalkNodeEvaluator();
 +        nodeEvaluator.setCanPassDoors(true);
++        nodeEvaluator.setCanFloat(true);
 +        return nodeEvaluator;
 +    };
 +    // Kaiiju end
