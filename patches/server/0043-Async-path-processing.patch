@@ -318,15 +318,18 @@ index 0000000000000000000000000000000000000000..6b91852238f80d236fc44f766b115267
 +}
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/path/AsyncPathProcessor.java b/src/main/java/dev/kaiijumc/kaiiju/path/AsyncPathProcessor.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..593a285a92431b7ebeaab0e965aa36bd3ef3d161
+index 0000000000000000000000000000000000000000..65de93a32de6c90ada4834ce5a66510b75b3cdf1
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/path/AsyncPathProcessor.java
-@@ -0,0 +1,44 @@
+@@ -0,0 +1,49 @@
 +package dev.kaiijumc.kaiiju.path;
 +
 +import com.google.common.util.concurrent.ThreadFactoryBuilder;
-+import net.minecraft.server.MinecraftServer;
++import io.papermc.paper.threadedregions.RegionizedServer;
++
 +import net.minecraft.world.level.pathfinder.Path;
++import net.minecraft.world.entity.Entity;
++
 +import org.jetbrains.annotations.NotNull;
 +import org.jetbrains.annotations.Nullable;
 +
@@ -354,13 +357,15 @@ index 0000000000000000000000000000000000000000..593a285a92431b7ebeaab0e965aa36bd
 +     * the consumer will be immediately invoked if the path is already processed
 +     * the consumer will always be called on the main thread
 +     *
++     * @param entity affected entity
 +     * @param path a path to wait on
 +     * @param afterProcessing a consumer to be called
 +     */
-+    public static void awaitProcessing(@Nullable Path path, Consumer<@Nullable Path> afterProcessing) {
++    public static void awaitProcessing(Entity entity, @Nullable Path path, Consumer<@Nullable Path> afterProcessing) {
 +        if (path != null && !path.isProcessed() && path instanceof AsyncPath asyncPath) {
-+            // It should be mainThreadExecutor.execute() in here, but that's absent in Folia
-+            asyncPath.postProcessing(() -> pathProcessingExecutor.execute(() -> afterProcessing.accept(path)));
++            asyncPath.postProcessing(() ->
++                entity.getBukkitEntity().taskScheduler.schedule(nmsEntity -> afterProcessing.accept(path), null, 1)
++            );
 +        } else {
 +            afterProcessing.accept(path);
 +        }
@@ -429,7 +434,7 @@ index 0000000000000000000000000000000000000000..9cc67a04d9be0cffff179b40536b3444
 +}
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/world/entity/ai/behavior/AcquirePoi.java b/src/main/java/net/minecraft/world/entity/ai/behavior/AcquirePoi.java
-index d4c91e0a0c64fcb7f1145de3f30134cb1f1f8ee6..62189c48bf3cd8d3eb5cd2af5b0a20095ce1b63c 100644
+index d4c91e0a0c64fcb7f1145de3f30134cb1f1f8ee6..ef5ec638bcd88df6eb93746868e863dbe0d11677 100644
 --- a/src/main/java/net/minecraft/world/entity/ai/behavior/AcquirePoi.java
 +++ b/src/main/java/net/minecraft/world/entity/ai/behavior/AcquirePoi.java
 @@ -67,6 +67,40 @@ public class AcquirePoi {
@@ -442,7 +447,7 @@ index d4c91e0a0c64fcb7f1145de3f30134cb1f1f8ee6..62189c48bf3cd8d3eb5cd2af5b0a2009
 +                            Path possiblePath = findPathToPois(entity, set);
 +
 +                            // wait on the path to be processed
-+                            dev.kaiijumc.kaiiju.path.AsyncPathProcessor.awaitProcessing(possiblePath, path -> {
++                            dev.kaiijumc.kaiiju.path.AsyncPathProcessor.awaitProcessing(entity, possiblePath, path -> {
 +                                // read canReach check
 +                                if (path == null || !path.canReach()) {
 +                                    for(Pair<Holder<PoiType>, BlockPos> pair : set) {
@@ -612,7 +617,7 @@ index 98bf17441da3169d49de55fe89d79ebe250a2b7e..2ad6168ac9891f491d62a34404eec1a0
          BlockPos blockPos = walkTarget.getTarget().currentBlockPosition();
          if (io.papermc.paper.util.TickThread.isTickThreadFor((ServerLevel) entity.level(), blockPos)) // Kaiiju - Don't pathfind outside region
 diff --git a/src/main/java/net/minecraft/world/entity/ai/behavior/SetClosestHomeAsWalkTarget.java b/src/main/java/net/minecraft/world/entity/ai/behavior/SetClosestHomeAsWalkTarget.java
-index 271efbb027f6f5d69ac5bc5dc51102a1eb00ab31..cf16fe305c598b74de4ec8546790e456c7a7a5e6 100644
+index 271efbb027f6f5d69ac5bc5dc51102a1eb00ab31..247433a5c17214f099db8f708a36ede9f8bcf939 100644
 --- a/src/main/java/net/minecraft/world/entity/ai/behavior/SetClosestHomeAsWalkTarget.java
 +++ b/src/main/java/net/minecraft/world/entity/ai/behavior/SetClosestHomeAsWalkTarget.java
 @@ -57,6 +57,26 @@ public class SetClosestHomeAsWalkTarget {
@@ -625,7 +630,7 @@ index 271efbb027f6f5d69ac5bc5dc51102a1eb00ab31..cf16fe305c598b74de4ec8546790e456
 +                                Path possiblePath = AcquirePoi.findPathToPois(entity, set);
 +
 +                                // wait on the path to be processed
-+                                dev.kaiijumc.kaiiju.path.AsyncPathProcessor.awaitProcessing(possiblePath, path -> {
++                                dev.kaiijumc.kaiiju.path.AsyncPathProcessor.awaitProcessing(entity, possiblePath, path -> {
 +                                        if (path == null || !path.canReach() || mutableInt.getValue() < 5) { // read canReach check
 +                                            long2LongMap.long2LongEntrySet().removeIf((entry) -> entry.getLongValue() < mutableLong.getValue());
 +                                            return;
@@ -743,7 +748,7 @@ index 71934af2dc4d209a9fbccfd36b5f2815ec196892..61945ebd8b30d39d4ef0fa3deafae1f3
      }
  
 diff --git a/src/main/java/net/minecraft/world/entity/ai/navigation/PathNavigation.java b/src/main/java/net/minecraft/world/entity/ai/navigation/PathNavigation.java
-index 2549b81eb5fa1a021edac960170f5e0d513dae97..c07a881f93b306cb31c1638988a8b58abf5e9920 100644
+index 2549b81eb5fa1a021edac960170f5e0d513dae97..5d14940e8cb049ec193df75879b71118d09f624c 100644
 --- a/src/main/java/net/minecraft/world/entity/ai/navigation/PathNavigation.java
 +++ b/src/main/java/net/minecraft/world/entity/ai/navigation/PathNavigation.java
 @@ -152,6 +152,10 @@ public abstract class PathNavigation {
@@ -766,7 +771,7 @@ index 2549b81eb5fa1a021edac960170f5e0d513dae97..c07a881f93b306cb31c1638988a8b58a
 +                // assign early a target position. most calls will only have 1 position
 +                if (!positions.isEmpty()) this.targetPos = positions.iterator().next();
 +
-+                dev.kaiijumc.kaiiju.path.AsyncPathProcessor.awaitProcessing(path, processedPath -> {
++                dev.kaiijumc.kaiiju.path.AsyncPathProcessor.awaitProcessing(this.mob, path, processedPath -> {
 +                    // check that processing didn't take so long that we calculated a new path
 +                    if (processedPath != this.path) return;
 +
@@ -824,7 +829,7 @@ index 2549b81eb5fa1a021edac960170f5e0d513dae97..c07a881f93b306cb31c1638988a8b58a
              Vec3 vec3 = new Vec3(((double)node.x + this.mob.getX()) / 2.0D, ((double)node.y + this.mob.getY()) / 2.0D, ((double)node.z + this.mob.getZ()) / 2.0D);
              return pos.closerToCenterThan(vec3, (double)(this.path.getNodeCount() - this.path.getNextNodeIndex()));
 diff --git a/src/main/java/net/minecraft/world/entity/ai/sensing/NearestBedSensor.java b/src/main/java/net/minecraft/world/entity/ai/sensing/NearestBedSensor.java
-index 8db20db72cd51046213625fac46c35854c59ec5d..170f599d4527c0d8afd32fd633e495a635024112 100644
+index 8db20db72cd51046213625fac46c35854c59ec5d..331ae7cc6efe7f7db27aae831d54345e5062cb97 100644
 --- a/src/main/java/net/minecraft/world/entity/ai/sensing/NearestBedSensor.java
 +++ b/src/main/java/net/minecraft/world/entity/ai/sensing/NearestBedSensor.java
 @@ -57,6 +57,24 @@ public class NearestBedSensor extends Sensor<Mob> {
@@ -834,7 +839,7 @@ index 8db20db72cd51046213625fac46c35854c59ec5d..170f599d4527c0d8afd32fd633e495a6
 +            // Kaiiju start - await on async path processing
 +            if (dev.kaiijumc.kaiiju.KaiijuConfig.asyncPathProcessing) {
 +                Path possiblePath = AcquirePoi.findPathToPois(entity, new java.util.HashSet<>(poiposes));
-+                dev.kaiijumc.kaiiju.path.AsyncPathProcessor.awaitProcessing(possiblePath, path -> {
++                dev.kaiijumc.kaiiju.path.AsyncPathProcessor.awaitProcessing(entity, possiblePath, path -> {
 +                    // petal - readd canReach check
 +                    if (path == null || !path.canReach()) {
 +                        this.batchCache.long2LongEntrySet().removeIf((entry) -> entry.getLongValue() < this.lastUpdate);
