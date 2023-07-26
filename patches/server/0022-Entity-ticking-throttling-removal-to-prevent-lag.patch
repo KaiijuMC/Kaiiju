@@ -319,10 +319,10 @@ index 991e4c19763a34a6fead88363e007c2d11aad836..24a2d3f496727790f63cb66a2534d442
          dev.kaiijumc.kaiiju.KaiijuConfig.registerCommands();
          // Kaiiju end
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 245c3e63588379f51780963ba91bc6bf0a3feda6..761019f86983daaea4fface519e052f8fb6de1cd 100644
+index 1818c5ae88c331fb900470436f72049165c9e9f4..7938ce423422c1a2cb72a9b2e45c7bbb6f20ec91 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
-@@ -822,6 +822,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -849,6 +849,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
                  } // Folia end - region threading
              }
  
@@ -330,7 +330,7 @@ index 245c3e63588379f51780963ba91bc6bf0a3feda6..761019f86983daaea4fface519e052f8
              org.spigotmc.ActivationRange.activateEntities(this); // Spigot
              timings.entityTick.startTiming(); // Spigot
              regionizedWorldData.forEachTickingEntity((entity) -> { // Folia - regionised ticking
-@@ -844,6 +845,13 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -871,6 +872,13 @@ public class ServerLevel extends Level implements WorldGenLevel {
                                  entity.stopRiding();
                              }
  
@@ -344,7 +344,7 @@ index 245c3e63588379f51780963ba91bc6bf0a3feda6..761019f86983daaea4fface519e052f8
                              gameprofilerfiller.push("tick");
                              this.guardEntityTick(this::tickNonPassenger, entity);
                              gameprofilerfiller.pop();
-@@ -851,6 +859,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -878,6 +886,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
                      }
                  }
              });

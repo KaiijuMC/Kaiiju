@@ -42,7 +42,7 @@ index abf5e2a06af9853b58ac9107cd6e9787c4185c66..389c68c0becd2f69dc1004d0b383f1a8
          long expectedChunks = (long)regionFiles.length * (32L * 32L);
  
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index 61c6bc2859235874aefac71e9e55162f0a89f29f..24bd63c596c9f61f1e89ec5b001b7cb7a29a09ff 100644
+index c4d28d887b4cc71dc713b1e3f46bc80f4484a95d..f50507ab85282d261985ce9b186581f5a7a50f79 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
 @@ -269,7 +269,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
@@ -64,10 +64,10 @@ index 61c6bc2859235874aefac71e9e55162f0a89f29f..24bd63c596c9f61f1e89ec5b001b7cb7
          // Paper start
          this.dataRegionManager = new io.papermc.paper.chunk.SingleThreadChunkRegionManager(this.level, 2, (1.0 / 3.0), 1, 6, "Data", DataRegionData::new, DataRegionSectionData::new);
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 4774d3f357d62b0818b4713f8085d05be09eaa5c..1bbd8b475cdc57fb15ca05ffe122220a5539da10 100644
+index 4c587f783f4c2207e4e1a1f4596c8f50e997d541..ad896c8a3060f5c8d85a8b5707317de646bf9cae 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
-@@ -426,8 +426,8 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -453,8 +453,8 @@ public class ServerLevel extends Level implements WorldGenLevel {
  
      private static final class EntityRegionFileStorage extends net.minecraft.world.level.chunk.storage.RegionFileStorage {
  
@@ -78,7 +78,7 @@ index 4774d3f357d62b0818b4713f8085d05be09eaa5c..1bbd8b475cdc57fb15ca05ffe122220a
          }
  
          protected void write(ChunkPos pos, net.minecraft.nbt.CompoundTag nbt) throws IOException {
-@@ -666,7 +666,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -693,7 +693,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
          // CraftBukkit end
          boolean flag2 = minecraftserver.forceSynchronousWrites();
          DataFixer datafixer = minecraftserver.getFixerUpper();
