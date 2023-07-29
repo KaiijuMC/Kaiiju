@@ -420,22 +420,28 @@ index 0000000000000000000000000000000000000000..bfa6cf5aa317a56eadb77c3bda60c884
 +}
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/path/NodeEvaluatorFeatures.java b/src/main/java/dev/kaiijumc/kaiiju/path/NodeEvaluatorFeatures.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..87b453ae5c7abc03c42a3401a976983438733edb
+index 0000000000000000000000000000000000000000..640a38877b9f98f429284e2a3eb196e02ddb08be
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/path/NodeEvaluatorFeatures.java
-@@ -0,0 +1,33 @@
+@@ -0,0 +1,41 @@
 +package dev.kaiijumc.kaiiju.path;
 +
 +import net.minecraft.world.level.pathfinder.NodeEvaluator;
++import net.minecraft.world.level.pathfinder.SwimNodeEvaluator;
 +
-+public record NodeEvaluatorFeatures(boolean canPassDoors, boolean canFloat, boolean canWalkOverFences, boolean canOpenDoors) {
++public record NodeEvaluatorFeatures(boolean canPassDoors,
++                                    boolean canFloat,
++                                    boolean canWalkOverFences,
++                                    boolean canOpenDoors,
++                                    boolean allowBreaching) {
 +    public static NodeEvaluatorFeatures fromLocalNodeEvaluator(NodeEvaluator localNodeEvaluator) {
-+        return new NodeEvaluatorFeatures(
-+                localNodeEvaluator.canPassDoors(),
-+                localNodeEvaluator.canFloat(),
-+                localNodeEvaluator.canWalkOverFences(),
-+                localNodeEvaluator.canOpenDoors()
-+        );
++        boolean canPassDoors = localNodeEvaluator.canPassDoors();
++        boolean canFloat = localNodeEvaluator.canFloat();
++        boolean canWalkOverFences = localNodeEvaluator.canWalkOverFences();
++        boolean canOpenDoors = localNodeEvaluator.canOpenDoors();
++        boolean allowBreaching = localNodeEvaluator instanceof SwimNodeEvaluator swimNodeEvaluator && swimNodeEvaluator.allowBreaching;
++
++        return new NodeEvaluatorFeatures(canPassDoors, canFloat, canWalkOverFences, canOpenDoors, allowBreaching);
 +    }
 +
 +    @Override
@@ -443,18 +449,20 @@ index 0000000000000000000000000000000000000000..87b453ae5c7abc03c42a3401a9769834
 +        if (this == o) return true;
 +        if (o == null || getClass() != o.getClass()) return false;
 +        NodeEvaluatorFeatures that = (NodeEvaluatorFeatures) o;
-+        return canPassDoors == that.canPassDoors &&
-+                canFloat == that.canFloat &&
-+                canWalkOverFences == that.canWalkOverFences &&
-+                canOpenDoors == that.canOpenDoors;
++        return canPassDoors == that.canPassDoors
++            && canFloat == that.canFloat
++            && canWalkOverFences == that.canWalkOverFences
++            && canOpenDoors == that.canOpenDoors
++            && allowBreaching == that.allowBreaching;
 +    }
 +
 +    @Override
 +    public int hashCode() {
 +        return (canPassDoors ? 1 : 0)
-+             + (canFloat ? 2 : 0)
-+             + (canWalkOverFences ? 4 : 0)
-+             + (canOpenDoors ? 8 : 0);
++             | (canFloat ? 2 : 0)
++             | (canWalkOverFences ? 4 : 0)
++             | (canOpenDoors ? 8 : 0)
++             | (allowBreaching ? 16 : 0);
 +    }
 +}
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/path/NodeEvaluatorGenerator.java b/src/main/java/dev/kaiijumc/kaiiju/path/NodeEvaluatorGenerator.java
@@ -879,6 +887,37 @@ index 2549b81eb5fa1a021edac960170f5e0d513dae97..6ab583960167412a925095991827d781
              Node node = this.path.getEndNode();
              Vec3 vec3 = new Vec3(((double)node.x + this.mob.getX()) / 2.0D, ((double)node.y + this.mob.getY()) / 2.0D, ((double)node.z + this.mob.getZ()) / 2.0D);
              return pos.closerToCenterThan(vec3, (double)(this.path.getNodeCount() - this.path.getNextNodeIndex()));
+diff --git a/src/main/java/net/minecraft/world/entity/ai/navigation/WaterBoundPathNavigation.java b/src/main/java/net/minecraft/world/entity/ai/navigation/WaterBoundPathNavigation.java
+index 87887916ff2f685346699989ba30c35ef7e5715f..e8b8abb31678517a89774d42710fe0973ce76f98 100644
+--- a/src/main/java/net/minecraft/world/entity/ai/navigation/WaterBoundPathNavigation.java
++++ b/src/main/java/net/minecraft/world/entity/ai/navigation/WaterBoundPathNavigation.java
+@@ -15,10 +15,26 @@ public class WaterBoundPathNavigation extends PathNavigation {
+         super(entity, world);
+     }
+ 
++    // Kaiiju start - petal - async path processing
++    private static final dev.kaiijumc.kaiiju.path.NodeEvaluatorGenerator nodeEvaluatorGenerator = (dev.kaiijumc.kaiiju.path.NodeEvaluatorFeatures nodeEvaluatorFeatures) -> {
++        SwimNodeEvaluator nodeEvaluator = new SwimNodeEvaluator(nodeEvaluatorFeatures.allowBreaching());
++        nodeEvaluator.setCanPassDoors(nodeEvaluatorFeatures.canPassDoors());
++        nodeEvaluator.setCanFloat(nodeEvaluatorFeatures.canFloat());
++        nodeEvaluator.setCanWalkOverFences(nodeEvaluatorFeatures.canWalkOverFences());
++        nodeEvaluator.setCanOpenDoors(nodeEvaluatorFeatures.canOpenDoors());
++        return nodeEvaluator;
++    };
++    // Kaiiju end
++
+     @Override
+     protected PathFinder createPathFinder(int range) {
+         this.allowBreaching = this.mob.getType() == EntityType.DOLPHIN;
+         this.nodeEvaluator = new SwimNodeEvaluator(this.allowBreaching);
++        // Kaiiju start - async path processing
++        if (dev.kaiijumc.kaiiju.KaiijuConfig.asyncPathProcessing)
++            return new PathFinder(this.nodeEvaluator, range, nodeEvaluatorGenerator);
++        else
++        // Kaiiju end
+         return new PathFinder(this.nodeEvaluator, range);
+     }
+ 
 diff --git a/src/main/java/net/minecraft/world/entity/ai/sensing/NearestBedSensor.java b/src/main/java/net/minecraft/world/entity/ai/sensing/NearestBedSensor.java
 index 8db20db72cd51046213625fac46c35854c59ec5d..3eb5f87d2755727557b70d3910915ff4134b04bd 100644
 --- a/src/main/java/net/minecraft/world/entity/ai/sensing/NearestBedSensor.java
@@ -993,6 +1032,37 @@ index 991d728db2a3b64316fc2102cf3aee470327a62e..c99de04d082f7f9b08d25730460385c4
              BlockPos blockposition = pathentity.getTarget();
  
              if (blockposition != null) {
+diff --git a/src/main/java/net/minecraft/world/entity/monster/Strider.java b/src/main/java/net/minecraft/world/entity/monster/Strider.java
+index ebf54d6e36fdee2833250816fae14195ac45eb67..367618db763f2f931451db4ead3d599ebd3bf5a2 100644
+--- a/src/main/java/net/minecraft/world/entity/monster/Strider.java
++++ b/src/main/java/net/minecraft/world/entity/monster/Strider.java
+@@ -565,10 +565,26 @@ public class Strider extends Animal implements ItemSteerable, Saddleable {
+             super(entity, world);
+         }
+ 
++        // Kaiiju start - petal - async path processing
++        private static final dev.kaiijumc.kaiiju.path.NodeEvaluatorGenerator nodeEvaluatorGenerator = (dev.kaiijumc.kaiiju.path.NodeEvaluatorFeatures nodeEvaluatorFeatures) -> {
++            WalkNodeEvaluator nodeEvaluator = new WalkNodeEvaluator();
++            nodeEvaluator.setCanPassDoors(nodeEvaluatorFeatures.canPassDoors());
++            nodeEvaluator.setCanFloat(nodeEvaluatorFeatures.canFloat());
++            nodeEvaluator.setCanWalkOverFences(nodeEvaluatorFeatures.canWalkOverFences());
++            nodeEvaluator.setCanOpenDoors(nodeEvaluatorFeatures.canOpenDoors());
++            return nodeEvaluator;
++        };
++        // Kaiiju end
++
+         @Override
+         protected PathFinder createPathFinder(int range) {
+             this.nodeEvaluator = new WalkNodeEvaluator();
+             this.nodeEvaluator.setCanPassDoors(true);
++            // Kaiiju start - async path processing
++            if (dev.kaiijumc.kaiiju.KaiijuConfig.asyncPathProcessing)
++                return new PathFinder(this.nodeEvaluator, range, nodeEvaluatorGenerator);
++            else
++            // Kaiiju end
+             return new PathFinder(this.nodeEvaluator, range);
+         }
+ 
 diff --git a/src/main/java/net/minecraft/world/level/pathfinder/Path.java b/src/main/java/net/minecraft/world/level/pathfinder/Path.java
 index 2a335f277bd0e4b8ad0f60d8226eb8aaa80a871f..b2c3c459fae7d0cb5ef0fcbc2ff0e61c7b952087 100644
 --- a/src/main/java/net/minecraft/world/level/pathfinder/Path.java
@@ -1126,3 +1196,16 @@ index d23481453717f715124156b5d83f6448f720d049..00f2f9c8f6fa7f506146d8def594177b
  
                  for(int l = 0; l < k; ++l) {
                      Node node2 = this.neighbors[l];
+diff --git a/src/main/java/net/minecraft/world/level/pathfinder/SwimNodeEvaluator.java b/src/main/java/net/minecraft/world/level/pathfinder/SwimNodeEvaluator.java
+index 0e2b14e7dfedf209d63279c81723fd7955122d78..079b278e2e262af433bb5bd0c12b3d8db4fa12fc 100644
+--- a/src/main/java/net/minecraft/world/level/pathfinder/SwimNodeEvaluator.java
++++ b/src/main/java/net/minecraft/world/level/pathfinder/SwimNodeEvaluator.java
+@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
+ import net.minecraft.world.level.material.FluidState;
+ 
+ public class SwimNodeEvaluator extends NodeEvaluator {
+-    private final boolean allowBreaching;
++    public final boolean allowBreaching; // Kaiiju - make this public
+     private final Long2ObjectMap<BlockPathTypes> pathTypesByPosCache = new Long2ObjectOpenHashMap<>();
+ 
+     public SwimNodeEvaluator(boolean canJumpOutOfWater) {
