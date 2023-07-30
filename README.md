@@ -11,13 +11,14 @@
 
 ## Features
 
-### Primary
-- **Xymb Linear Format**: Saves about 50% of disk space in OW/Nether and 95% in The End.
-- **Auto update**: Automatic upstream updates.
-
 ### Notable
-- **Entity throttling & removal**: Tweak entity tick frequency & max entity per region.
+- **Xymb Linear Format**: A Region file format that reduces disk space usage by about 50%.
+- **Async Pathfinding**: Petal async pathfinding fixed & reworked.
 - **Technical Minecraft**: Enable Vanilla exploits such as sand duping, RNG manipulation...
+
+### Other
+- **Small optimizations**: Increase server efficiency by disabling unnecessary features.
+- **Commands**: Restore few commands that were previously removed by Folia.
 
 ### Configuration
 
@@ -25,42 +26,50 @@
 network:
   send-null-entity-packets: true
   alternate-keepalive: false
+  kick-player-on-bad-packet: true
+gameplay:
+  server-mod-name: Kaiiju
+  shared-random-for-players: true
 optimization:
   disable-vanish-api: false
   disable-player-stats: false
   disable-arm-swing-event: false
   disable-ensure-tick-thread-checks: false
-gameplay:
-  server-mod-name: Kaiiju
-  shared-random-for-players: true
+  async-path-processing: false
+region-format:
+  debug: false
 world-settings:
   default:
+    gameplay:
+      fix-void-trading: true
+      break-redstone-on-top-of-trap-doors-early: true
+      fix-tripwire-state-inconsistency: true
+      safe-teleportation: true
+      sand-duplication: false
+      teleport-async-on-high-velocity: false
+    optimization:
+      shulker-box-drop-contents-when-destroyed: true
+      optimize-hoppers: true
+      tick-when-empty: true
+      enable-entity-throttling: false
+      disable-achievements: false
+      disable-creatures-spawn-events: false
+      disable-dolphin-swim-to-treasure: false
     region-format:
       format: ANVIL
       linear:
         compression-level: 1
         crash-on-broken-symlink: true
-    optimization:
-      shulker-box-drop-contents-when-destroyed: true
-      enable-entity-throttling: false
-      disable-achievements: false
-      disable-creatures-spawn-events: false
-      disable-dolphin-swim-to-treasure: false
-    gameplay:
-      fix-void-trading: true
-      optimize-hoppers: true
-      tick-when-empty: true
-      break-redstone-on-top-of-trap-doors-early: true
-      fix-tripwire-state-inconsistency: true
-      safe-teleportation: true
-      sand-duplication: false
 ```
 Documentation: [Kaiiju Wiki](https://github.com/KaiijuMC/Kaiiju/wiki/Configuration)
 
 ### Roadmap
-- **Static view distance**: Reduce RAM usage / Region size with a "static" view distance.
-- **Native world conversion**: Convert region file format at startup.
 - **Stash deduplication**: Make giant dupe stashes possible and lagless.
+- **Multithreaded Tracker**: Rework Petal multithreaded tracker.
+
+## Open to contributions
+- **Native world conversion**: Convert region file format at startup.
+- **Performance patch**: Any significative performance patch.
 
 ## Building
 
