@@ -30,14 +30,18 @@ network:
 gameplay:
   server-mod-name: Kaiiju
   shared-random-for-players: true
+region-format:
+  debug: false
 optimization:
   disable-vanish-api: false
   disable-player-stats: false
   disable-arm-swing-event: false
   disable-ensure-tick-thread-checks: false
-  async-path-processing: false
-region-format:
-  debug: false
+  async-path-processing:
+    enable: false
+    max-threads: 0
+    keepalive: 60
+    queue-capacity: 700
 world-settings:
   default:
     gameplay:
@@ -47,6 +51,11 @@ world-settings:
       safe-teleportation: true
       sand-duplication: false
       teleport-async-on-high-velocity: false
+    region-format:
+      format: ANVIL
+      linear:
+        compression-level: 1
+        crash-on-broken-symlink: true
     optimization:
       shulker-box-drop-contents-when-destroyed: true
       optimize-hoppers: true
@@ -55,11 +64,6 @@ world-settings:
       disable-achievements: false
       disable-creatures-spawn-events: false
       disable-dolphin-swim-to-treasure: false
-    region-format:
-      format: ANVIL
-      linear:
-        compression-level: 1
-        crash-on-broken-symlink: true
 ```
 Documentation: [Kaiiju Wiki](https://github.com/KaiijuMC/Kaiiju/wiki/Configuration)
 
