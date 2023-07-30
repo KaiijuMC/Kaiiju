@@ -1114,10 +1114,10 @@ index 2a335f277bd0e4b8ad0f60d8226eb8aaa80a871f..b2c3c459fae7d0cb5ef0fcbc2ff0e61c
              return false;
          } else if (o.nodes.size() != this.nodes.size()) {
 diff --git a/src/main/java/net/minecraft/world/level/pathfinder/PathFinder.java b/src/main/java/net/minecraft/world/level/pathfinder/PathFinder.java
-index d23481453717f715124156b5d83f6448f720d049..00f2f9c8f6fa7f506146d8def594177baa42b849 100644
+index d23481453717f715124156b5d83f6448f720d049..d4cc2a5f99f8445be9a63c279e28032f11a91304 100644
 --- a/src/main/java/net/minecraft/world/level/pathfinder/PathFinder.java
 +++ b/src/main/java/net/minecraft/world/level/pathfinder/PathFinder.java
-@@ -24,37 +24,79 @@ public class PathFinder {
+@@ -24,37 +24,77 @@ public class PathFinder {
      public final NodeEvaluator nodeEvaluator;
      private static final boolean DEBUG = false;
      private final BinaryHeap openSet = new BinaryHeap();
@@ -1141,7 +1141,7 @@ index d23481453717f715124156b5d83f6448f720d049..00f2f9c8f6fa7f506146d8def594177b
 -        this.openSet.clear();
 -        this.nodeEvaluator.prepare(world, mob);
 -        Node node = this.nodeEvaluator.getStart();
-+        //this.openSet.clear(); // Kaiiju - petal - it's always cleared in processPath
++        if(!dev.kaiijumc.kaiiju.KaiijuConfig.asyncPathProcessing) this.openSet.clear(); // Kaiiju - petal - it's always cleared in processPath
 +        // Kaiiju start - petal - use a generated evaluator if we have one otherwise run sync
 +        NodeEvaluator nodeEvaluator = this.nodeEvaluatorGenerator == null
 +                      ? this.nodeEvaluator
@@ -1170,9 +1170,7 @@ index d23481453717f715124156b5d83f6448f720d049..00f2f9c8f6fa7f506146d8def594177b
 +            // Kaiiju start - petal - async path processing
 +            if (this.nodeEvaluatorGenerator == null) {
 +                // run sync :(
-+                Path path = this.findPath(world.getProfiler(), node, map, followRange, distance, rangeMultiplier, nodeEvaluator);
-+                nodeEvaluator.done();
-+                return path;
++                return this.findPath(nodeEvaluator, world.getProfiler(), node, map, followRange, distance, rangeMultiplier);
 +            }
 +
 +            return new dev.kaiijumc.kaiiju.path.AsyncPath(Lists.newArrayList(), positions, () -> {
@@ -1191,7 +1189,7 @@ index d23481453717f715124156b5d83f6448f720d049..00f2f9c8f6fa7f506146d8def594177b
 +    //@Nullable // Kaiiju - Always not null
      // Paper start - optimize collection
 -    private Path findPath(ProfilerFiller profiler, Node startNode, List<Map.Entry<Target, BlockPos>> positions, float followRange, int distance, float rangeMultiplier) {
-+    private Path findPath(ProfilerFiller profiler, Node startNode, List<Map.Entry<Target, BlockPos>> positions, float followRange, int distance, float rangeMultiplier, NodeEvaluator nodeEvaluator) {
++    private Path findPath(NodeEvaluator nodeEvaluator, ProfilerFiller profiler, Node startNode, List<Map.Entry<Target, BlockPos>> positions, float followRange, int distance, float rangeMultiplier) {
          profiler.push("find_path");
          profiler.markForCharting(MetricCategory.PATH_FINDING);
 +    // Kaiiju start - petal - split pathfinding into the original sync method for compat and processing for delaying
@@ -1207,7 +1205,7 @@ index d23481453717f715124156b5d83f6448f720d049..00f2f9c8f6fa7f506146d8def594177b
          // Set<Target> set = positions.keySet();
          startNode.g = 0.0F;
          startNode.h = this.getBestH(startNode, positions); // Paper - optimize collection
-@@ -91,7 +133,7 @@ public class PathFinder {
+@@ -91,7 +131,7 @@ public class PathFinder {
              }
  
              if (!(node.distanceTo(startNode) >= followRange)) {
