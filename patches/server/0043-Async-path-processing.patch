@@ -482,6 +482,18 @@ index 0000000000000000000000000000000000000000..d4646df5004d9df78992bf849a759cc6
 +
 +}
 \ No newline at end of file
+diff --git a/src/main/java/net/minecraft/world/entity/Mob.java b/src/main/java/net/minecraft/world/entity/Mob.java
+index a8b23b1594d2b39568c68c93a8a1b936457672bc..17f5bafa8a9c4da3d43218c744e7c29948f371ae 100644
+--- a/src/main/java/net/minecraft/world/entity/Mob.java
++++ b/src/main/java/net/minecraft/world/entity/Mob.java
+@@ -294,6 +294,7 @@ public abstract class Mob extends LivingEntity implements Targeting {
+     @Nullable
+     @Override
+     public LivingEntity getTarget() {
++        if (!io.papermc.paper.util.TickThread.isTickThreadFor(this)) return this.target; else // Kaiiju - for the async path processor
+         // Folia start - region threading
+         if (!io.papermc.paper.util.TickThread.isTickThreadFor(this.target)) {
+             this.target = null;
 diff --git a/src/main/java/net/minecraft/world/entity/ai/behavior/AcquirePoi.java b/src/main/java/net/minecraft/world/entity/ai/behavior/AcquirePoi.java
 index d4c91e0a0c64fcb7f1145de3f30134cb1f1f8ee6..ef5ec638bcd88df6eb93746868e863dbe0d11677 100644
 --- a/src/main/java/net/minecraft/world/entity/ai/behavior/AcquirePoi.java
