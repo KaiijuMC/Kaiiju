@@ -807,7 +807,7 @@ index 71934af2dc4d209a9fbccfd36b5f2815ec196892..754963fe76cf9169b8c5c9eb9ee93c45
      }
  
 diff --git a/src/main/java/net/minecraft/world/entity/ai/navigation/PathNavigation.java b/src/main/java/net/minecraft/world/entity/ai/navigation/PathNavigation.java
-index 2549b81eb5fa1a021edac960170f5e0d513dae97..6ab583960167412a925095991827d7812c8cee39 100644
+index 2549b81eb5fa1a021edac960170f5e0d513dae97..477c9eba278bfa88f0358514bb3c609e154fde80 100644
 --- a/src/main/java/net/minecraft/world/entity/ai/navigation/PathNavigation.java
 +++ b/src/main/java/net/minecraft/world/entity/ai/navigation/PathNavigation.java
 @@ -152,6 +152,10 @@ public abstract class PathNavigation {
@@ -832,7 +832,7 @@ index 2549b81eb5fa1a021edac960170f5e0d513dae97..6ab583960167412a925095991827d781
 +
 +                dev.kaiijumc.kaiiju.path.AsyncPathProcessor.awaitProcessing(mob, path, processedPath -> {
 +                    // check that processing didn't take so long that we calculated a new path
-+                    //if (processedPath != this.path) return;
++                    if (processedPath != this.path) return;
 +
 +                    if (processedPath != null && processedPath.getTarget() != null) {
 +                        this.targetPos = processedPath.getTarget();
