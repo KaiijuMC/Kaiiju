@@ -776,7 +776,7 @@ index acd0b946cab86eb173e713535194d3a9347c7d48..8d3f5f8793b2ebf132b79374c14f0c40
          if (!this.isDone()) {
              if (this.canUpdatePath()) {
 diff --git a/src/main/java/net/minecraft/world/entity/ai/navigation/GroundPathNavigation.java b/src/main/java/net/minecraft/world/entity/ai/navigation/GroundPathNavigation.java
-index 71934af2dc4d209a9fbccfd36b5f2815ec196892..754963fe76cf9169b8c5c9eb9ee93c4544f3258e 100644
+index 71934af2dc4d209a9fbccfd36b5f2815ec196892..96357530e99bc0b36c1de74bedc1bd7038b91b5a 100644
 --- a/src/main/java/net/minecraft/world/entity/ai/navigation/GroundPathNavigation.java
 +++ b/src/main/java/net/minecraft/world/entity/ai/navigation/GroundPathNavigation.java
 @@ -21,10 +21,26 @@ public class GroundPathNavigation extends PathNavigation {
@@ -784,7 +784,7 @@ index 71934af2dc4d209a9fbccfd36b5f2815ec196892..754963fe76cf9169b8c5c9eb9ee93c45
      }
  
 +    // Kaiiju start - petal - async path processing
-+    private static final dev.kaiijumc.kaiiju.path.NodeEvaluatorGenerator nodeEvaluatorGenerator = (dev.kaiijumc.kaiiju.path.NodeEvaluatorFeatures nodeEvaluatorFeatures) -> {
++    protected static final dev.kaiijumc.kaiiju.path.NodeEvaluatorGenerator nodeEvaluatorGenerator = (dev.kaiijumc.kaiiju.path.NodeEvaluatorFeatures nodeEvaluatorFeatures) -> {
 +        WalkNodeEvaluator nodeEvaluator = new WalkNodeEvaluator();
 +        nodeEvaluator.setCanPassDoors(nodeEvaluatorFeatures.canPassDoors());
 +        nodeEvaluator.setCanFloat(nodeEvaluatorFeatures.canFloat());
@@ -1063,6 +1063,26 @@ index ebf54d6e36fdee2833250816fae14195ac45eb67..367618db763f2f931451db4ead3d599e
              return new PathFinder(this.nodeEvaluator, range);
          }
  
+diff --git a/src/main/java/net/minecraft/world/entity/monster/warden/Warden.java b/src/main/java/net/minecraft/world/entity/monster/warden/Warden.java
+index 97b763431bc5015448ee7a26a340635a932c950b..c4b1ed10ca965903436ccc60c5e67c3e19628f27 100644
+--- a/src/main/java/net/minecraft/world/entity/monster/warden/Warden.java
++++ b/src/main/java/net/minecraft/world/entity/monster/warden/Warden.java
+@@ -600,6 +600,15 @@ public class Warden extends Monster implements VibrationSystem {
+             protected PathFinder createPathFinder(int range) {
+                 this.nodeEvaluator = new WalkNodeEvaluator();
+                 this.nodeEvaluator.setCanPassDoors(true);
++                // Kaiiju start - petal - async path processing
++                if (dev.kaiijumc.kaiiju.KaiijuConfig.asyncPathProcessing)
++                    return new PathFinder(this.nodeEvaluator, range, GroundPathNavigation.nodeEvaluatorGenerator) {
++                        @Override
++                        protected float distance(Node a, Node b) {
++                            return a.distanceToXZ(b);
++                        }
++                    };
++                else
+                 return new PathFinder(this.nodeEvaluator, range) {
+                     @Override
+                     protected float distance(Node a, Node b) {
 diff --git a/src/main/java/net/minecraft/world/level/pathfinder/Path.java b/src/main/java/net/minecraft/world/level/pathfinder/Path.java
 index 2a335f277bd0e4b8ad0f60d8226eb8aaa80a871f..b2c3c459fae7d0cb5ef0fcbc2ff0e61c7b952087 100644
 --- a/src/main/java/net/minecraft/world/level/pathfinder/Path.java
