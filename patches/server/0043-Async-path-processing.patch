@@ -5,21 +5,39 @@ Subject: [PATCH] Async path processing
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index ebfa9e1dcca5ea8272e796f0409902d92b59ee76..e2367e9913bcecbf7d2139676310b1a1fc7c0b44 100644
+index ebfa9e1dcca5ea8272e796f0409902d92b59ee76..b4196068948cf1f1320bbcf00bd16a7652734c19 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -213,12 +213,14 @@ public class KaiijuConfig {
+@@ -12,6 +12,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
+ 
+ import java.io.File;
+ import java.io.IOException;
++import java.lang.Math;
+ import java.lang.reflect.InvocationTargetException;
+ import java.lang.reflect.Method;
+ import java.lang.reflect.Modifier;
+@@ -213,12 +214,24 @@ public class KaiijuConfig {
      public static boolean disablePlayerStats = false;
      public static boolean disableArmSwingEvent = false;
      public static boolean disableEnsureTickThreadChecks = false;
 +    public static boolean asyncPathProcessing = false;
++    public static int asyncPathProcessingMaxThreads = 0;
++    public static int asyncPathProcessingKeepalive = 60;
++    public static int asyncPathProcessingQueueCapacity = 700;
  
      private static void optimizationSettings() {
          disableVanishApi = getBoolean("optimization.disable-vanish-api", disableVanishApi);
          disablePlayerStats = getBoolean("optimization.disable-player-stats", disablePlayerStats);
          disableArmSwingEvent = getBoolean("optimization.disable-arm-swing-event", disableArmSwingEvent);
          disableEnsureTickThreadChecks = getBoolean("optimization.disable-ensure-tick-thread-checks", disableEnsureTickThreadChecks);
-+        asyncPathProcessing = getBoolean("optimization.async-path-processing", asyncPathProcessing);
++        asyncPathProcessing = getBoolean("optimization.async-path-processing.enable", asyncPathProcessing);
++        asyncPathProcessingMaxThreads = getInt("optimization.async-path-processing.max-threads", asyncPathProcessingMaxThreads);
++        asyncPathProcessingKeepalive = getInt("optimization.async-path-processing.keepalive", asyncPathProcessingKeepalive);
++        asyncPathProcessingQueueCapacity = getInt("optimization.async-path-processing.queue-capacity", asyncPathProcessingQueueCapacity);
++        if (asyncPathProcessingMaxThreads < 0)
++            asyncPathProcessingMaxThreads = Math.max(Runtime.getRuntime().availableProcessors() + asyncPathProcessingMaxThreads, 1);
++        if (asyncPathProcessingMaxThreads == 0)
++            asyncPathProcessingMaxThreads = Math.max(Runtime.getRuntime().availableProcessors() / 4, 1);
      }
  
      public static String serverModName = "Kaiiju";
@@ -318,10 +336,10 @@ index 0000000000000000000000000000000000000000..6b91852238f80d236fc44f766b115267
 +}
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/path/AsyncPathProcessor.java b/src/main/java/dev/kaiijumc/kaiiju/path/AsyncPathProcessor.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..ba6cb036a89d8f07b1f9350dba24875243bcd31d
+index 0000000000000000000000000000000000000000..a6de8906d1629c60523c02681379ccdcaa22b588
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/path/AsyncPathProcessor.java
-@@ -0,0 +1,48 @@
+@@ -0,0 +1,53 @@
 +package dev.kaiijumc.kaiiju.path;
 +
 +import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -332,9 +350,7 @@ index 0000000000000000000000000000000000000000..ba6cb036a89d8f07b1f9350dba248752
 +import org.jetbrains.annotations.NotNull;
 +import org.jetbrains.annotations.Nullable;
 +
-+import java.util.concurrent.CompletableFuture;
-+import java.util.concurrent.Executor;
-+import java.util.concurrent.Executors;
++import java.util.concurrent.*;
 +import java.util.function.Consumer;
 +
 +/**
@@ -342,10 +358,17 @@ index 0000000000000000000000000000000000000000..ba6cb036a89d8f07b1f9350dba248752
 + */
 +public class AsyncPathProcessor {
 +
-+    private static final Executor pathProcessingExecutor = Executors.newCachedThreadPool(new ThreadFactoryBuilder()
++    private static final Executor pathProcessingExecutor = new ThreadPoolExecutor(
++        1,
++        dev.kaiijumc.kaiiju.KaiijuConfig.asyncPathProcessingMaxThreads,
++        dev.kaiijumc.kaiiju.KaiijuConfig.asyncPathProcessingKeepalive,
++        TimeUnit.SECONDS,
++        new ArrayBlockingQueue<>(dev.kaiijumc.kaiiju.KaiijuConfig.asyncPathProcessingQueueCapacity),
++        new ThreadFactoryBuilder()
 +            .setNameFormat("petal-path-processor-%d")
 +            .setPriority(Thread.NORM_PRIORITY - 2)
-+            .build());
++            .build()
++    );
 +
 +    protected static CompletableFuture<Void> queue(@NotNull AsyncPath path) {
 +        return CompletableFuture.runAsync(path::process, pathProcessingExecutor);
