@@ -5,7 +5,7 @@ Subject: [PATCH] Async path processing
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index ebfa9e1dcca5ea8272e796f0409902d92b59ee76..b4196068948cf1f1320bbcf00bd16a7652734c19 100644
+index ebfa9e1dcca5ea8272e796f0409902d92b59ee76..bdad5f0bfff96b04627671533c38fe19d5b58c12 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 @@ -12,6 +12,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
@@ -16,7 +16,7 @@ index ebfa9e1dcca5ea8272e796f0409902d92b59ee76..b4196068948cf1f1320bbcf00bd16a76
  import java.lang.reflect.InvocationTargetException;
  import java.lang.reflect.Method;
  import java.lang.reflect.Modifier;
-@@ -213,12 +214,24 @@ public class KaiijuConfig {
+@@ -213,12 +214,26 @@ public class KaiijuConfig {
      public static boolean disablePlayerStats = false;
      public static boolean disableArmSwingEvent = false;
      public static boolean disableEnsureTickThreadChecks = false;
@@ -36,8 +36,10 @@ index ebfa9e1dcca5ea8272e796f0409902d92b59ee76..b4196068948cf1f1320bbcf00bd16a76
 +        asyncPathProcessingQueueCapacity = getInt("optimization.async-path-processing.queue-capacity", asyncPathProcessingQueueCapacity);
 +        if (asyncPathProcessingMaxThreads < 0)
 +            asyncPathProcessingMaxThreads = Math.max(Runtime.getRuntime().availableProcessors() + asyncPathProcessingMaxThreads, 1);
-+        if (asyncPathProcessingMaxThreads == 0)
++        else if (asyncPathProcessingMaxThreads == 0)
 +            asyncPathProcessingMaxThreads = Math.max(Runtime.getRuntime().availableProcessors() / 4, 1);
++        if (!asyncPathProcessing)
++            asyncPathProcessingMaxThreads = 0;
      }
  
      public static String serverModName = "Kaiiju";
