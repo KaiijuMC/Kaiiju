@@ -5,7 +5,7 @@ Subject: [PATCH] Async path processing
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index ebfa9e1dcca5ea8272e796f0409902d92b59ee76..ae2e6f59295bc89a7cec552268ab3e766ab5a4a7 100644
+index ebfa9e1dcca5ea8272e796f0409902d92b59ee76..6be4abdd16f2d57a80dbe175a91ff304fd17a7db 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 @@ -12,6 +12,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
@@ -23,7 +23,7 @@ index ebfa9e1dcca5ea8272e796f0409902d92b59ee76..ae2e6f59295bc89a7cec552268ab3e76
 +    public static boolean asyncPathProcessing = false;
 +    public static int asyncPathProcessingMaxThreads = 0;
 +    public static int asyncPathProcessingKeepalive = 60;
-+    public static int asyncPathProcessingQueueCapacity = 1000;
++    public static int asyncPathProcessingQueueCapacity = 4096;
  
      private static void optimizationSettings() {
          disableVanishApi = getBoolean("optimization.disable-vanish-api", disableVanishApi);
@@ -513,14 +513,14 @@ index 0000000000000000000000000000000000000000..130d61324679c8600faa52255f3ad99f
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/world/entity/Mob.java b/src/main/java/net/minecraft/world/entity/Mob.java
-index a8b23b1594d2b39568c68c93a8a1b936457672bc..17f5bafa8a9c4da3d43218c744e7c29948f371ae 100644
+index a8b23b1594d2b39568c68c93a8a1b936457672bc..8bd27e1a60c1a92350f4954764ea17914959e6dc 100644
 --- a/src/main/java/net/minecraft/world/entity/Mob.java
 +++ b/src/main/java/net/minecraft/world/entity/Mob.java
 @@ -294,6 +294,7 @@ public abstract class Mob extends LivingEntity implements Targeting {
      @Nullable
      @Override
      public LivingEntity getTarget() {
-+        if (!io.papermc.paper.util.TickThread.isTickThreadFor(this)) return this.target; else // Kaiiju - for the async path processor
++        if (!io.papermc.paper.util.TickThread.isTickThreadFor(this)) return this.target; // Kaiiju - for the async path processor
          // Folia start - region threading
          if (!io.papermc.paper.util.TickThread.isTickThreadFor(this.target)) {
              this.target = null;
