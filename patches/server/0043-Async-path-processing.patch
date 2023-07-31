@@ -5,7 +5,7 @@ Subject: [PATCH] Async path processing
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index ebfa9e1dcca5ea8272e796f0409902d92b59ee76..f4d2a71c2aa0deb66ddc459f0d7fb857292620fb 100644
+index ebfa9e1dcca5ea8272e796f0409902d92b59ee76..ae2e6f59295bc89a7cec552268ab3e766ab5a4a7 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 @@ -12,6 +12,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
@@ -23,7 +23,7 @@ index ebfa9e1dcca5ea8272e796f0409902d92b59ee76..f4d2a71c2aa0deb66ddc459f0d7fb857
 +    public static boolean asyncPathProcessing = false;
 +    public static int asyncPathProcessingMaxThreads = 0;
 +    public static int asyncPathProcessingKeepalive = 60;
-+    public static int asyncPathProcessingQueueCapacity = 700;
++    public static int asyncPathProcessingQueueCapacity = 1000;
  
      private static void optimizationSettings() {
          disableVanishApi = getBoolean("optimization.disable-vanish-api", disableVanishApi);
