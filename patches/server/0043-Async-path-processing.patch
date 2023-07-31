@@ -747,6 +747,19 @@ index 271efbb027f6f5d69ac5bc5dc51102a1eb00ab31..247433a5c17214f099db8f708a36ede9
  
                              return true;
                          } else {
+diff --git a/src/main/java/net/minecraft/world/entity/ai/goal/DoorInteractGoal.java b/src/main/java/net/minecraft/world/entity/ai/goal/DoorInteractGoal.java
+index 6771f2dc974317b6b152288bf41d1a95bc78a8e4..7a641747b17164b09bb8483cda7f69d11741a94a 100644
+--- a/src/main/java/net/minecraft/world/entity/ai/goal/DoorInteractGoal.java
++++ b/src/main/java/net/minecraft/world/entity/ai/goal/DoorInteractGoal.java
+@@ -57,7 +57,7 @@ public abstract class DoorInteractGoal extends Goal {
+         } else {
+             GroundPathNavigation groundPathNavigation = (GroundPathNavigation)this.mob.getNavigation();
+             Path path = groundPathNavigation.getPath();
+-            if (path != null && !path.isDone() && groundPathNavigation.canOpenDoors()) {
++            if (path != null && path.isProcessed() && !path.isDone() && groundPathNavigation.canOpenDoors()) { // Kaiiju - async pathfinding - ensure path is processed
+                 for(int i = 0; i < Math.min(path.getNextNodeIndex() + 2, path.getNodeCount()); ++i) {
+                     Node node = path.getNode(i);
+                     this.doorPos = new BlockPos(node.x, node.y + 1, node.z);
 diff --git a/src/main/java/net/minecraft/world/entity/ai/navigation/AmphibiousPathNavigation.java b/src/main/java/net/minecraft/world/entity/ai/navigation/AmphibiousPathNavigation.java
 index 97bd4c9f83257c8c54694110d369d0487e4df9f9..f0772715cb806ae0a9d035ba8edb14de742c38a2 100644
 --- a/src/main/java/net/minecraft/world/entity/ai/navigation/AmphibiousPathNavigation.java
@@ -961,10 +974,10 @@ index 87887916ff2f685346699989ba30c35ef7e5715f..e8b8abb31678517a89774d42710fe097
      }
  
 diff --git a/src/main/java/net/minecraft/world/entity/ai/sensing/NearestBedSensor.java b/src/main/java/net/minecraft/world/entity/ai/sensing/NearestBedSensor.java
-index 8db20db72cd51046213625fac46c35854c59ec5d..3eb5f87d2755727557b70d3910915ff4134b04bd 100644
+index 8db20db72cd51046213625fac46c35854c59ec5d..acb6969e9672e93efe753eb295a8f35ad1151048 100644
 --- a/src/main/java/net/minecraft/world/entity/ai/sensing/NearestBedSensor.java
 +++ b/src/main/java/net/minecraft/world/entity/ai/sensing/NearestBedSensor.java
-@@ -57,6 +57,24 @@ public class NearestBedSensor extends Sensor<Mob> {
+@@ -57,6 +57,25 @@ public class NearestBedSensor extends Sensor<Mob> {
              java.util.List<Pair<Holder<PoiType>, BlockPos>> poiposes = new java.util.ArrayList<>();
              // don't ask me why it's unbounded. ask mojang.
              io.papermc.paper.util.PoiAccess.findAnyPoiPositions(poiManager, type -> type.is(PoiTypes.HOME), predicate, entity.blockPosition(), 48, PoiManager.Occupancy.ANY, false, Integer.MAX_VALUE, poiposes);
@@ -977,6 +990,7 @@ index 8db20db72cd51046213625fac46c35854c59ec5d..3eb5f87d2755727557b70d3910915ff4
 +                        this.batchCache.long2LongEntrySet().removeIf((entry) -> entry.getLongValue() < this.lastUpdate);
 +                        return;
 +                    }
++                    if (path == null) return;
 +
 +                    BlockPos blockPos = path.getTarget();
 +                    Optional<Holder<PoiType>> optional = poiManager.getType(blockPos);
@@ -989,7 +1003,7 @@ index 8db20db72cd51046213625fac46c35854c59ec5d..3eb5f87d2755727557b70d3910915ff4
              Path path = AcquirePoi.findPathToPois(entity, new java.util.HashSet<>(poiposes));
              // Paper end - optimise POI access
              if (path != null && path.canReach()) {
-@@ -70,6 +88,7 @@ public class NearestBedSensor extends Sensor<Mob> {
+@@ -70,6 +89,7 @@ public class NearestBedSensor extends Sensor<Mob> {
                      return entry.getLongValue() < this.lastUpdate;
                  });
              }
