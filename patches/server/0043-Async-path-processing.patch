@@ -397,7 +397,7 @@ index 0000000000000000000000000000000000000000..a6de8906d1629c60523c02681379ccdc
 +}
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/path/NodeEvaluatorCache.java b/src/main/java/dev/kaiijumc/kaiiju/path/NodeEvaluatorCache.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..bfa6cf5aa317a56eadb77c3bda60c884c491763e
+index 0000000000000000000000000000000000000000..121eda164714650f76bb6c8495ef375d8a00d812
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/path/NodeEvaluatorCache.java
 @@ -0,0 +1,42 @@
@@ -422,7 +422,7 @@ index 0000000000000000000000000000000000000000..bfa6cf5aa317a56eadb77c3bda60c884
 +    }
 +
 +    public static @NotNull NodeEvaluator takeNodeEvaluator(@NotNull NodeEvaluatorGenerator generator, @NotNull NodeEvaluator localNodeEvaluator) {
-+        final NodeEvaluatorFeatures nodeEvaluatorFeatures = NodeEvaluatorFeatures.fromLocalNodeEvaluator(localNodeEvaluator);
++        final NodeEvaluatorFeatures nodeEvaluatorFeatures = NodeEvaluatorFeatures.fromNodeEvaluator(localNodeEvaluator);
 +        NodeEvaluator nodeEvaluator = getDequeForGenerator(nodeEvaluatorFeatures).poll();
 +
 +        if (nodeEvaluator == null) {
@@ -435,7 +435,7 @@ index 0000000000000000000000000000000000000000..bfa6cf5aa317a56eadb77c3bda60c884
 +    }
 +
 +    public static void returnNodeEvaluator(@NotNull NodeEvaluator nodeEvaluator) {
-+        final NodeEvaluatorFeatures nodeEvaluatorFeatures = NodeEvaluatorFeatures.fromLocalNodeEvaluator(nodeEvaluator);
++        final NodeEvaluatorFeatures nodeEvaluatorFeatures = NodeEvaluatorFeatures.fromNodeEvaluator(nodeEvaluator);
 +        final var generator = nodeEvaluatorToGenerator.remove(nodeEvaluator);
 +        Validate.notNull(generator, "NodeEvaluator already returned");
 +
@@ -445,49 +445,29 @@ index 0000000000000000000000000000000000000000..bfa6cf5aa317a56eadb77c3bda60c884
 +}
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/path/NodeEvaluatorFeatures.java b/src/main/java/dev/kaiijumc/kaiiju/path/NodeEvaluatorFeatures.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..640a38877b9f98f429284e2a3eb196e02ddb08be
+index 0000000000000000000000000000000000000000..446de8628ccd319a4404e07212dde1cf06241951
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/path/NodeEvaluatorFeatures.java
-@@ -0,0 +1,41 @@
+@@ -0,0 +1,21 @@
 +package dev.kaiijumc.kaiiju.path;
 +
 +import net.minecraft.world.level.pathfinder.NodeEvaluator;
 +import net.minecraft.world.level.pathfinder.SwimNodeEvaluator;
 +
-+public record NodeEvaluatorFeatures(boolean canPassDoors,
++public record NodeEvaluatorFeatures(NodeEvaluatorType type,
++                                    boolean canPassDoors,
 +                                    boolean canFloat,
 +                                    boolean canWalkOverFences,
 +                                    boolean canOpenDoors,
 +                                    boolean allowBreaching) {
-+    public static NodeEvaluatorFeatures fromLocalNodeEvaluator(NodeEvaluator localNodeEvaluator) {
-+        boolean canPassDoors = localNodeEvaluator.canPassDoors();
-+        boolean canFloat = localNodeEvaluator.canFloat();
-+        boolean canWalkOverFences = localNodeEvaluator.canWalkOverFences();
-+        boolean canOpenDoors = localNodeEvaluator.canOpenDoors();
-+        boolean allowBreaching = localNodeEvaluator instanceof SwimNodeEvaluator swimNodeEvaluator && swimNodeEvaluator.allowBreaching;
-+
-+        return new NodeEvaluatorFeatures(canPassDoors, canFloat, canWalkOverFences, canOpenDoors, allowBreaching);
-+    }
-+
-+    @Override
-+    public boolean equals(Object o) {
-+        if (this == o) return true;
-+        if (o == null || getClass() != o.getClass()) return false;
-+        NodeEvaluatorFeatures that = (NodeEvaluatorFeatures) o;
-+        return canPassDoors == that.canPassDoors
-+            && canFloat == that.canFloat
-+            && canWalkOverFences == that.canWalkOverFences
-+            && canOpenDoors == that.canOpenDoors
-+            && allowBreaching == that.allowBreaching;
-+    }
-+
-+    @Override
-+    public int hashCode() {
-+        return (canPassDoors ? 1 : 0)
-+             | (canFloat ? 2 : 0)
-+             | (canWalkOverFences ? 4 : 0)
-+             | (canOpenDoors ? 8 : 0)
-+             | (allowBreaching ? 16 : 0);
++    public static NodeEvaluatorFeatures fromNodeEvaluator(NodeEvaluator nodeEvaluator) {
++        NodeEvaluatorType type = NodeEvaluatorType.fromNodeEvaluator(nodeEvaluator);
++        boolean canPassDoors = nodeEvaluator.canPassDoors();
++        boolean canFloat = nodeEvaluator.canFloat();
++        boolean canWalkOverFences = nodeEvaluator.canWalkOverFences();
++        boolean canOpenDoors = nodeEvaluator.canOpenDoors();
++        boolean allowBreaching = nodeEvaluator instanceof SwimNodeEvaluator swimNodeEvaluator && swimNodeEvaluator.allowBreaching;
++        return new NodeEvaluatorFeatures(type, canPassDoors, canFloat, canWalkOverFences, canOpenDoors, allowBreaching);
 +    }
 +}
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/path/NodeEvaluatorGenerator.java b/src/main/java/dev/kaiijumc/kaiiju/path/NodeEvaluatorGenerator.java
@@ -507,6 +487,29 @@ index 0000000000000000000000000000000000000000..d4646df5004d9df78992bf849a759cc6
 +
 +}
 \ No newline at end of file
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/path/NodeEvaluatorType.java b/src/main/java/dev/kaiijumc/kaiiju/path/NodeEvaluatorType.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..130d61324679c8600faa52255f3ad99f3a6778e8
+--- /dev/null
++++ b/src/main/java/dev/kaiijumc/kaiiju/path/NodeEvaluatorType.java
+@@ -0,0 +1,17 @@
++package dev.kaiijumc.kaiiju.path;
++
++import net.minecraft.world.level.pathfinder.*;
++
++public enum NodeEvaluatorType {
++    WALK,
++    SWIM,
++    AMPHIBIOUS,
++    FLY;
++
++    public static NodeEvaluatorType fromNodeEvaluator(NodeEvaluator nodeEvaluator) {
++        if (nodeEvaluator instanceof SwimNodeEvaluator) return SWIM;
++        if (nodeEvaluator instanceof FlyNodeEvaluator) return  FLY;
++        if (nodeEvaluator instanceof AmphibiousNodeEvaluator) return AMPHIBIOUS;
++        return WALK;
++    }
++}
 diff --git a/src/main/java/net/minecraft/world/entity/Mob.java b/src/main/java/net/minecraft/world/entity/Mob.java
 index a8b23b1594d2b39568c68c93a8a1b936457672bc..17f5bafa8a9c4da3d43218c744e7c29948f371ae 100644
 --- a/src/main/java/net/minecraft/world/entity/Mob.java
@@ -1101,10 +1104,10 @@ index ebf54d6e36fdee2833250816fae14195ac45eb67..367618db763f2f931451db4ead3d599e
          }
  
 diff --git a/src/main/java/net/minecraft/world/entity/monster/warden/Warden.java b/src/main/java/net/minecraft/world/entity/monster/warden/Warden.java
-index 97b763431bc5015448ee7a26a340635a932c950b..c4b1ed10ca965903436ccc60c5e67c3e19628f27 100644
+index 97b763431bc5015448ee7a26a340635a932c950b..48109aebe34cbdfac3eceffb1c20aa84aca542fe 100644
 --- a/src/main/java/net/minecraft/world/entity/monster/warden/Warden.java
 +++ b/src/main/java/net/minecraft/world/entity/monster/warden/Warden.java
-@@ -600,6 +600,15 @@ public class Warden extends Monster implements VibrationSystem {
+@@ -600,6 +600,16 @@ public class Warden extends Monster implements VibrationSystem {
              protected PathFinder createPathFinder(int range) {
                  this.nodeEvaluator = new WalkNodeEvaluator();
                  this.nodeEvaluator.setCanPassDoors(true);
@@ -1117,6 +1120,7 @@ index 97b763431bc5015448ee7a26a340635a932c950b..c4b1ed10ca965903436ccc60c5e67c3e
 +                        }
 +                    };
 +                else
++                // Kaiiju end
                  return new PathFinder(this.nodeEvaluator, range) {
                      @Override
                      protected float distance(Node a, Node b) {
