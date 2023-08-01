@@ -41,7 +41,7 @@ optimization:
     enable: false
     max-threads: 0
     keepalive: 60
-    queue-capacity: 700
+    queue-capacity: 4096
 world-settings:
   default:
     gameplay:
