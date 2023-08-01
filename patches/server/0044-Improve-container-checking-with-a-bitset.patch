@@ -1,0 +1,456 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Paul Sauve <paul@technove.co>
+Date: Tue, 1 Aug 2023 03:38:09 +0200
+Subject: [PATCH] Improve container checking with a bitset
+
+
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/structs/ItemListWithBitset.java b/src/main/java/dev/kaiijumc/kaiiju/structs/ItemListWithBitset.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..ee32b7c4a1ae1e23149694ecba5ab7bd347d6ca6
+--- /dev/null
++++ b/src/main/java/dev/kaiijumc/kaiiju/structs/ItemListWithBitset.java
+@@ -0,0 +1,114 @@
++package dev.kaiijumc.kaiiju.structs;
++
++
++import net.minecraft.core.NonNullList;
++import net.minecraft.world.item.ItemStack;
++import org.apache.commons.lang.Validate;
++import org.jetbrains.annotations.NotNull;
++
++import java.util.AbstractList;
++import java.util.Arrays;
++import java.util.List;
++
++public class ItemListWithBitset extends AbstractList<ItemStack> {
++    public static ItemListWithBitset fromList(List<ItemStack> list) {
++        if (list instanceof ItemListWithBitset ours) {
++            return ours;
++        }
++        return new ItemListWithBitset(list);
++    }
++
++    private static ItemStack[] createArray(int size) {
++        ItemStack[] array = new ItemStack[size];
++        Arrays.fill(array, ItemStack.EMPTY);
++        return array;
++    }
++
++    private final ItemStack[] items;
++
++    private long bitSet = 0;
++    private final long allBits;
++
++    private static class OurNonNullList extends NonNullList<ItemStack> {
++        protected OurNonNullList(List<ItemStack> delegate) {
++            super(delegate, ItemStack.EMPTY);
++        }
++    }
++
++    public final NonNullList<ItemStack> nonNullList = new OurNonNullList(this);
++
++    private ItemListWithBitset(List<ItemStack> list) {
++        this(list.size());
++
++        for (int i = 0; i < list.size(); i++) {
++            this.set(i, list.get(i));
++        }
++    }
++
++    public ItemListWithBitset(int size) {
++        Validate.isTrue(size < Long.BYTES * 8, "size is too large");
++
++        this.items = createArray(size);
++        this.allBits = ((1L << size) - 1);
++    }
++
++    public boolean isCompletelyEmpty() {
++        return this.bitSet == 0;
++    }
++
++    public boolean hasFullStacks() {
++        return (this.bitSet & this.allBits) == allBits;
++    }
++
++    @Override
++    public ItemStack set(int index, @NotNull ItemStack itemStack) {
++        ItemStack existing = this.items[index];
++
++        this.items[index] = itemStack;
++
++        if (itemStack == ItemStack.EMPTY) {
++            this.bitSet &= ~(1L << index);
++        } else {
++            this.bitSet |= 1L << index;
++        }
++
++        return existing;
++    }
++
++    @NotNull
++    @Override
++    public ItemStack get(int var0) {
++        return this.items[var0];
++    }
++
++    @Override
++    public int size() {
++        return this.items.length;
++    }
++
++    @Override
++    public void clear() {
++        Arrays.fill(this.items, ItemStack.EMPTY);
++    }
++
++    // these are unsupported for block inventories which have a static size
++    @Override
++    public void add(int var0, ItemStack var1) {
++        throw new UnsupportedOperationException();
++    }
++
++    @Override
++    public ItemStack remove(int var0) {
++        throw new UnsupportedOperationException();
++    }
++
++    @Override
++    public String toString() {
++        return "ItemListWithBitset{" +
++          "items=" + Arrays.toString(items) +
++          ", bitSet=" + Long.toString(bitSet, 2) +
++          ", allBits=" + Long.toString(allBits, 2) +
++          ", size=" + this.items.length +
++          '}';
++    }
++}
+diff --git a/src/main/java/net/minecraft/world/CompoundContainer.java b/src/main/java/net/minecraft/world/CompoundContainer.java
+index 241fec02e6869c638d3a160819b32173a081467b..62848ca68f532fa14241320df76d180c13072c34 100644
+--- a/src/main/java/net/minecraft/world/CompoundContainer.java
++++ b/src/main/java/net/minecraft/world/CompoundContainer.java
+@@ -64,6 +64,23 @@ public class CompoundContainer implements Container {
+         this.container2 = second;
+     }
+ 
++    // Kaiiju start - airplane - improve container checking with a bitset
++    @Override
++   public boolean hasEmptySlot(net.minecraft.core.Direction enumdirection) {
++        return this.container1.hasEmptySlot(null) || this.container2.hasEmptySlot(null);
++    }
++
++    @Override
++   public boolean isCompletelyFull(net.minecraft.core.Direction enumdirection) {
++        return this.container1.isCompletelyFull(null) && this.container2.isCompletelyFull(null);
++    }
++
++    @Override
++    public boolean isCompletelyEmpty(net.minecraft.core.Direction enumdirection) {
++        return this.container1.isCompletelyEmpty(null) && this.container2.isCompletelyEmpty(null);
++    }
++    // Kaiiju end
++
+     @Override
+     public int getContainerSize() {
+         return this.container1.getContainerSize() + this.container2.getContainerSize();
+diff --git a/src/main/java/net/minecraft/world/Container.java b/src/main/java/net/minecraft/world/Container.java
+index 04b1531572e8fff1e46fe1c94e7fc863841e0f66..ac1e21a4fc210424ea57c247d03914c54129de9c 100644
+--- a/src/main/java/net/minecraft/world/Container.java
++++ b/src/main/java/net/minecraft/world/Container.java
+@@ -13,6 +13,63 @@ import org.bukkit.craftbukkit.entity.CraftHumanEntity;
+ // CraftBukkit end
+ 
+ public interface Container extends Clearable {
++    // Kaiiju start - airplane - allow the inventory to override and optimize these frequent calls
++    default boolean hasEmptySlot(@org.jetbrains.annotations.Nullable net.minecraft.core.Direction enumdirection) { // there is a slot with 0 items in it
++        if (this instanceof WorldlyContainer worldlyContainer) {
++            for (int i : worldlyContainer.getSlotsForFace(enumdirection)) {
++                if (this.getItem(i).isEmpty()) {
++                    return true;
++                }
++            }
++        } else {
++            int size = this.getContainerSize();
++            for (int i = 0; i < size; i++) {
++                if (this.getItem(i).isEmpty()) {
++                    return true;
++                }
++            }
++        }
++        return false;
++    }
++
++    default boolean isCompletelyFull(@org.jetbrains.annotations.Nullable net.minecraft.core.Direction enumdirection) { // every stack is maxed
++        if (this instanceof WorldlyContainer worldlyContainer) {
++            for (int i : worldlyContainer.getSlotsForFace(enumdirection)) {
++                ItemStack itemStack = this.getItem(i);
++                if (itemStack.getCount() < itemStack.getMaxStackSize()) {
++                    return false;
++                }
++            }
++        } else {
++            int size = this.getContainerSize();
++            for (int i = 0; i < size; i++) {
++                ItemStack itemStack = this.getItem(i);
++                if (itemStack.getCount() < itemStack.getMaxStackSize()) {
++                    return false;
++                }
++            }
++        }
++        return true;
++    }
++
++    default boolean isCompletelyEmpty(@org.jetbrains.annotations.Nullable net.minecraft.core.Direction enumdirection) {
++        if (this instanceof WorldlyContainer worldlyContainer) {
++            for (int i : worldlyContainer.getSlotsForFace(enumdirection)) {
++                if (!this.getItem(i).isEmpty()) {
++                    return false;
++                }
++            }
++        } else {
++            int size = this.getContainerSize();
++            for (int i = 0; i < size; i++) {
++                if (!this.getItem(i).isEmpty()) {
++                    return false;
++                }
++            }
++        }
++        return true;
++    }
++    // Kaiiju end
+ 
+     int LARGE_MAX_STACK_SIZE = 64;
+     int DEFAULT_DISTANCE_LIMIT = 8;
+diff --git a/src/main/java/net/minecraft/world/entity/vehicle/AbstractMinecartContainer.java b/src/main/java/net/minecraft/world/entity/vehicle/AbstractMinecartContainer.java
+index 272095d7a09ab41227d741172735f66fd2798ce1..1f2e2d7726abd63bb46697697c91696387c819a2 100644
+--- a/src/main/java/net/minecraft/world/entity/vehicle/AbstractMinecartContainer.java
++++ b/src/main/java/net/minecraft/world/entity/vehicle/AbstractMinecartContainer.java
+@@ -28,6 +28,7 @@ import org.bukkit.inventory.InventoryHolder;
+ public abstract class AbstractMinecartContainer extends AbstractMinecart implements ContainerEntity {
+ 
+     private NonNullList<ItemStack> itemStacks;
++    private dev.kaiijumc.kaiiju.structs.ItemListWithBitset itemStacksOptimized; // Kaiiju - airplane - implement ItemListWithBitset
+     @Nullable
+     public ResourceLocation lootTable;
+     public long lootTableSeed;
+@@ -89,12 +90,18 @@ public abstract class AbstractMinecartContainer extends AbstractMinecart impleme
+ 
+     protected AbstractMinecartContainer(EntityType<?> type, Level world) {
+         super(type, world);
+-        this.itemStacks = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY); // CraftBukkit - SPIGOT-3513
++        // Kaiiju start - airplane - use ItemListWithBitset
++        this.itemStacksOptimized = new dev.kaiijumc.kaiiju.structs.ItemListWithBitset(this.getContainerSize()); // CraftBukkit - SPIGOT-3513
++        this.itemStacks = this.itemStacksOptimized.nonNullList;
++        // Kaiiju end
+     }
+ 
+     protected AbstractMinecartContainer(EntityType<?> type, double x, double y, double z, Level world) {
+         super(type, world, x, y, z);
+-        this.itemStacks = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY); // CraftBukkit - SPIGOT-3513
++        // Kaiiju start - airplane - use ItemListWithBitset
++        this.itemStacksOptimized = new dev.kaiijumc.kaiiju.structs.ItemListWithBitset(this.getContainerSize()); // CraftBukkit - SPIGOT-3513
++        this.itemStacks = this.itemStacksOptimized.nonNullList;
++        // Kaiiju end
+     }
+ 
+     @Override
+@@ -156,6 +163,10 @@ public abstract class AbstractMinecartContainer extends AbstractMinecart impleme
+     protected void readAdditionalSaveData(CompoundTag nbt) {
+         super.readAdditionalSaveData(nbt);
+         this.lootableData.loadNbt(nbt); // Paper
++        // Kaiiju start - airplane - use ItemListWithBitset
++        this.itemStacksOptimized = new dev.kaiijumc.kaiiju.structs.ItemListWithBitset(this.getContainerSize()); // CraftBukkit - SPIGOT-3513
++        this.itemStacks = this.itemStacksOptimized.nonNullList;
++        // Kaiiju end
+         this.readChestVehicleSaveData(nbt);
+     }
+ 
+diff --git a/src/main/java/net/minecraft/world/level/block/entity/ChestBlockEntity.java b/src/main/java/net/minecraft/world/level/block/entity/ChestBlockEntity.java
+index a71414397bd45ee7bcacfeef0041d80dfa25f114..93db8c056f1ec0f998b480cfdea3666cbc54603c 100644
+--- a/src/main/java/net/minecraft/world/level/block/entity/ChestBlockEntity.java
++++ b/src/main/java/net/minecraft/world/level/block/entity/ChestBlockEntity.java
+@@ -31,6 +31,7 @@ import org.bukkit.entity.HumanEntity;
+ public class ChestBlockEntity extends RandomizableContainerBlockEntity implements LidBlockEntity {
+ 
+     private static final int EVENT_SET_OPEN_COUNT = 1;
++    private dev.kaiijumc.kaiiju.structs.ItemListWithBitset optimizedItems; // Kaiiju - airplane - implement ItemListWithBitset
+     private NonNullList<ItemStack> items;
+     public final ContainerOpenersCounter openersCounter;
+     private final ChestLidController chestLidController;
+@@ -65,9 +66,14 @@ public class ChestBlockEntity extends RandomizableContainerBlockEntity implement
+     }
+     // CraftBukkit end
+ 
++    private final boolean isNative = getClass().equals(ChestBlockEntity.class); // Kaiiju - airplane
++
+     protected ChestBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+         super(type, pos, state);
+-        this.items = NonNullList.withSize(27, ItemStack.EMPTY);
++        // Kaiiju start - airplane - use ItemListWithBitset
++        this.optimizedItems = new dev.kaiijumc.kaiiju.structs.ItemListWithBitset(27);
++        this.items = this.optimizedItems.nonNullList;
++        // Kaiiju end
+         this.openersCounter = new ContainerOpenersCounter() {
+             @Override
+             protected void onOpen(Level world, BlockPos pos, BlockState state) {
+@@ -98,6 +104,23 @@ public class ChestBlockEntity extends RandomizableContainerBlockEntity implement
+         this.chestLidController = new ChestLidController();
+     }
+ 
++    // Kaiiju start - airplane - improve container checking with a bitset
++    @Override
++    public boolean hasEmptySlot(Direction enumdirection) {
++        return isNative ? !this.optimizedItems.hasFullStacks() : super.hasEmptySlot(enumdirection);
++    }
++
++    @Override
++    public boolean isCompletelyFull(Direction enumdirection) {
++        return isNative ? this.optimizedItems.hasFullStacks() && super.isCompletelyFull(enumdirection) : super.isCompletelyFull(enumdirection);
++    }
++
++    @Override
++    public boolean isCompletelyEmpty(Direction enumdirection) {
++        return isNative && this.optimizedItems.isCompletelyEmpty() || super.isCompletelyEmpty(enumdirection);
++    }
++    // Kaiiju end
++
+     public ChestBlockEntity(BlockPos pos, BlockState state) {
+         this(BlockEntityType.CHEST, pos, state);
+     }
+@@ -115,6 +138,10 @@ public class ChestBlockEntity extends RandomizableContainerBlockEntity implement
+     @Override
+     public void load(CompoundTag nbt) {
+         super.load(nbt);
++        // Kaiiju start - airplane - use ItemListWithBitset
++        this.optimizedItems = new dev.kaiijumc.kaiiju.structs.ItemListWithBitset(this.getContainerSize());
++        this.items = this.optimizedItems.nonNullList;
++        // Kaiiju end
+         this.items = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
+         if (!this.tryLoadLootTable(nbt)) {
+             ContainerHelper.loadAllItems(nbt, this.items);
+@@ -187,7 +214,10 @@ public class ChestBlockEntity extends RandomizableContainerBlockEntity implement
+ 
+     @Override
+     protected void setItems(NonNullList<ItemStack> list) {
+-        this.items = list;
++        // Kaiiju start - airplane - use ItemListWithBitset
++        this.optimizedItems = dev.kaiijumc.kaiiju.structs.ItemListWithBitset.fromList(list);
++        this.items = this.optimizedItems.nonNullList;
++        // Kaiiju end
+     }
+ 
+     @Override
+diff --git a/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
+index 762b763f271c3208b4f8a7e346897207ec5beb6c..502563c34d1ea39920525684075d03d943650f20 100644
+--- a/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
++++ b/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
+@@ -48,6 +48,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+     public static final int MOVE_ITEM_SPEED = 8;
+     public static final int HOPPER_CONTAINER_SIZE = 5;
+     private NonNullList<ItemStack> items;
++    private dev.kaiijumc.kaiiju.structs.ItemListWithBitset optimizedItems; // Kaiiju - airplane - implement ItemListWithBitset
+     private int cooldownTime;
+     private long tickedGameTime;
+ 
+@@ -83,13 +84,37 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+ 
+     public HopperBlockEntity(BlockPos pos, BlockState state) {
+         super(BlockEntityType.HOPPER, pos, state);
+-        this.items = NonNullList.withSize(5, ItemStack.EMPTY);
++        // Kaiiju start - airplane - use ItemListWithBitset
++        this.optimizedItems = new dev.kaiijumc.kaiiju.structs.ItemListWithBitset(5);
++        this.items = this.optimizedItems.nonNullList;
++        // Kaiiju end
+         this.cooldownTime = -1;
+     }
+ 
++    // Kaiiju start - airplane - improve container checking with a bitset
++    @Override
++    public boolean hasEmptySlot(Direction enumdirection) {
++        return !this.optimizedItems.hasFullStacks();
++    }
++
++    @Override
++    public boolean isCompletelyFull(Direction enumdirection) {
++        return this.optimizedItems.hasFullStacks() && super.isCompletelyFull(enumdirection);
++    }
++
++    @Override
++    public boolean isCompletelyEmpty(Direction enumdirection) {
++        return this.optimizedItems.isCompletelyEmpty() || super.isCompletelyEmpty(enumdirection);
++    }
++    // Kaiiju end
++
+     @Override
+     public void load(CompoundTag nbt) {
+         super.load(nbt);
++        // Kaiiju start - airplane - use ItemListWithBitset
++        this.optimizedItems = new dev.kaiijumc.kaiiju.structs.ItemListWithBitset(this.getContainerSize());
++        this.items = this.optimizedItems.nonNullList;
++        // Kaiiju end
+         this.items = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
+         if (!this.tryLoadLootTable(nbt)) {
+             ContainerHelper.loadAllItems(nbt, this.items);
+@@ -162,7 +187,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+                     flag = HopperBlockEntity.ejectItems(world, pos, state, (Container) blockEntity, blockEntity); // CraftBukkit
+                 }
+ 
+-                if (!blockEntity.inventoryFull()) {
++                if (!blockEntity.optimizedItems.hasFullStacks() || !blockEntity.inventoryFull()) {
+                     flag |= booleansupplier.getAsBoolean();
+                 }
+ 
+@@ -455,11 +480,11 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+     }
+ 
+     private static boolean isFullContainer(Container inventory, Direction direction) {
+-        return allMatch(inventory, direction, STACK_SIZE_TEST); // Paper - no streams
++        return inventory.isCompletelyFull(direction); // Kaiiju - airplane - use bitsets
+     }
+ 
+     private static boolean isEmptyContainer(Container inv, Direction facing) {
+-        return allMatch(inv, facing, IS_EMPTY_TEST);
++        return inv.isCompletelyEmpty(facing); // Kaiiju - airplane - use bitsets
+     }
+ 
+     public static boolean suckInItems(Level world, Hopper hopper) {
+@@ -649,7 +674,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+ 
+         if (HopperBlockEntity.canPlaceItemInContainer(to, stack, slot, side)) {
+             boolean flag = false;
+-            boolean flag1 = to.isEmpty();
++            boolean flag1 = to.isCompletelyEmpty(side); // Kaiiju - airplane - use bitsets
+ 
+             if (itemstack1.isEmpty()) {
+                 // Spigot start - SPIGOT-6693, InventorySubcontainer#setItem
+@@ -844,7 +869,10 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+ 
+     @Override
+     protected void setItems(NonNullList<ItemStack> list) {
+-        this.items = list;
++        // Kaiiju start - airplane - use ItemListWithBitset
++        this.optimizedItems = dev.kaiijumc.kaiiju.structs.ItemListWithBitset.fromList(list);
++        this.items = this.optimizedItems.nonNullList;
++        // Kaiiju end
+     }
+ 
+     public static void entityInside(Level world, BlockPos pos, BlockState state, Entity entity, HopperBlockEntity blockEntity) {
+diff --git a/src/main/java/net/minecraft/world/level/block/entity/RandomizableContainerBlockEntity.java b/src/main/java/net/minecraft/world/level/block/entity/RandomizableContainerBlockEntity.java
+index 081691f9710ff1115e4308f79ed49fbc38941193..648e28c5fba5c62e65f83fbb5ebc8836ffb166a9 100644
+--- a/src/main/java/net/minecraft/world/level/block/entity/RandomizableContainerBlockEntity.java
++++ b/src/main/java/net/minecraft/world/level/block/entity/RandomizableContainerBlockEntity.java
+@@ -95,14 +95,7 @@ public abstract class RandomizableContainerBlockEntity extends BaseContainerBloc
+     @Override
+     public boolean isEmpty() {
+         this.unpackLootTable((Player)null);
+-        // Paper start
+-        for (final ItemStack itemStack : this.getItems()) {
+-            if (!itemStack.isEmpty()) {
+-                return false;
+-            }
+-        }
+-        return true;
+-        // Paper end
++        return this.isCompletelyEmpty(null); // Kaiiju - airplane - use super
+     }
+ 
+     @Override
