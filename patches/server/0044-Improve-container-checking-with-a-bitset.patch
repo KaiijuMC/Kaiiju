@@ -265,7 +265,7 @@ index 272095d7a09ab41227d741172735f66fd2798ce1..1f2e2d7726abd63bb46697697c916963
      }
  
 diff --git a/src/main/java/net/minecraft/world/level/block/entity/ChestBlockEntity.java b/src/main/java/net/minecraft/world/level/block/entity/ChestBlockEntity.java
-index a71414397bd45ee7bcacfeef0041d80dfa25f114..93db8c056f1ec0f998b480cfdea3666cbc54603c 100644
+index a71414397bd45ee7bcacfeef0041d80dfa25f114..67f69540e6c217070f8d2af8908d4eb6f2b5c1c1 100644
 --- a/src/main/java/net/minecraft/world/level/block/entity/ChestBlockEntity.java
 +++ b/src/main/java/net/minecraft/world/level/block/entity/ChestBlockEntity.java
 @@ -31,6 +31,7 @@ import org.bukkit.entity.HumanEntity;
@@ -316,18 +316,19 @@ index a71414397bd45ee7bcacfeef0041d80dfa25f114..93db8c056f1ec0f998b480cfdea3666c
      public ChestBlockEntity(BlockPos pos, BlockState state) {
          this(BlockEntityType.CHEST, pos, state);
      }
-@@ -115,6 +138,10 @@ public class ChestBlockEntity extends RandomizableContainerBlockEntity implement
+@@ -115,7 +138,10 @@ public class ChestBlockEntity extends RandomizableContainerBlockEntity implement
      @Override
      public void load(CompoundTag nbt) {
          super.load(nbt);
+-        this.items = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
 +        // Kaiiju start - airplane - use ItemListWithBitset
 +        this.optimizedItems = new dev.kaiijumc.kaiiju.structs.ItemListWithBitset(this.getContainerSize());
 +        this.items = this.optimizedItems.nonNullList;
 +        // Kaiiju end
-         this.items = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
          if (!this.tryLoadLootTable(nbt)) {
              ContainerHelper.loadAllItems(nbt, this.items);
-@@ -187,7 +214,10 @@ public class ChestBlockEntity extends RandomizableContainerBlockEntity implement
+         }
+@@ -187,7 +213,10 @@ public class ChestBlockEntity extends RandomizableContainerBlockEntity implement
  
      @Override
      protected void setItems(NonNullList<ItemStack> list) {
