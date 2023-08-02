@@ -6,12 +6,12 @@ Subject: [PATCH] Send null entity packets
 This is from Purpur. Don't send null entity packets.
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 7c6d43d8a360530344ef296f4477750c8a298607..ab08e11f13921163b8ff1ff51ff9e9b86d2b47c7 100644
+index 22af24dd08a368e2b307840b0330be34f3fe84af..6419640a26ee0e6ca2e3f3342efff36df053c83c 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 @@ -198,7 +198,10 @@ public class KaiijuConfig {
      private static void regionFormatSettings() {
-         regionFormatDebug = getBoolean("region-format.debug", regionFormatDebug);
+         linearFlushFrequency = getInt("region-format.linear.flush-frequency", linearFlushFrequency);
      }
 +    
 +    public static boolean sendNullEntityPackets = true;
@@ -21,7 +21,7 @@ index 7c6d43d8a360530344ef296f4477750c8a298607..ab08e11f13921163b8ff1ff51ff9e9b8
      }
  }
 diff --git a/src/main/java/net/minecraft/server/level/ServerEntity.java b/src/main/java/net/minecraft/server/level/ServerEntity.java
-index 6670e657e08e130f7e0368f418379fd1ece00cdf..5558d87ef182f82be7877455dd027082c6a80632 100644
+index 81d0b2933040a451441f660f9e46199ae3b111e3..cdbc4be679d7e096c1005eaf84b74c4877479c43 100644
 --- a/src/main/java/net/minecraft/server/level/ServerEntity.java
 +++ b/src/main/java/net/minecraft/server/level/ServerEntity.java
 @@ -201,6 +201,11 @@ public class ServerEntity {

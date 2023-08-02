@@ -5,18 +5,15 @@ Subject: [PATCH] Region format configuration
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 7da7e0aeb5eac9ac73a3570e716f1ceb11fd7027..b86c90cc3601e666998cfa12f44515f605bb53eb 100644
+index 7da7e0aeb5eac9ac73a3570e716f1ceb11fd7027..f08bcc9ae1770fa847d8a5e873a554bef5485100 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -192,4 +192,10 @@ public class KaiijuConfig {
+@@ -192,4 +192,7 @@ public class KaiijuConfig {
          }
          return builder.build();
      }
 +
-+    public static boolean regionFormatDebug = false;
-+
 +    private static void regionFormatSettings() {
-+        regionFormatDebug = getBoolean("region-format.debug", regionFormatDebug);
 +    }
  }
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuWorldConfig.java
@@ -85,7 +82,7 @@ index 0000000000000000000000000000000000000000..7164d9cd03186f0657783f83de3d6435
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index cc1a7c4d38874ec218f7151685ae6cc00295c2e4..06233380f7580726753de34c1fb23d6347c9ac94 100644
+index 7e5645d9cb64ce17f60c85619f5640c8de4b1e86..bc9204d2c925437e9ff5c5d62d9faf38c2938e48 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -893,7 +893,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa

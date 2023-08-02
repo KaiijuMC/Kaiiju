@@ -5,12 +5,12 @@ Subject: [PATCH] Network configuration
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index b86c90cc3601e666998cfa12f44515f605bb53eb..7c6d43d8a360530344ef296f4477750c8a298607 100644
+index b0ee4b9dd8fb40761c21ad43eeb1165cbde84962..22af24dd08a368e2b307840b0330be34f3fe84af 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 @@ -198,4 +198,7 @@ public class KaiijuConfig {
      private static void regionFormatSettings() {
-         regionFormatDebug = getBoolean("region-format.debug", regionFormatDebug);
+         linearFlushFrequency = getInt("region-format.linear.flush-frequency", linearFlushFrequency);
      }
 +
 +    private static void networkSettings() {

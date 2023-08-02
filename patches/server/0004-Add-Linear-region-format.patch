@@ -38,6 +38,20 @@ index f2c27e0ac65be4b75c1d86ef6fd45fdb538d96ac..00724993d0448454d14a47652b039b88
  
          public static final class InProgressWrite {
              public long writeCounter;
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+index f08bcc9ae1770fa847d8a5e873a554bef5485100..1b15a248a54ef9e8ea1c11fa33b8a8e7a4a614c7 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+@@ -193,6 +193,9 @@ public class KaiijuConfig {
+         return builder.build();
+     }
+ 
++    public static int linearFlushFrequency = 1000;
++
+     private static void regionFormatSettings() {
++        linearFlushFrequency = getInt("region-format.linear.flush-frequency", linearFlushFrequency);
+     }
+ }
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/region/AbstractRegionFile.java b/src/main/java/dev/kaiijumc/kaiiju/region/AbstractRegionFile.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..249303116d3cfadd078ebf0ae6e44bf99eed6a47
@@ -112,10 +126,10 @@ index 0000000000000000000000000000000000000000..dcfbabf54b19a4c29d5c95830242c5c2
 +}
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/region/LinearRegionFile.java b/src/main/java/dev/kaiijumc/kaiiju/region/LinearRegionFile.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..b7ce89429675bde7f037793305275f4bf89d0727
+index 0000000000000000000000000000000000000000..ff48e2eaf1cb89d877bd344044338c437ad03d7d
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/region/LinearRegionFile.java
-@@ -0,0 +1,337 @@
+@@ -0,0 +1,322 @@
 +package dev.kaiijumc.kaiiju.region;
 +
 +import com.github.luben.zstd.ZstdInputStream;
@@ -138,156 +152,143 @@ index 0000000000000000000000000000000000000000..b7ce89429675bde7f037793305275f4b
 +import java.util.ArrayList;
 +import java.util.Arrays;
 +import java.util.List;
++import java.util.concurrent.atomic.AtomicBoolean;
 +import java.util.concurrent.locks.ReentrantLock;
 +
-+public class LinearRegionFile extends Thread implements AbstractRegionFile {
++public class LinearRegionFile implements AbstractRegionFile {
 +    private static final long SUPERBLOCK = -4323716122432332390L;
 +    private static final byte VERSION = 2;
 +    private static final int HEADER_SIZE = 32;
 +    private static final int FOOTER_SIZE = 8;
 +    private static final Logger LOGGER = LogUtils.getLogger();
 +    private static final List<Byte> SUPPORTED_VERSIONS = Arrays.asList((byte) 1, (byte) 2);
-+
++    private static final LinearRegionFileFlusher linearRegionFileFlusher = new LinearRegionFileFlusher();
 +
 +    private final byte[][] buffer = new byte[1024][];
 +    private final int[] bufferUncompressedSize = new int[1024];
 +
 +    private final int[] chunkTimestamps = new int[1024];
-+    private final Object markedToSaveLock = new Object();
 +    private final ChunkStatus[] statuses = new ChunkStatus[1024];
 +
 +    private final LZ4Compressor compressor;
 +    private final LZ4FastDecompressor decompressor;
 +
-+    private boolean markedToSave = false;
-+    private boolean close = false;
-+
 +    public final ReentrantLock fileLock = new ReentrantLock(true);
-+    public Path regionFile;
-+
++    public final ReentrantLock internalFileLock = new ReentrantLock(true);
 +    private final int compressionLevel;
 +
++    private AtomicBoolean markedToSave = new AtomicBoolean(false);
++    public boolean close = false;
++    public Path path;
++
++
++    public LinearRegionFile(Path file, int compression) throws IOException {
++        this.path = file;
++        this.compressionLevel = compression;
++        linearRegionFileFlusher.register(this);
++        this.compressor = LZ4Factory.fastestInstance().fastCompressor();
++        this.decompressor = LZ4Factory.fastestInstance().fastDecompressor();
++
++        File regionFile = new File(this.path.toString());
++
++        Arrays.fill(this.bufferUncompressedSize, 0);
++
++        if(!regionFile.canRead()) return;
++        // TODO USE TRY CATCH
++        FileInputStream fileStream = new FileInputStream(regionFile);
++        DataInputStream rawDataStream = new DataInputStream(fileStream);
++
++        long superBlock = rawDataStream.readLong();
++        if (superBlock != SUPERBLOCK)
++            throw new RuntimeException("Invalid superblock: " + superBlock + " file " + file);
++
++        byte version = rawDataStream.readByte();
++        if (!SUPPORTED_VERSIONS.contains(version))
++            throw new RuntimeException("Invalid version: " + version + " file " + file);
++
++        // Skip newestTimestamp (Long) + Compression level (Byte) + Chunk count (Short): Unused.
++        rawDataStream.skipBytes(11);
++
++        int dataCount = rawDataStream.readInt();
++        long fileLength = file.toFile().length();
++        if (fileLength != HEADER_SIZE + dataCount + FOOTER_SIZE)
++            throw new IOException("Invalid file length: " + this.path + " " + fileLength + " " + (HEADER_SIZE + dataCount + FOOTER_SIZE));
++
++        rawDataStream.skipBytes(8); // Skip data hash (Long): Unused.
++
++        byte[] rawCompressed = new byte[dataCount];
++        rawDataStream.readFully(rawCompressed, 0, dataCount);
++
++        superBlock = rawDataStream.readLong();
++        if (superBlock != SUPERBLOCK)
++            throw new IOException("Footer superblock invalid " + this.path);
++
++        DataInputStream dataStream = new DataInputStream(new ZstdInputStream(new ByteArrayInputStream(rawCompressed)));
++
++        int[] starts = new int[1024];
++        for(int i = 0; i < 1024; i++) {
++            starts[i] = dataStream.readInt();
++            dataStream.skipBytes(4); // Skip timestamps (Int): Unused.
++        }
++
++        for(int i = 0; i < 1024; i++) {
++            if(starts[i] > 0) {
++                int size = starts[i];
++                byte[] b = new byte[size];
++                dataStream.readFully(b, 0, size);
++
++                int maxCompressedLength = this.compressor.maxCompressedLength(size);
++                byte[] compressed = new byte[maxCompressedLength];
++                int compressedLength = this.compressor.compress(b, 0, size, compressed, 0, maxCompressedLength);
++                b = new byte[compressedLength];
++                System.arraycopy(compressed, 0, b, 0, compressedLength);
++
++                this.buffer[i] = b;
++                this.bufferUncompressedSize[i] = size;
++            }
++        }
++    }
++
 +    public Path getRegionFile() {
-+        return this.regionFile;
++        return this.path;
 +    }
 +
 +    public ReentrantLock getFileLock() {
 +        return this.fileLock;
 +    }
 +
-+    public LinearRegionFile(Path file, int compression) throws IOException {
-+        this.regionFile = file;
-+        this.compressionLevel = compression;
-+
-+        this.compressor = LZ4Factory.fastestInstance().fastCompressor();
-+        this.decompressor = LZ4Factory.fastestInstance().fastDecompressor();
-+
-+        File regionFile = new File(this.regionFile.toString());
-+
-+        Arrays.fill(this.bufferUncompressedSize, 0);
-+
-+        if(regionFile.canRead()) {
-+            FileInputStream fileStream = new FileInputStream(regionFile);
-+            DataInputStream rawDataStream = new DataInputStream(fileStream);
-+
-+            long superBlock = rawDataStream.readLong();
-+            if (superBlock != SUPERBLOCK)
-+                throw new RuntimeException("Invalid superblock: " + superBlock + " file " + file);
-+
-+            byte version = rawDataStream.readByte();
-+            if (!SUPPORTED_VERSIONS.contains(version))
-+                throw new RuntimeException("Invalid version: " + version + " file " + file);
-+
-+            // Skip newestTimestamp (Long) + Compression level (Byte) + Chunk count (Short): Unused.
-+            rawDataStream.skipBytes(11);
-+
-+            int dataCount = rawDataStream.readInt();
-+            long fileLength = file.toFile().length();
-+            if (fileLength != HEADER_SIZE + dataCount + FOOTER_SIZE)
-+                throw new IOException("Invalid file length: " + this.regionFile + " " + fileLength + " " + (HEADER_SIZE + dataCount + FOOTER_SIZE));
-+
-+            rawDataStream.skipBytes(8); // Skip data hash (Long): Unused.
-+
-+            byte[] rawCompressed = new byte[dataCount];
-+            rawDataStream.readFully(rawCompressed, 0, dataCount);
-+
-+            superBlock = rawDataStream.readLong();
-+            if (superBlock != SUPERBLOCK)
-+                throw new IOException("Footer superblock invalid " + this.regionFile);
-+
-+            DataInputStream dataStream = new DataInputStream(new ZstdInputStream(new ByteArrayInputStream(rawCompressed)));
-+
-+            int[] starts = new int[1024];
-+            for(int i = 0; i < 1024; i++) {
-+                starts[i] = dataStream.readInt();
-+                dataStream.skipBytes(4); // Skip timestamps (Int): Unused.
-+            }
-+
-+            for(int i = 0; i < 1024; i++) {
-+                if(starts[i] > 0) {
-+                    int size = starts[i];
-+                    byte[] b = new byte[size];
-+                    dataStream.readFully(b, 0, size);
-+
-+                    int maxCompressedLength = this.compressor.maxCompressedLength(size);
-+                    byte[] compressed = new byte[maxCompressedLength];
-+                    int compressedLength = this.compressor.compress(b, 0, size, compressed, 0, maxCompressedLength);
-+                    b = new byte[compressedLength];
-+                    System.arraycopy(compressed, 0, b, 0, compressedLength);
-+
-+                    this.buffer[i] = b;
-+                    this.bufferUncompressedSize[i] = size;
-+                }
-+            }
-+        }
-+        this.start();
++    public void flush() throws IOException {
++        if (isMarkedToSave()) rawFlush(); // sync
 +    }
 +
-+    private synchronized void markToSave() {
-+        synchronized(markedToSaveLock) {
-+            markedToSave = true;
-+        }
++    private void markToSave() {
++        markedToSave.set(true);
 +    }
 +
-+    private synchronized boolean isMarkedToSave() {
-+        synchronized(markedToSaveLock) {
-+            if(markedToSave) {
-+                markedToSave = false;
-+                return true;
-+            }
-+            return false;
-+        }
++    public boolean isMarkedToSave() {
++        return markedToSave.getAndSet(false);
 +    }
 +
-+    public void run() {
++    public void rawFlush() {
 +        try {
-+            while(true) {
-+                if(markedToSave) {
-+                    try {
-+                        flush();
-+                    } catch(IOException ex) {
-+                        LOGGER.error("Region file " + this.regionFile.toAbsolutePath() + " flush failed");
-+                    }
-+                }
-+                for(int i = 0 ; i < 100 ; i++) {
-+                    Thread.sleep(100);
-+                    if(close) return;
-+                }
-+            }
-+        } catch(InterruptedException ignored) {}
++            internalFileLock.lock();
++            save();
++        } catch (IOException e) {
++            LOGGER.error("Failed to flush region file " + path.toAbsolutePath(), e);
++        } finally {
++            internalFileLock.unlock();
++        }
 +    }
 +
-+    public synchronized boolean doesChunkExist(ChunkPos pos) throws Exception {
++    public boolean doesChunkExist(ChunkPos pos) throws Exception {
 +        throw new Exception("doesChunkExist is a stub");
 +    }
 +
-+    public synchronized void flush() throws IOException {
-+        if(!isMarkedToSave()) return;
-+
++    private void save() throws IOException {
 +        long timestamp = getTimestamp();
 +        short chunkCount = 0;
 +
-+        File tempFile = new File(regionFile.toString() + ".tmp");
++        File tempFile = new File(path.toString() + ".tmp");
 +        FileOutputStream fileStream = new FileOutputStream(tempFile);
 +
 +        ByteArrayOutputStream zstdByteArray = new ByteArrayOutputStream();
@@ -337,7 +338,7 @@ index 0000000000000000000000000000000000000000..b7ce89429675bde7f037793305275f4b
 +        dataStream.close();
 +
 +        fileStream.close();
-+        Files.move(tempFile.toPath(), this.regionFile, StandardCopyOption.REPLACE_EXISTING);
++        Files.move(tempFile.toPath(), this.path, StandardCopyOption.REPLACE_EXISTING);
 +    }
 +
 +    public void setStatus(int x, int z, ChunkStatus status) {
@@ -360,7 +361,7 @@ index 0000000000000000000000000000000000000000..b7ce89429675bde7f037793305275f4b
 +            this.chunkTimestamps[index] = getTimestamp();
 +            this.bufferUncompressedSize[getChunkIndex(pos.x, pos.z)] = uncompressedSize;
 +        } catch (IOException e) {
-+            LOGGER.error("Chunk write IOException " + e + " " + this.regionFile);
++            LOGGER.error("Chunk write IOException " + e + " " + this.path);
 +        }
 +        markToSave();
 +    }
@@ -422,13 +423,11 @@ index 0000000000000000000000000000000000000000..b7ce89429675bde7f037793305275f4b
 +        return this.bufferUncompressedSize[getChunkIndex(pos.x, pos.z)] > 0;
 +    }
 +
-+    public void close() throws IOException {
++    public synchronized void close() throws IOException {
++        if (close) return;
 +        close = true;
-+        try {
-+            flush();
-+        } catch(IOException e) {
-+            throw new IOException("Region flush IOException " + e + " " + this.regionFile);
-+        }
++        linearRegionFileFlusher.remove(this);
++        flush(); // sync
 +    }
 +
 +    private static int getChunkIndex(int x, int z) {
@@ -446,11 +445,64 @@ index 0000000000000000000000000000000000000000..b7ce89429675bde7f037793305275f4b
 +    public void setOversized(int x, int z, boolean something) {}
 +
 +    public CompoundTag getOversizedData(int x, int z) throws IOException {
-+        throw new IOException("getOversizedData is a stub " + this.regionFile);
++        throw new IOException("getOversizedData is a stub " + this.path);
 +    }
 +
 +    public boolean isOversized(int x, int z) {
 +        return false;
++    }
++}
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/region/LinearRegionFileFlusher.java b/src/main/java/dev/kaiijumc/kaiiju/region/LinearRegionFileFlusher.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..21e7a5f70422a2ff0b7425d01ef55bf7c81b36d2
+--- /dev/null
++++ b/src/main/java/dev/kaiijumc/kaiiju/region/LinearRegionFileFlusher.java
+@@ -0,0 +1,47 @@
++package dev.kaiijumc.kaiiju.region;
++
++import com.google.common.util.concurrent.ThreadFactoryBuilder;
++import java.util.Set;
++import java.util.concurrent.*;
++import dev.kaiijumc.kaiiju.KaiijuConfig;
++
++public class LinearRegionFileFlusher {
++    private final Set<LinearRegionFile> registeredRegionFiles = ConcurrentHashMap.newKeySet();
++    private final ScheduledExecutorService scheduler;
++    private final ExecutorService executor;
++
++    public LinearRegionFileFlusher() {
++        executor = Executors.newCachedThreadPool(
++            new ThreadFactoryBuilder()
++                .setNameFormat("linear-flusher-thread-%d")
++                .build()
++        );
++        scheduler = Executors.newSingleThreadScheduledExecutor(
++            new ThreadFactoryBuilder()
++                .setNameFormat("linear-flush-scheduler")
++                .build()
++        );
++        scheduler.scheduleAtFixedRate(this::createAndFlush, 0L, KaiijuConfig.linearFlushFrequency, TimeUnit.MILLISECONDS);
++    }
++
++    public void remove(LinearRegionFile regionFile) {
++        registeredRegionFiles.remove(regionFile);
++    }
++
++    public void register(LinearRegionFile regionFile) {
++        registeredRegionFiles.add(regionFile);
++    }
++
++    private void createAndFlush() {
++        registeredRegionFiles.forEach(regionFile -> {
++            if (!regionFile.close && regionFile.isMarkedToSave()) {
++                executor.execute(regionFile::rawFlush);
++            }
++        });
++    }
++
++    public void shutdown() {
++        executor.shutdown();
++        scheduler.shutdown();
 +    }
 +}
 diff --git a/src/main/java/io/papermc/paper/chunk/system/io/RegionFileIOThread.java b/src/main/java/io/papermc/paper/chunk/system/io/RegionFileIOThread.java
@@ -587,7 +639,7 @@ index 25fe439c8d1e88a86e85ac9a4761425d98ee6c4f..c4d28d887b4cc71dc713b1e3f46bc80f
          regionFile.setStatus(chunkPos.x, chunkPos.z, ChunkSerializer.getStatus(compound));
      }
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 042ca6b3faae5249210567f2c26dff404974e1ff..7099a44a2322ab390c21e74668c8657dcc9e5e87 100644
+index 042ca6b3faae5249210567f2c26dff404974e1ff..1446db0111ba21514640e09e48a32d54b4a97a0c 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -426,8 +426,8 @@ public class ServerLevel extends Level implements WorldGenLevel {
@@ -596,7 +648,7 @@ index 042ca6b3faae5249210567f2c26dff404974e1ff..7099a44a2322ab390c21e74668c8657d
  
 -        public EntityRegionFileStorage(Path directory, boolean dsync) {
 -            super(directory, dsync);
-+        public EntityRegionFileStorage(String format, int linearCompression, Path directory, boolean dsync) { // Kaiiju
++        public EntityRegionFileStorage(dev.kaiijumc.kaiiju.region.RegionFileFormat format, int linearCompression, Path directory, boolean dsync) { // Kaiiju
 +            super(format, linearCompression, directory, dsync); // Kaiiju
          }
  
@@ -754,7 +806,7 @@ index dcfe090c269d4cbcc2eb1b6f85392848bb34656c..d42c320179ae055b8675d1ce6ce1788e
          try (DataInputStream out = new DataInputStream(new java.io.BufferedInputStream(new InflaterInputStream(Files.newInputStream(file))))) {
              return NbtIo.read((java.io.DataInput) out);
 diff --git a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
-index 81554c321a78258ff78da3801f00d0fb90b9e113..b35a6a7daf768af3bc453fe18deec823f4b63a3a 100644
+index 81554c321a78258ff78da3801f00d0fb90b9e113..e91e8aef8b63ea9d94e0ecb3e4a62655a8c77ce1 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 @@ -22,9 +22,13 @@ public class RegionFileStorage implements AutoCloseable {
@@ -836,7 +888,7 @@ index 81554c321a78258ff78da3801f00d0fb90b9e113..b35a6a7daf768af3bc453fe18deec823
              }
              // Paper end
              return regionfile;
-@@ -126,28 +134,49 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -126,28 +134,45 @@ public class RegionFileStorage implements AutoCloseable {
              }
              // Paper end - cache regionfile does not exist state
              if (this.regionCache.size() >= io.papermc.paper.configuration.GlobalConfiguration.get().misc.regionFileCacheSize) { // Paper - configurable
@@ -874,10 +926,6 @@ index 81554c321a78258ff78da3801f00d0fb90b9e113..b35a6a7daf768af3bc453fe18deec823
 +                // Kaiiju end
                  this.createRegionFile(regionPos);
              }
-+            // Kaiiju start - Polyglot
-+            if (dev.kaiijumc.kaiiju.KaiijuConfig.regionFormatDebug)
-+                org.bukkit.Bukkit.getLogger().info("Opening file " + path1 + " with format " + this.format + " (existingOnly = " + existingOnly + ")");
-+            // Kaiiju end
 +
              // Paper end - cache regionfile does not exist state
              FileUtil.createDirectoriesSafe(this.folder); // Paper - only create directory if not existing only - moved from above
@@ -893,7 +941,7 @@ index 81554c321a78258ff78da3801f00d0fb90b9e113..b35a6a7daf768af3bc453fe18deec823
              }
              // Paper end
              return regionfile1;
-@@ -175,7 +204,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -175,7 +200,7 @@ public class RegionFileStorage implements AutoCloseable {
      }
  
  
@@ -902,7 +950,7 @@ index 81554c321a78258ff78da3801f00d0fb90b9e113..b35a6a7daf768af3bc453fe18deec823
          synchronized (regionfile) {
              try (DataInputStream datainputstream = regionfile.getChunkDataInputStream(chunkCoordinate)) {
                  CompoundTag oversizedData = regionfile.getOversizedData(chunkCoordinate.x, chunkCoordinate.z);
-@@ -222,14 +251,14 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -222,14 +247,14 @@ public class RegionFileStorage implements AutoCloseable {
      @Nullable
      public CompoundTag read(ChunkPos pos) throws IOException {
          // CraftBukkit start - SPIGOT-5680: There's no good reason to preemptively create files on read, save that for writing
@@ -919,7 +967,7 @@ index 81554c321a78258ff78da3801f00d0fb90b9e113..b35a6a7daf768af3bc453fe18deec823
          // We add the regionfile parameter to avoid the potential deadlock (on fileLock) if we went back to obtain a regionfile
          // if we decide to re-read
          // Paper end
-@@ -239,7 +268,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -239,7 +264,7 @@ public class RegionFileStorage implements AutoCloseable {
  
          // Paper start
          if (regionfile.isOversized(pos.x, pos.z)) {
@@ -928,7 +976,7 @@ index 81554c321a78258ff78da3801f00d0fb90b9e113..b35a6a7daf768af3bc453fe18deec823
              return readOversizedChunk(regionfile, pos);
          }
          // Paper end
-@@ -253,12 +282,12 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -253,12 +278,12 @@ public class RegionFileStorage implements AutoCloseable {
                      if (this.isChunkData) {
                          ChunkPos chunkPos = ChunkSerializer.getChunkCoordinate(nbttagcompound);
                          if (!chunkPos.equals(pos)) {
@@ -944,7 +992,7 @@ index 81554c321a78258ff78da3801f00d0fb90b9e113..b35a6a7daf768af3bc453fe18deec823
                              return null;
                          }
                      }
-@@ -292,13 +321,13 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -292,13 +317,13 @@ public class RegionFileStorage implements AutoCloseable {
  
          return nbttagcompound;
          } finally { // Paper start
@@ -960,7 +1008,7 @@ index 81554c321a78258ff78da3801f00d0fb90b9e113..b35a6a7daf768af3bc453fe18deec823
          if (regionfile == null) {
              return;
          }
-@@ -328,7 +357,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -328,7 +353,7 @@ public class RegionFileStorage implements AutoCloseable {
      }
  
      protected void write(ChunkPos pos, @Nullable CompoundTag nbt) throws IOException {
@@ -969,7 +1017,7 @@ index 81554c321a78258ff78da3801f00d0fb90b9e113..b35a6a7daf768af3bc453fe18deec823
          if (nbt == null && regionfile == null) {
              return;
          }
-@@ -378,7 +407,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -378,7 +403,7 @@ public class RegionFileStorage implements AutoCloseable {
          }
          // Paper end
          } finally { // Paper start
@@ -978,7 +1026,7 @@ index 81554c321a78258ff78da3801f00d0fb90b9e113..b35a6a7daf768af3bc453fe18deec823
          } // Paper end
      }
  
-@@ -387,7 +416,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -387,7 +412,7 @@ public class RegionFileStorage implements AutoCloseable {
          ObjectIterator objectiterator = this.regionCache.values().iterator();
  
          while (objectiterator.hasNext()) {
@@ -987,7 +1035,7 @@ index 81554c321a78258ff78da3801f00d0fb90b9e113..b35a6a7daf768af3bc453fe18deec823
  
              try {
                  regionfile.close();
-@@ -403,7 +432,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -403,7 +428,7 @@ public class RegionFileStorage implements AutoCloseable {
          ObjectIterator objectiterator = this.regionCache.values().iterator();
  
          while (objectiterator.hasNext()) {

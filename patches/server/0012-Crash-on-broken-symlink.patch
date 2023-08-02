@@ -64,14 +64,14 @@ index c4d28d887b4cc71dc713b1e3f46bc80f4484a95d..f50507ab85282d261985ce9b186581f5
          // Paper start
          this.dataRegionManager = new io.papermc.paper.chunk.SingleThreadChunkRegionManager(this.level, 2, (1.0 / 3.0), 1, 6, "Data", DataRegionData::new, DataRegionSectionData::new);
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 7099a44a2322ab390c21e74668c8657dcc9e5e87..475554797ffc279243ac0d88f1e619c3dd07bc4b 100644
+index 1446db0111ba21514640e09e48a32d54b4a97a0c..475554797ffc279243ac0d88f1e619c3dd07bc4b 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -426,8 +426,8 @@ public class ServerLevel extends Level implements WorldGenLevel {
  
      private static final class EntityRegionFileStorage extends net.minecraft.world.level.chunk.storage.RegionFileStorage {
  
--        public EntityRegionFileStorage(String format, int linearCompression, Path directory, boolean dsync) { // Kaiiju
+-        public EntityRegionFileStorage(dev.kaiijumc.kaiiju.region.RegionFileFormat format, int linearCompression, Path directory, boolean dsync) { // Kaiiju
 -            super(format, linearCompression, directory, dsync); // Kaiiju
 +        public EntityRegionFileStorage(dev.kaiijumc.kaiiju.region.RegionFileFormat format, int linearCompression, boolean linearCrashOnBrokenSymlink, Path directory, boolean dsync) { // Kaiiju
 +            super(format, linearCompression, linearCrashOnBrokenSymlink, directory, dsync); // Kaiiju
@@ -135,7 +135,7 @@ index 1d880f27dd147da683fc30ed6f1bfa43ecdb7d93..41598adf6d49a44bcaadfff379722146
      }
  
 diff --git a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
-index b35a6a7daf768af3bc453fe18deec823f4b63a3a..8409293b3f329715d6dff3d455c6a484d5b133ee 100644
+index e91e8aef8b63ea9d94e0ecb3e4a62655a8c77ce1..bbc6a0c70cbafbfa411ab418e4fec11ad101ae91 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 @@ -20,6 +20,7 @@ import net.minecraft.world.level.ChunkPos;
@@ -209,7 +209,7 @@ index b35a6a7daf768af3bc453fe18deec823f4b63a3a..8409293b3f329715d6dff3d455c6a484
 +                guardAgainstBrokenSymlinks(path1); // Kaiiju - Crash on broken symlink
                  this.createRegionFile(regionPos);
              }
-             // Kaiiju start - Polyglot
+ 
 diff --git a/src/main/java/net/minecraft/world/level/chunk/storage/SectionStorage.java b/src/main/java/net/minecraft/world/level/chunk/storage/SectionStorage.java
 index 9394d191c56aab78e63fd3f283efedd69384e323..dcfe4a285cc5865be3b0c1b8104b722895135dd0 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/storage/SectionStorage.java

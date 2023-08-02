@@ -5,7 +5,7 @@ Subject: [PATCH] Async path processing
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index ebfa9e1dcca5ea8272e796f0409902d92b59ee76..6be4abdd16f2d57a80dbe175a91ff304fd17a7db 100644
+index dc4e1265d5552af7360399b283193d23920985b7..931cbd5a8139eddcd216dc8c409f76f23cab7e1f 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 @@ -12,6 +12,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
