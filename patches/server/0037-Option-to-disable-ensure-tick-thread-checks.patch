@@ -5,10 +5,10 @@ Subject: [PATCH] Option to disable ensure tick thread checks
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index ec71f3f52cb8f7931aabd94619d2e7a24491d7ad..fa2a763e5784e7dae02c94a13751cbf746b6eee8 100644
+index 9b118a6e22264c88c0460016822b1920631fff85..95015955a8076bc903c012704b57b1b84286aaae 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -210,11 +210,13 @@ public class KaiijuConfig {
+@@ -215,11 +215,13 @@ public class KaiijuConfig {
      public static boolean disableVanishApi = false;
      public static boolean disablePlayerStats = false;
      public static boolean disableArmSwingEvent = false;

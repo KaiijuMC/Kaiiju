@@ -5,10 +5,10 @@ Subject: [PATCH] Option to disable player stats
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index f49510c999ce5241f26dc9ba90a6148bf31467c7..b23f2df433d7ebc871f4009081c28ed9054d91c7 100644
+index a3c15f1009dad095b9411242e2d0347a6141984b..8c872b2ad341f0105275209201fda03706535161 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -208,9 +208,11 @@ public class KaiijuConfig {
+@@ -213,9 +213,11 @@ public class KaiijuConfig {
      }
  
      public static boolean disableVanishApi = false;

@@ -5,10 +5,10 @@ Subject: [PATCH] Option to disable vanish api
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index c934341c17caf4696065ac6c39bdfef570c62f13..f49510c999ce5241f26dc9ba90a6148bf31467c7 100644
+index cac747a46cccf8b115917a72340e9b81e7a437c9..a3c15f1009dad095b9411242e2d0347a6141984b 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -207,7 +207,10 @@ public class KaiijuConfig {
+@@ -212,7 +212,10 @@ public class KaiijuConfig {
          alternateKeepAlive = getBoolean("network.alternate-keepalive", alternateKeepAlive);
      }
  

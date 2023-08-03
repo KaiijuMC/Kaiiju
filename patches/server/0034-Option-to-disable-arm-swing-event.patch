@@ -5,10 +5,10 @@ Subject: [PATCH] Option to disable arm swing event
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index b23f2df433d7ebc871f4009081c28ed9054d91c7..ec71f3f52cb8f7931aabd94619d2e7a24491d7ad 100644
+index 8c872b2ad341f0105275209201fda03706535161..9b118a6e22264c88c0460016822b1920631fff85 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -209,10 +209,12 @@ public class KaiijuConfig {
+@@ -214,10 +214,12 @@ public class KaiijuConfig {
  
      public static boolean disableVanishApi = false;
      public static boolean disablePlayerStats = false;

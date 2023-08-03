@@ -7,10 +7,10 @@ Don't kick players because 1 keepalive is lost.
 This patch is from Purpur.
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index ab08e11f13921163b8ff1ff51ff9e9b86d2b47c7..b42a3466f145a92608c8746fd4beb529b4a60b01 100644
+index 47e23a196ae5e44600a64184b69141c00235baca..95b53b50606ea0ad47f407bebbb9e2bd445c0e66 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -200,8 +200,10 @@ public class KaiijuConfig {
+@@ -205,8 +205,10 @@ public class KaiijuConfig {
      }
      
      public static boolean sendNullEntityPackets = true;

@@ -39,17 +39,31 @@ index f2c27e0ac65be4b75c1d86ef6fd45fdb538d96ac..00724993d0448454d14a47652b039b88
          public static final class InProgressWrite {
              public long writeCounter;
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index f08bcc9ae1770fa847d8a5e873a554bef5485100..073f386bb2c95969ea2f5172cb41191b7e41a272 100644
+index f08bcc9ae1770fa847d8a5e873a554bef5485100..b7f43cce80742aa0cd523e930772ff84946f3eef 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -193,6 +193,9 @@ public class KaiijuConfig {
+@@ -15,7 +15,6 @@ import java.io.IOException;
+ import java.lang.reflect.InvocationTargetException;
+ import java.lang.reflect.Method;
+ import java.lang.reflect.Modifier;
+-import java.util.Arrays;
+ import java.util.HashMap;
+ import java.util.List;
+ import java.util.Map;
+@@ -193,6 +192,15 @@ public class KaiijuConfig {
          return builder.build();
      }
  
 +    public static int linearFlushFrequency = 10;
++    public static int linearFlushThreads = 1;
 +
      private static void regionFormatSettings() {
 +        linearFlushFrequency = getInt("region-format.linear.flush-frequency", linearFlushFrequency);
++        linearFlushThreads = getInt("region-format.linear.flush-max-threads", linearFlushThreads);
++        if (linearFlushThreads < 0)
++            linearFlushThreads = Math.max(Runtime.getRuntime().availableProcessors() + linearFlushThreads, 1);
++        else
++            linearFlushThreads = Math.max(linearFlushThreads, 1);
      }
  }
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/region/AbstractRegionFile.java b/src/main/java/dev/kaiijumc/kaiiju/region/AbstractRegionFile.java
@@ -456,33 +470,34 @@ index 0000000000000000000000000000000000000000..02208f179c5b5bc31790c8d1b6e902a4
 +}
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/region/LinearRegionFileFlusher.java b/src/main/java/dev/kaiijumc/kaiiju/region/LinearRegionFileFlusher.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..a43b00598490824205064422f188ae5a0778bdb9
+index 0000000000000000000000000000000000000000..2ffe437c50bc522a1ae04eab9943931b79a9fd04
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/region/LinearRegionFileFlusher.java
-@@ -0,0 +1,45 @@
+@@ -0,0 +1,46 @@
 +package dev.kaiijumc.kaiiju.region;
 +
 +import com.google.common.util.concurrent.ThreadFactoryBuilder;
 +import java.util.Queue;
 +import java.util.concurrent.*;
 +import dev.kaiijumc.kaiiju.KaiijuConfig;
++import org.bukkit.Bukkit;
 +
 +public class LinearRegionFileFlusher {
 +    private final Queue<LinearRegionFile> savingQueue = new LinkedBlockingQueue<>();
-+    private final ScheduledExecutorService scheduler;
-+    private final ExecutorService executor;
++    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(
++        new ThreadFactoryBuilder()
++            .setNameFormat("linear-flush-scheduler")
++            .build()
++    );
++    private final ExecutorService executor = Executors.newFixedThreadPool(
++        KaiijuConfig.linearFlushThreads,
++        new ThreadFactoryBuilder()
++            .setNameFormat("linear-flusher-%d")
++            .build()
++    );
 +
 +    public LinearRegionFileFlusher() {
-+        executor = Executors.newSingleThreadExecutor(
-+            new ThreadFactoryBuilder()
-+                .setNameFormat("linear-flusher-thread")
-+                .build()
-+        );
-+        scheduler = Executors.newSingleThreadScheduledExecutor(
-+            new ThreadFactoryBuilder()
-+                .setNameFormat("linear-flush-scheduler")
-+                .build()
-+        );
++        Bukkit.getLogger().info("Using " + KaiijuConfig.linearFlushThreads + " threads for linear region flushing.");
 +        scheduler.scheduleAtFixedRate(this::pollAndFlush, 0L, KaiijuConfig.linearFlushFrequency, TimeUnit.SECONDS);
 +    }
 +

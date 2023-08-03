@@ -6,12 +6,12 @@ Subject: [PATCH] Send null entity packets
 This is from Purpur. Don't send null entity packets.
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 22af24dd08a368e2b307840b0330be34f3fe84af..6419640a26ee0e6ca2e3f3342efff36df053c83c 100644
+index fa829cef4033625470dfae29ddf777e6c5ab8c55..47e23a196ae5e44600a64184b69141c00235baca 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -198,7 +198,10 @@ public class KaiijuConfig {
-     private static void regionFormatSettings() {
-         linearFlushFrequency = getInt("region-format.linear.flush-frequency", linearFlushFrequency);
+@@ -203,7 +203,10 @@ public class KaiijuConfig {
+         else
+             linearFlushThreads = Math.max(linearFlushThreads, 1);
      }
 +    
 +    public static boolean sendNullEntityPackets = true;
