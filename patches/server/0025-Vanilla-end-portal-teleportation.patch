@@ -5,7 +5,7 @@ Subject: [PATCH] Vanilla end portal teleportation
 
 
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index b971f35b69a930dddcf603207f524dc95e09f0fd..aaf8c22d43eb0414c5bfc58fa68f585304763b44 100644
+index b971f35b69a930dddcf603207f524dc95e09f0fd..03895d35c02ff9422aaa0177eb0aa40e03fdc925 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -4029,12 +4029,17 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
@@ -44,7 +44,7 @@ index b971f35b69a930dddcf603207f524dc95e09f0fd..aaf8c22d43eb0414c5bfc58fa68f5853
              passengerTree.root.placeInAsync(
                  originWorld, destination, Entity.TELEPORT_FLAG_LOAD_CHUNK | (takePassengers ? Entity.TELEPORT_FLAG_TELEPORT_PASSENGERS : 0L),
 -                passengerTree, teleportComplete
-+                passengerTree, tpComplete
++                passengerTree, tpComplete // Kaiiju - vanilla end teleportation
              );
          });
  

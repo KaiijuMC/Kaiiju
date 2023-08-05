@@ -338,15 +338,16 @@ index 0000000000000000000000000000000000000000..6b91852238f80d236fc44f766b115267
 +}
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/path/AsyncPathProcessor.java b/src/main/java/dev/kaiijumc/kaiiju/path/AsyncPathProcessor.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..8ac99ae5f0c0fc8a471be293c9033c04ec644780
+index 0000000000000000000000000000000000000000..2a54fa6d733cb5d406fd218161448197515be7fb
 --- /dev/null
 +++ b/src/main/java/dev/kaiijumc/kaiiju/path/AsyncPathProcessor.java
-@@ -0,0 +1,52 @@
+@@ -0,0 +1,53 @@
 +package dev.kaiijumc.kaiiju.path;
 +
 +import com.google.common.util.concurrent.ThreadFactoryBuilder;
 +
-+import dev.kaiijumc.kaiiju.KaiijuConfig;import net.minecraft.world.level.pathfinder.Path;
++import dev.kaiijumc.kaiiju.KaiijuConfig;
++import net.minecraft.world.level.pathfinder.Path;
 +import net.minecraft.world.entity.Entity;
 +
 +import org.jetbrains.annotations.NotNull;
@@ -1141,16 +1142,17 @@ index 97b763431bc5015448ee7a26a340635a932c950b..48109aebe34cbdfac3eceffb1c20aa84
                      @Override
                      protected float distance(Node a, Node b) {
 diff --git a/src/main/java/net/minecraft/world/level/block/ShulkerBoxBlock.java b/src/main/java/net/minecraft/world/level/block/ShulkerBoxBlock.java
-index b51155ad12515b2d0dd0f202580b9f455c114d9a..358233cb35860adad86c01872c65ec6f165ba594 100644
+index b51155ad12515b2d0dd0f202580b9f455c114d9a..48c59e3ddd2fca3357a0b816630ae606bbfbb059 100644
 --- a/src/main/java/net/minecraft/world/level/block/ShulkerBoxBlock.java
 +++ b/src/main/java/net/minecraft/world/level/block/ShulkerBoxBlock.java
-@@ -242,8 +242,13 @@ public class ShulkerBoxBlock extends BaseEntityBlock {
+@@ -242,8 +242,14 @@ public class ShulkerBoxBlock extends BaseEntityBlock {
  
      @Override
      public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
 +        try { // Kaiiju - async pathfinding - lol i hate that
          BlockEntity blockEntity = world.getBlockEntity(pos);
          return blockEntity instanceof ShulkerBoxBlockEntity ? Shapes.create(((ShulkerBoxBlockEntity)blockEntity).getBoundingBox(state)) : Shapes.block();
++        // Kaiiju start - async pathfinding - workaround
 +        } catch (NullPointerException e) {
 +            return Shapes.block();
 +        }
