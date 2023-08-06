@@ -5,7 +5,7 @@ Subject: [PATCH] Async path processing
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 6df1720159383c2f536b40ded1092a437c1a20af..fc88b9f1e7e8f5858a91deeca2a5d51266a79a93 100644
+index ebfa9e1dcca5ea8272e796f0409902d92b59ee76..582cf5ff5af7ec173bcf0d2abe0827f9372a98fa 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 @@ -12,6 +12,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
@@ -16,7 +16,7 @@ index 6df1720159383c2f536b40ded1092a437c1a20af..fc88b9f1e7e8f5858a91deeca2a5d512
  import java.lang.reflect.InvocationTargetException;
  import java.lang.reflect.Method;
  import java.lang.reflect.Modifier;
-@@ -218,12 +219,26 @@ public class KaiijuConfig {
+@@ -213,12 +214,26 @@ public class KaiijuConfig {
      public static boolean disablePlayerStats = false;
      public static boolean disableArmSwingEvent = false;
      public static boolean disableEnsureTickThreadChecks = false;
