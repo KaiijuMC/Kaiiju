@@ -22,10 +22,10 @@ index f3f824d0ab1a2a72825c40b67192386479a0b34c..95ed6cb7b94797187d1011cab344e187
      }
  }
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 475554797ffc279243ac0d88f1e619c3dd07bc4b..475d0f3dd38e0407fa120d57e7d89216836538dd 100644
+index ad896c8a3060f5c8d85a8b5707317de646bf9cae..0df4672abb5e87587da8712b6febf6312e241cda 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
-@@ -2838,7 +2838,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -2865,7 +2865,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
              // Spigot Start
              if (entity.getBukkitEntity() instanceof org.bukkit.inventory.InventoryHolder && (!(entity instanceof ServerPlayer) || entity.getRemovalReason() != Entity.RemovalReason.KILLED)) { // SPIGOT-6876: closeInventory clears death message
                  // Paper start
