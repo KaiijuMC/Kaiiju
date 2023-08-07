@@ -24,7 +24,7 @@ index 9f0095f2196133a8bcffd5306aa9ac0b99b2f8d7..31d66bb2fcf4bb7262df2d8006e307fe
  
      public boolean fixVoidTrading = true;
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index 428da29b343eea9df25e5d719d5162faf0d9d7e5..ad5830f419321e0f901d58a18bba7b970de567aa 100644
+index 53f5bf8e6660f25290d4e64aca9c2911921b9fed..3c1871a879a14d38e56b0c31a73b2f42597d0816 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -792,7 +792,7 @@ public class ServerPlayer extends Player {
@@ -93,7 +93,7 @@ index 428da29b343eea9df25e5d719d5162faf0d9d7e5..ad5830f419321e0f901d58a18bba7b97
          }, true);
      }
  
-@@ -1788,14 +1788,14 @@ public class ServerPlayer extends Player {
+@@ -1787,14 +1787,14 @@ public class ServerPlayer extends Player {
              maindimensionkey1 = resourcekey1;
          }
          // Paper end
@@ -111,7 +111,7 @@ index 428da29b343eea9df25e5d719d5162faf0d9d7e5..ad5830f419321e0f901d58a18bba7b97
          }
  
          if (maindimensionkey1 != Level.NETHER) { // CraftBukkit
-@@ -1873,7 +1873,7 @@ public class ServerPlayer extends Player {
+@@ -1872,7 +1872,7 @@ public class ServerPlayer extends Player {
                  {
                      Either<Player.BedSleepingProblem, Unit> either = super.startSleepInBed(blockposition, force).ifRight((unit) -> {
                          this.awardStat(Stats.SLEEP_IN_BED);
@@ -120,7 +120,7 @@ index 428da29b343eea9df25e5d719d5162faf0d9d7e5..ad5830f419321e0f901d58a18bba7b97
                      });
  
                      if (!this.serverLevel().canSleepThroughNights()) {
-@@ -2159,7 +2159,7 @@ public class ServerPlayer extends Player {
+@@ -2158,7 +2158,7 @@ public class ServerPlayer extends Player {
  
      @Override
      public void triggerRecipeCrafted(Recipe<?> recipe, List<ItemStack> ingredients) {
@@ -129,7 +129,7 @@ index 428da29b343eea9df25e5d719d5162faf0d9d7e5..ad5830f419321e0f901d58a18bba7b97
      }
  
      @Override
-@@ -2288,14 +2288,14 @@ public class ServerPlayer extends Player {
+@@ -2287,14 +2287,14 @@ public class ServerPlayer extends Player {
              this.levitationStartPos = this.position();
          }
  
@@ -146,7 +146,7 @@ index 428da29b343eea9df25e5d719d5162faf0d9d7e5..ad5830f419321e0f901d58a18bba7b97
      }
  
      @Override
-@@ -2306,7 +2306,7 @@ public class ServerPlayer extends Player {
+@@ -2305,7 +2305,7 @@ public class ServerPlayer extends Player {
              this.levitationStartPos = null;
          }
  
@@ -155,7 +155,7 @@ index 428da29b343eea9df25e5d719d5162faf0d9d7e5..ad5830f419321e0f901d58a18bba7b97
      }
  
      @Override
-@@ -2866,7 +2866,7 @@ public class ServerPlayer extends Player {
+@@ -2865,7 +2865,7 @@ public class ServerPlayer extends Player {
  
      @Override
      protected void updateUsingItem(ItemStack stack) {
@@ -164,7 +164,7 @@ index 428da29b343eea9df25e5d719d5162faf0d9d7e5..ad5830f419321e0f901d58a18bba7b97
          super.updateUsingItem(stack);
      }
  
-@@ -2895,7 +2895,7 @@ public class ServerPlayer extends Player {
+@@ -2894,7 +2894,7 @@ public class ServerPlayer extends Player {
          Entity entity = item.getOwner();
  
          if (entity != null) {
