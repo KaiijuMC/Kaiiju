@@ -23,15 +23,17 @@
 ### Configuration
 
 ```yaml
+gameplay:
+  server-mod-name: Kaiiju
+  shared-random-for-players: true
 network:
   send-null-entity-packets: true
   alternate-keepalive: false
   kick-player-on-bad-packet: true
-gameplay:
-  server-mod-name: Kaiiju
-  shared-random-for-players: true
 region-format:
-  debug: false
+  linear:
+    flush-frequency: 10
+    flush-max-threads: 1
 optimization:
   disable-vanish-api: false
   disable-player-stats: false
@@ -41,7 +43,6 @@ optimization:
     enable: false
     max-threads: 0
     keepalive: 60
-    queue-capacity: 4096
 world-settings:
   default:
     gameplay:
