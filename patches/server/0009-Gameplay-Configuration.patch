@@ -5,10 +5,10 @@ Subject: [PATCH] Gameplay Configuration
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 7b56cc1275319cf07a4a25280e0ff900bdca8afa..fdc4cdbf34ed10f6523dceac7c1931d3ca4eb522 100644
+index 8aab072a21b0775338b8235a84f5f675f385cf37..46ae5b84ee5b87b0ed0b93e920689e44288a50d2 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -209,4 +209,7 @@ public class KaiijuConfig {
+@@ -214,4 +214,7 @@ public class KaiijuConfig {
  
      private static void optimizationSettings() {
      }
