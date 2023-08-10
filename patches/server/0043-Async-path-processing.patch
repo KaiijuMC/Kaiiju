@@ -514,7 +514,7 @@ index 0000000000000000000000000000000000000000..130d61324679c8600faa52255f3ad99f
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/world/entity/Mob.java b/src/main/java/net/minecraft/world/entity/Mob.java
-index a8b23b1594d2b39568c68c93a8a1b936457672bc..af4305813abdb5db5e35ba4466e3e0b717e78cda 100644
+index a21edc7df32a59a6cb1af3865d2ce35f72cf8afc..e9d4722f65c6fe6fd867d5af399c6bb8df3218d8 100644
 --- a/src/main/java/net/minecraft/world/entity/Mob.java
 +++ b/src/main/java/net/minecraft/world/entity/Mob.java
 @@ -294,6 +294,7 @@ public abstract class Mob extends LivingEntity implements Targeting {
@@ -523,7 +523,7 @@ index a8b23b1594d2b39568c68c93a8a1b936457672bc..af4305813abdb5db5e35ba4466e3e0b7
      public LivingEntity getTarget() {
 +        if (Thread.currentThread().getName().contains("petal-path-processor")) return this.target; // Kaiiju - Don't reset target when async pathfinding!
          // Folia start - region threading
-         if (!io.papermc.paper.util.TickThread.isTickThreadFor(this.target)) {
+         if (this.target != null && (!io.papermc.paper.util.TickThread.isTickThreadFor(this.target) || this.target.isRemoved())) {
              this.target = null;
 diff --git a/src/main/java/net/minecraft/world/entity/ai/behavior/AcquirePoi.java b/src/main/java/net/minecraft/world/entity/ai/behavior/AcquirePoi.java
 index d4c91e0a0c64fcb7f1145de3f30134cb1f1f8ee6..ef5ec638bcd88df6eb93746868e863dbe0d11677 100644
@@ -826,7 +826,7 @@ index acd0b946cab86eb173e713535194d3a9347c7d48..8d3f5f8793b2ebf132b79374c14f0c40
          if (!this.isDone()) {
              if (this.canUpdatePath()) {
 diff --git a/src/main/java/net/minecraft/world/entity/ai/navigation/GroundPathNavigation.java b/src/main/java/net/minecraft/world/entity/ai/navigation/GroundPathNavigation.java
-index 71934af2dc4d209a9fbccfd36b5f2815ec196892..96357530e99bc0b36c1de74bedc1bd7038b91b5a 100644
+index ef5f231ca2ac2837609670e84d9571eb8f80126e..1d7ee215b6f9cf8406e5aaa2cad73052fd25ee57 100644
 --- a/src/main/java/net/minecraft/world/entity/ai/navigation/GroundPathNavigation.java
 +++ b/src/main/java/net/minecraft/world/entity/ai/navigation/GroundPathNavigation.java
 @@ -21,10 +21,26 @@ public class GroundPathNavigation extends PathNavigation {
@@ -1007,10 +1007,10 @@ index 8db20db72cd51046213625fac46c35854c59ec5d..acb6969e9672e93efe753eb295a8f35a
          }
      }
 diff --git a/src/main/java/net/minecraft/world/entity/animal/Bee.java b/src/main/java/net/minecraft/world/entity/animal/Bee.java
-index 55026e1731e41b4e3e4c6a8fef5d96a32051a556..b6895ecaba0ccd14a033c055ae28d20baf43c45b 100644
+index a5ae46b30c24812f5e3ef66eb748e92f2867add8..0b0bd2f496ef74804fcb43da160f5447786d878d 100644
 --- a/src/main/java/net/minecraft/world/entity/animal/Bee.java
 +++ b/src/main/java/net/minecraft/world/entity/animal/Bee.java
-@@ -1072,7 +1072,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
+@@ -1077,7 +1077,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
                          } else {
                              Bee.this.pathfindRandomlyTowards(Bee.this.hivePos);
                          }
@@ -1019,7 +1019,7 @@ index 55026e1731e41b4e3e4c6a8fef5d96a32051a556..b6895ecaba0ccd14a033c055ae28d20b
                          boolean flag = this.pathfindDirectlyTowards(Bee.this.hivePos);
  
                          if (!flag) {
-@@ -1134,7 +1134,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
+@@ -1139,7 +1139,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
              } else {
                  Path pathentity = Bee.this.navigation.getPath();
  

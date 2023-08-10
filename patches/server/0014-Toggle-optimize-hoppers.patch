@@ -22,10 +22,10 @@ index 95ed6cb7b94797187d1011cab344e187b39d9193..6d7356cc07da58b1cef8d8963e790251
  
      public boolean fixVoidTrading = true;
 diff --git a/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-index 4825a74ce4893dafdb70ae1badf3d2e1930d01a1..762b763f271c3208b4f8a7e346897207ec5beb6c 100644
+index 1eebd3969735bff3e5559ed01ab4a2ec1c3c2de6..8781a7cebf66007158286f265e2adbaf40c1d2ff 100644
 --- a/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-@@ -401,49 +401,51 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -402,49 +402,51 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
              if (HopperBlockEntity.isFullContainer(iinventory1, enumdirection)) {
                  return false;
              } else {
@@ -114,7 +114,7 @@ index 4825a74ce4893dafdb70ae1badf3d2e1930d01a1..762b763f271c3208b4f8a7e346897207
              }
          }
      }
-@@ -467,6 +469,12 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -468,6 +470,12 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
          if (iinventory != null) {
              Direction enumdirection = Direction.DOWN;
  
@@ -127,7 +127,7 @@ index 4825a74ce4893dafdb70ae1badf3d2e1930d01a1..762b763f271c3208b4f8a7e346897207
              // Paper start - optimize hoppers and remove streams
              worldData.skipPullModeEventFire = worldData.skipHopperEvents; // Folia - region threading
              return !HopperBlockEntity.isEmptyContainer(iinventory, enumdirection) && anyMatch(iinventory, enumdirection, (item, i) -> {
-@@ -499,48 +507,50 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -500,48 +508,50 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
      private static boolean a(Hopper ihopper, Container iinventory, int i, Direction enumdirection, Level world) { // Spigot
          ItemStack itemstack = iinventory.getItem(i);
  
