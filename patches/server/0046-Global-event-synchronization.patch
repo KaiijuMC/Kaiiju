@@ -1,0 +1,50 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Xymb <xymb@endcrystal.me>
+Date: Mon, 28 Aug 2023 16:57:55 +0200
+Subject: [PATCH] Global event synchronization
+
+
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+index 7ae19ea532ee0d15774466899d33cb1f130bd9a7..dd6a9ca1c6a2feada31829d0c8ada4e67fdf0cf6 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+@@ -248,8 +248,10 @@ public class KaiijuConfig {
+     }
+ 
+     public static boolean disableEnsureTickThreadChecks = false;
++    public static boolean globalEventSynchronization = false;
+ 
+     private static void unsupportedSettings() {
+         disableEnsureTickThreadChecks = getBoolean("unsupported.disable-ensure-tick-thread-checks", disableEnsureTickThreadChecks);
++        globalEventSynchronization = getBoolean("unsupported.global-event-synchronization", globalEventSynchronization);
+     }
+ }
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/lock/GlobalPluginSynchronizer.java b/src/main/java/dev/kaiijumc/kaiiju/lock/GlobalPluginSynchronizer.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..406b241c8d4998b9977a43b8c1b628c7a27a927d
+--- /dev/null
++++ b/src/main/java/dev/kaiijumc/kaiiju/lock/GlobalPluginSynchronizer.java
+@@ -0,0 +1,5 @@
++package dev.kaiijumc.kaiiju.lock;
++
++public class GlobalPluginSynchronizer {
++    public static final Object lock = new Object();
++}
+diff --git a/src/main/java/io/papermc/paper/plugin/manager/PaperEventManager.java b/src/main/java/io/papermc/paper/plugin/manager/PaperEventManager.java
+index d0f6d4e6ab3a7a4bd6cb8e27c90c7c7300f204a5..03b8f704de1e9a798391297d3daf3c49bf599a56 100644
+--- a/src/main/java/io/papermc/paper/plugin/manager/PaperEventManager.java
++++ b/src/main/java/io/papermc/paper/plugin/manager/PaperEventManager.java
+@@ -58,6 +58,13 @@ class PaperEventManager {
+             }
+ 
+             try {
++                // Kaiiju start - Global Event Synchronization
++                if (dev.kaiijumc.kaiiju.KaiijuConfig.globalEventSynchronization) {
++                    synchronized (dev.kaiijumc.kaiiju.lock.GlobalPluginSynchronizer.lock) {
++                        registration.callEvent(event);
++                    }
++                } else
++                // Kaiiju end
+                 registration.callEvent(event);
+             } catch (AuthorNagException ex) {
+                 Plugin plugin = registration.getPlugin();
