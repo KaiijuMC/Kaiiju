@@ -5,7 +5,7 @@ Subject: [PATCH] Async path processing
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 6df1720159383c2f536b40ded1092a437c1a20af..fc88b9f1e7e8f5858a91deeca2a5d51266a79a93 100644
+index c0432bb14df86fe070c90deb33aa8c535cfe46f3..7ae19ea532ee0d15774466899d33cb1f130bd9a7 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 @@ -12,6 +12,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
@@ -16,10 +16,10 @@ index 6df1720159383c2f536b40ded1092a437c1a20af..fc88b9f1e7e8f5858a91deeca2a5d512
  import java.lang.reflect.InvocationTargetException;
  import java.lang.reflect.Method;
  import java.lang.reflect.Modifier;
-@@ -218,12 +219,26 @@ public class KaiijuConfig {
+@@ -217,11 +218,25 @@ public class KaiijuConfig {
+     public static boolean disableVanishApi = false;
      public static boolean disablePlayerStats = false;
      public static boolean disableArmSwingEvent = false;
-     public static boolean disableEnsureTickThreadChecks = false;
 +    public static boolean asyncPathProcessing = false;
 +    public static int asyncPathProcessingMaxThreads = 0;
 +    public static int asyncPathProcessingKeepalive = 60;
@@ -28,7 +28,6 @@ index 6df1720159383c2f536b40ded1092a437c1a20af..fc88b9f1e7e8f5858a91deeca2a5d512
          disableVanishApi = getBoolean("optimization.disable-vanish-api", disableVanishApi);
          disablePlayerStats = getBoolean("optimization.disable-player-stats", disablePlayerStats);
          disableArmSwingEvent = getBoolean("optimization.disable-arm-swing-event", disableArmSwingEvent);
-         disableEnsureTickThreadChecks = getBoolean("optimization.disable-ensure-tick-thread-checks", disableEnsureTickThreadChecks);
 +        asyncPathProcessing = getBoolean("optimization.async-path-processing.enable", asyncPathProcessing);
 +        asyncPathProcessingMaxThreads = getInt("optimization.async-path-processing.max-threads", asyncPathProcessingMaxThreads);
 +        asyncPathProcessingKeepalive = getInt("optimization.async-path-processing.keepalive", asyncPathProcessingKeepalive);

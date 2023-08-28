@@ -5,7 +5,7 @@ Subject: [PATCH] Don't kick player on bad packet
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 95015955a8076bc903c012704b57b1b84286aaae..6df1720159383c2f536b40ded1092a437c1a20af 100644
+index 12738605442b9cdd086b2b29ff372d12552993b8..c0432bb14df86fe070c90deb33aa8c535cfe46f3 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 @@ -206,10 +206,12 @@ public class KaiijuConfig {

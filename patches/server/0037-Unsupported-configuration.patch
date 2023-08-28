@@ -1,0 +1,18 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kugge <sofiane.djerbi38@gmail.com>
+Date: Mon, 28 Aug 2023 16:30:36 +0200
+Subject: [PATCH] Unsupported configuration
+
+
+diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+index 9b118a6e22264c88c0460016822b1920631fff85..8232ff317f44c698cac94656e4a910d75b73f402 100644
+--- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
++++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
+@@ -229,4 +229,7 @@ public class KaiijuConfig {
+         serverModName = getString("gameplay.server-mod-name", serverModName);
+         sharedRandomForPlayers = getBoolean("gameplay.shared-random-for-players", sharedRandomForPlayers);
+     }
++
++    private static void unsupportedSettings() {
++    }
+ }
