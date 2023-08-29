@@ -23,35 +23,30 @@
 ### Configuration
 
 ```yaml
-gameplay:
-  server-mod-name: Kaiiju
-  shared-random-for-players: true
-network:
-  send-null-entity-packets: true
-  alternate-keepalive: false
-  kick-player-on-bad-packet: true
 region-format:
   linear:
     flush-frequency: 10
     flush-max-threads: 1
+network:
+  send-null-entity-packets: true
+  alternate-keepalive: false
+  kick-player-on-bad-packet: true
 optimization:
   disable-vanish-api: false
   disable-player-stats: false
   disable-arm-swing-event: false
-  disable-ensure-tick-thread-checks: false
   async-path-processing:
     enable: false
     max-threads: 0
     keepalive: 60
+gameplay:
+  server-mod-name: Kaiiju
+  shared-random-for-players: true
+unsupported:
+  disable-ensure-tick-thread-checks: false
+  global-event-synchronization: false
 world-settings:
   default:
-    gameplay:
-      fix-void-trading: true
-      break-redstone-on-top-of-trap-doors-early: true
-      fix-tripwire-state-inconsistency: true
-      safe-teleportation: true
-      sand-duplication: false
-      teleport-async-on-high-velocity: false
     region-format:
       format: ANVIL
       linear:
@@ -65,6 +60,13 @@ world-settings:
       disable-achievements: false
       disable-creatures-spawn-events: false
       disable-dolphin-swim-to-treasure: false
+    gameplay:
+      fix-void-trading: true
+      break-redstone-on-top-of-trap-doors-early: true
+      fix-tripwire-state-inconsistency: true
+      safe-teleportation: true
+      sand-duplication: false
+      teleport-async-on-high-velocity: false
 ```
 Documentation: [Kaiiju Wiki](https://github.com/KaiijuMC/Kaiiju/wiki/Configuration)
 
