@@ -24,7 +24,7 @@ index 9f0095f2196133a8bcffd5306aa9ac0b99b2f8d7..31d66bb2fcf4bb7262df2d8006e307fe
  
      public boolean fixVoidTrading = true;
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index 53f5bf8e6660f25290d4e64aca9c2911921b9fed..3c1871a879a14d38e56b0c31a73b2f42597d0816 100644
+index 76a48f708a35df5631f0010498afda858a9293ca..a14b1ff86c46a77ceb55fbcb5eba822f50705ae3 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -792,7 +792,7 @@ public class ServerPlayer extends Player {

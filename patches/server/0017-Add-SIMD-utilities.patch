@@ -6,7 +6,7 @@ Subject: [PATCH] Add SIMD utilities
 Patch from Pufferfish
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 164678d8c7f0a0a66adc957a86849fa927b7cb73..a151ca3a0803a5e653674e51e8d41a2f38b1f3df 100644
+index 99f31c4f5bf3064e483d5f387778c05742197e49..d73a4d547ad7768513773535d8cf15619c8079b0 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -68,6 +68,12 @@ dependencies {
