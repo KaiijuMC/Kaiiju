@@ -24,7 +24,7 @@ index 9f0095f2196133a8bcffd5306aa9ac0b99b2f8d7..31d66bb2fcf4bb7262df2d8006e307fe
  
      public boolean fixVoidTrading = true;
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index 53f5bf8e6660f25290d4e64aca9c2911921b9fed..3c1871a879a14d38e56b0c31a73b2f42597d0816 100644
+index e0e7e0a2f60aff5bc8c625988860036722707da8..6f1878a8a0c904322286079f500592a268a269e9 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -792,7 +792,7 @@ public class ServerPlayer extends Player {
@@ -120,7 +120,7 @@ index 53f5bf8e6660f25290d4e64aca9c2911921b9fed..3c1871a879a14d38e56b0c31a73b2f42
                      });
  
                      if (!this.serverLevel().canSleepThroughNights()) {
-@@ -2158,7 +2158,7 @@ public class ServerPlayer extends Player {
+@@ -2163,7 +2163,7 @@ public class ServerPlayer extends Player {
  
      @Override
      public void triggerRecipeCrafted(Recipe<?> recipe, List<ItemStack> ingredients) {
@@ -129,7 +129,7 @@ index 53f5bf8e6660f25290d4e64aca9c2911921b9fed..3c1871a879a14d38e56b0c31a73b2f42
      }
  
      @Override
-@@ -2287,14 +2287,14 @@ public class ServerPlayer extends Player {
+@@ -2292,14 +2292,14 @@ public class ServerPlayer extends Player {
              this.levitationStartPos = this.position();
          }
  
@@ -146,7 +146,7 @@ index 53f5bf8e6660f25290d4e64aca9c2911921b9fed..3c1871a879a14d38e56b0c31a73b2f42
      }
  
      @Override
-@@ -2305,7 +2305,7 @@ public class ServerPlayer extends Player {
+@@ -2310,7 +2310,7 @@ public class ServerPlayer extends Player {
              this.levitationStartPos = null;
          }
  
@@ -155,7 +155,7 @@ index 53f5bf8e6660f25290d4e64aca9c2911921b9fed..3c1871a879a14d38e56b0c31a73b2f42
      }
  
      @Override
-@@ -2865,7 +2865,7 @@ public class ServerPlayer extends Player {
+@@ -2870,7 +2870,7 @@ public class ServerPlayer extends Player {
  
      @Override
      protected void updateUsingItem(ItemStack stack) {
@@ -164,7 +164,7 @@ index 53f5bf8e6660f25290d4e64aca9c2911921b9fed..3c1871a879a14d38e56b0c31a73b2f42
          super.updateUsingItem(stack);
      }
  
-@@ -2894,7 +2894,7 @@ public class ServerPlayer extends Player {
+@@ -2899,7 +2899,7 @@ public class ServerPlayer extends Player {
          Entity entity = item.getOwner();
  
          if (entity != null) {

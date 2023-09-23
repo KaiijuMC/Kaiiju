@@ -5,10 +5,10 @@ Subject: [PATCH] Vanilla end portal teleportation
 
 
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 31c741bb6aa70f0456f72710cf277a8ce9ddff3f..114ab0bf54538e39050a1da7cb7703d16033d24d 100644
+index 4f8abe7cc8a687e7b55108a9b78b12a1f3deecd3..7c57675adc33d7c5525cdf8ebfd696a0e756c9a7 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -4028,12 +4028,17 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+@@ -4030,12 +4030,17 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
                          targetPos, 16, // load 16 blocks to be safe from block physics
                          ca.spottedleaf.concurrentutil.executor.standard.PrioritisedExecutor.Priority.HIGH,
                          (chunks) -> {
@@ -28,7 +28,7 @@ index 31c741bb6aa70f0456f72710cf277a8ce9ddff3f..114ab0bf54538e39050a1da7cb7703d1
                              );
                          }
                      );
-@@ -4220,6 +4225,10 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+@@ -4222,6 +4227,10 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
          if (!this.canPortalAsync(takePassengers)) {
              return false;
          }
@@ -39,7 +39,7 @@ index 31c741bb6aa70f0456f72710cf277a8ce9ddff3f..114ab0bf54538e39050a1da7cb7703d1
  
          Vec3 initialPosition = this.position();
          ChunkPos initialPositionChunk = new ChunkPos(
-@@ -4278,7 +4287,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+@@ -4280,7 +4289,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
              // place
              passengerTree.root.placeInAsync(
                  originWorld, destination, Entity.TELEPORT_FLAG_LOAD_CHUNK | (takePassengers ? Entity.TELEPORT_FLAG_TELEPORT_PASSENGERS : 0L),

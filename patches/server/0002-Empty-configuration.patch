@@ -410,7 +410,7 @@ index 0000000000000000000000000000000000000000..6fac162e0ec057af9f3336314d566355
 +}
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index 78ada86028bac06b62a7d70776a29705a3b11a06..ee75d828174ac1c84931bc087472fefd76073bdb 100644
+index c5dfd99a38a79fd19a2bf85fa297a28e40612b51..99b3db382a164fbe3afddb08f5317d463ceda765 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -218,6 +218,15 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
@@ -430,7 +430,7 @@ index 78ada86028bac06b62a7d70776a29705a3b11a06..ee75d828174ac1c84931bc087472fefd
          io.papermc.paper.brigadier.PaperBrigadierProviderImpl.INSTANCE.getClass(); // init PaperBrigadierProvider
          // Paper end
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index 4338b948a53d32cac5c780cbd43c6ca1cc5d11e5..8ae9b2232cceecb5fbafbea13d7eaac9b5891738 100644
+index 916df0c8d263f90e04564c5f512fd5ed5eaaa6d5..5ffe01a20e929554b4bde0b6d453472261686f54 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
 @@ -166,6 +166,8 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
@@ -451,7 +451,7 @@ index 4338b948a53d32cac5c780cbd43c6ca1cc5d11e5..8ae9b2232cceecb5fbafbea13d7eaac9
          this.world = new CraftWorld((ServerLevel) this, gen, biomeProvider, env);
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 4098c6a0a83b9d515eaa51ba04fa4e4e8d46ddb8..ba4fd6996e9e159b5fbb4ebe1df471137afdd10f 100644
+index a96f743e479a05d3240884a3c0e871caec573bbe..3167ef56973578bdeeee96d545b81d41629fe994 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -1098,6 +1098,7 @@ public final class CraftServer implements Server {
@@ -478,7 +478,7 @@ index 4098c6a0a83b9d515eaa51ba04fa4e4e8d46ddb8..ba4fd6996e9e159b5fbb4ebe1df47113
          this.overrideAllCommandBlockCommands = this.commandsConfiguration.getStringList("command-block-overrides").contains("*");
          this.ignoreVanillaPermissions = this.commandsConfiguration.getBoolean("ignore-vanilla-permissions");
  
-@@ -2945,6 +2948,13 @@ public final class CraftServer implements Server {
+@@ -2975,6 +2978,13 @@ public final class CraftServer implements Server {
              return CraftServer.this.console.paperConfigurations.createLegacyObject(CraftServer.this.console);
          }
  
