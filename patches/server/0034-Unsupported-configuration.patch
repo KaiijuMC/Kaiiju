@@ -5,10 +5,10 @@ Subject: [PATCH] Unsupported configuration
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 9b118a6e22264c88c0460016822b1920631fff85..8232ff317f44c698cac94656e4a910d75b73f402 100644
+index 2f3827441987528d79d9268002c7a7671faff429..b0515b073f30f6b3417b28b7fb2242e9ca309354 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -229,4 +229,7 @@ public class KaiijuConfig {
+@@ -227,4 +227,7 @@ public class KaiijuConfig {
          serverModName = getString("gameplay.server-mod-name", serverModName);
          sharedRandomForPlayers = getBoolean("gameplay.shared-random-for-players", sharedRandomForPlayers);
      }

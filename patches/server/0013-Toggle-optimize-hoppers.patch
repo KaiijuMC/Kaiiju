@@ -22,7 +22,7 @@ index 95ed6cb7b94797187d1011cab344e187b39d9193..6d7356cc07da58b1cef8d8963e790251
  
      public boolean fixVoidTrading = true;
 diff --git a/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-index 81d8de7c80bac16d874faf990cb08f1556a46adc..0735ee186b4e81231201ef6f8ddb02995b64259d 100644
+index 97858b410769f95e4a8d8acd757216ffe06f8cf4..036683a0ea4df0fe2bd7aca434471d3de0c07710 100644
 --- a/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 @@ -441,49 +441,51 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
@@ -127,7 +127,7 @@ index 81d8de7c80bac16d874faf990cb08f1556a46adc..0735ee186b4e81231201ef6f8ddb0299
              // Paper start - optimize hoppers and remove streams
              worldData.skipPullModeEventFire = worldData.skipHopperEvents; // Folia - region threading
              // merge container isEmpty check and move logic into one loop
-@@ -571,48 +579,50 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -573,48 +581,50 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
      private static boolean a(Hopper ihopper, Container iinventory, int i, Direction enumdirection, Level world) { // Spigot
          ItemStack itemstack = iinventory.getItem(i);
  

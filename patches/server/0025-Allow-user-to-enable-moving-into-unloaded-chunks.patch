@@ -5,10 +5,10 @@ Subject: [PATCH] Allow user to enable moving into unloaded chunks
 
 
 diff --git a/src/main/java/io/papermc/paper/configuration/WorldConfiguration.java b/src/main/java/io/papermc/paper/configuration/WorldConfiguration.java
-index 571c18117d7f85eddff31d535c09b46e0e9e4341..afaaa7fc06b4c0c1a355fdd3280003cfed40429e 100644
+index cb56735107028af16efe633f7179ba4c0481b0df..6ec138eb51d5386da4ad8ac5142aa68e291a7c96 100644
 --- a/src/main/java/io/papermc/paper/configuration/WorldConfiguration.java
 +++ b/src/main/java/io/papermc/paper/configuration/WorldConfiguration.java
-@@ -463,14 +463,14 @@ public class WorldConfiguration extends ConfigurationPart {
+@@ -467,14 +467,14 @@ public class WorldConfiguration extends ConfigurationPart {
      public class Chunks extends Post {
          @Override
          public void postProcess() {

@@ -5,12 +5,12 @@ Subject: [PATCH] Optimization Configuration
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 95b53b50606ea0ad47f407bebbb9e2bd445c0e66..8aab072a21b0775338b8235a84f5f675f385cf37 100644
+index 47e23a196ae5e44600a64184b69141c00235baca..90d97f3e0500a38e64ec0b88b2cab6ef28640c10 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -211,4 +211,7 @@ public class KaiijuConfig {
+@@ -209,4 +209,7 @@ public class KaiijuConfig {
+     private static void networkSettings() {
          sendNullEntityPackets = getBoolean("network.send-null-entity-packets", sendNullEntityPackets);
-         alternateKeepAlive = getBoolean("network.alternate-keepalive", alternateKeepAlive);
      }
 +
 +    private static void optimizationSettings() {

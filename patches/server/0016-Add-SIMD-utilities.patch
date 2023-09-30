@@ -6,13 +6,13 @@ Subject: [PATCH] Add SIMD utilities
 Patch from Pufferfish
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 99f31c4f5bf3064e483d5f387778c05742197e49..d73a4d547ad7768513773535d8cf15619c8079b0 100644
+index 07efc7e9593f619c3b71bb3936077a66a0f2964d..8aa2f328f7fe3d85f7ddf05fa0259061eb950fff 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -68,6 +68,12 @@ dependencies {
  }
  
- val craftbukkitPackageVersion = "1_20_R1" // Paper
+ val craftbukkitPackageVersion = "1_20_R2" // Paper
 +// Kaiiju start - Pufferfish - SIMD utilities
 +tasks.withType<JavaCompile> {
 +    val compilerArgs = options.compilerArgs
@@ -128,7 +128,7 @@ index 0000000000000000000000000000000000000000..758fa97304a32bf17935c86dc03cbf50
 +}
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index ee75d828174ac1c84931bc087472fefd76073bdb..991e4c19763a34a6fead88363e007c2d11aad836 100644
+index dcf8fd8ab06b10ecffae7332bc7e1a941b6a27a1..31397e53ab76266356c7582280d264c0f1df2504 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -225,6 +225,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface

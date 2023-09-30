@@ -5,11 +5,11 @@ Subject: [PATCH] Kick player instead of crashing
 
 
 diff --git a/src/main/java/io/papermc/paper/chunk/system/RegionizedPlayerChunkLoader.java b/src/main/java/io/papermc/paper/chunk/system/RegionizedPlayerChunkLoader.java
-index c5df121d6194a97b20dc390698991b9c72dba538..9990fccc741a139c57528f70157ae63dbe3fd8e8 100644
+index 07abf5a326cc7aa8a449b74bd7ac8a43b98528c0..eb875ee3d5bcbf90719eafc1c873189f1bfc26dd 100644
 --- a/src/main/java/io/papermc/paper/chunk/system/RegionizedPlayerChunkLoader.java
 +++ b/src/main/java/io/papermc/paper/chunk/system/RegionizedPlayerChunkLoader.java
-@@ -485,7 +485,12 @@ public class RegionizedPlayerChunkLoader {
-                     new ChunkPos(chunkX, chunkZ), new MutableObject<>(), false, true); // unloaded, loaded
+@@ -484,7 +484,12 @@ public class RegionizedPlayerChunkLoader {
+                 PlayerChunkSender.sendChunk(this.player.connection, this.world, this.world.getChunkIfLoaded(chunkX, chunkZ));
                  return;
              }
 -            throw new IllegalStateException();
@@ -23,10 +23,10 @@ index c5df121d6194a97b20dc390698991b9c72dba538..9990fccc741a139c57528f70157ae63d
  
          private void sendUnloadChunk(final int chunkX, final int chunkZ) {
 diff --git a/src/main/java/net/minecraft/server/level/ChunkHolder.java b/src/main/java/net/minecraft/server/level/ChunkHolder.java
-index 18f438eec03cabc1614ab807081cff6b18fb09a8..df3869d7aee9c1c880319251b40879c8802c72b4 100644
+index 047e817eae19800d146970a3ab44913ea1d17c89..59858f2dc91ab50fff99f2f23eedfb99207b29cf 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkHolder.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkHolder.java
-@@ -129,7 +129,12 @@ public class ChunkHolder {
+@@ -102,7 +102,12 @@ public class ChunkHolder {
  
      public void addPlayer(ServerPlayer player) {
          if (!this.playersSentChunkTo.add(player)) {

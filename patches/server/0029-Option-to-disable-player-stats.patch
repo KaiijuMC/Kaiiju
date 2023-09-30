@@ -5,10 +5,10 @@ Subject: [PATCH] Option to disable player stats
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index a3c15f1009dad095b9411242e2d0347a6141984b..8c872b2ad341f0105275209201fda03706535161 100644
+index 59b41c29f42072ec2d3ba03b09e0ead897800ee1..b11a329ead2347917d24d932c9a1a826d288f5b6 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -213,9 +213,11 @@ public class KaiijuConfig {
+@@ -211,9 +211,11 @@ public class KaiijuConfig {
      }
  
      public static boolean disableVanishApi = false;
@@ -21,7 +21,7 @@ index a3c15f1009dad095b9411242e2d0347a6141984b..8c872b2ad341f0105275209201fda037
  
      public static String serverModName = "Kaiiju";
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index 7cb6a0b99c8e51f7f767b704071473c5d8bded7d..e0e7e0a2f60aff5bc8c625988860036722707da8 100644
+index 500b05ce2cda7b2c0e5332e2921d55a3101fc451..b61a9a14952ed5f063d6e343c1a07aa57ae90320 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -2143,6 +2143,7 @@ public class ServerPlayer extends Player {

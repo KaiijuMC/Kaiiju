@@ -5,10 +5,10 @@ Subject: [PATCH] Add back worldborder command
 
 
 diff --git a/src/main/java/net/minecraft/commands/Commands.java b/src/main/java/net/minecraft/commands/Commands.java
-index 681cd79ce24fe5d952e987d46e2fd8df07a0f8a1..68af43ed4d667648df0e45ffc899d3e4b7b1a69d 100644
+index 4f6bd2d88219ac82c4d08c35231e5d3314f87110..21e2a55c3c9023718f51fdb2d3a321eceb2aa7ca 100644
 --- a/src/main/java/net/minecraft/commands/Commands.java
 +++ b/src/main/java/net/minecraft/commands/Commands.java
-@@ -199,7 +199,7 @@ public class Commands {
+@@ -202,7 +202,7 @@ public class Commands {
          TitleCommand.register(this.dispatcher);
          //TriggerCommand.register(this.dispatcher); // Folia - region threading - TODO later
          WeatherCommand.register(this.dispatcher);

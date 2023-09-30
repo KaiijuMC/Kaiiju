@@ -25,11 +25,11 @@ index 31d66bb2fcf4bb7262df2d8006e307fee92660ea..c9830912019079369268bfbf2c95de18
  
      public boolean fixVoidTrading = true;
 diff --git a/src/main/java/net/minecraft/server/level/ServerChunkCache.java b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-index af35fd63b090aa3d89bc60cb9cb7694b5f502681..e5dded0363b14608e834e63e678563b1423d66e7 100644
+index 18735dbd0d2bae1576d2bdb7402d98e9affbd599..2ae03f7dc08c00318cafa305a92ab21115d6bc02 100644
 --- a/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 +++ b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-@@ -486,21 +486,29 @@ public class ServerChunkCache extends ChunkSource {
-                 chunkRange = (chunkRange > viewDistance) ? (byte)viewDistance : chunkRange;
+@@ -530,7 +530,11 @@ public class ServerChunkCache extends ChunkSource {
+                 chunkRange = (chunkRange > viewDistance) ? viewDistance : chunkRange;
                  chunkRange = (chunkRange > DistanceManager.MOB_SPAWN_RANGE) ? DistanceManager.MOB_SPAWN_RANGE : chunkRange;
  
 -                com.destroystokyo.paper.event.entity.PlayerNaturallySpawnCreaturesEvent event = new com.destroystokyo.paper.event.entity.PlayerNaturallySpawnCreaturesEvent(player.getBukkitEntity(), (byte)chunkRange);
@@ -39,25 +39,26 @@ index af35fd63b090aa3d89bc60cb9cb7694b5f502681..e5dded0363b14608e834e63e678563b1
 +                event = new com.destroystokyo.paper.event.entity.PlayerNaturallySpawnCreaturesEvent(player.getBukkitEntity(), (byte)chunkRange);
 +                // Kaiiju end
                  event.callEvent();
-                 if (event.isCancelled() || event.getSpawnRadius() < 0) { // Folia - region threading
-                     player.lastEntitySpawnRadiusSquared = -1.0; player.playerNaturallySpawnedEvent = null;  // Folia - region threading
+                 if (event.isCancelled() || event.getSpawnRadius() < 0) {
                      regionizedWorldData.mobSpawnMap.remove(player); // Folia - region threading
+@@ -538,14 +542,18 @@ public class ServerChunkCache extends ChunkSource {
+                     player.lastEntitySpawnRadiusSquared = -1.0;
                      continue;
                  }
 +                // Kaiiju start - disable creatures spawn events
-+                chunkRange = Math.min(event.getSpawnRadius(), 32);
++                chunkRange = Math.min(event.getSpawnRadius(), DistanceManager.MOB_SPAWN_RANGE);
 +                }
 +                // Kaiiju end
  
--                int range = Math.min(event.getSpawnRadius(), 32); // limit to max view distance
-+                int range = chunkRange; // limit to max view distance // Kaiiju
-                 int chunkX = io.papermc.paper.util.MCUtil.getChunkCoordinate(player.getX());
-                 int chunkZ = io.papermc.paper.util.MCUtil.getChunkCoordinate(player.getZ());
+-                int range = Math.min(event.getSpawnRadius(), DistanceManager.MOB_SPAWN_RANGE); // limit to max spawn range
++                int range = chunkRange; // limit to max spawn range // Kaiiju
+                 int chunkX = io.papermc.paper.util.CoordinateUtils.getChunkCoordinate(player.getX());
+                 int chunkZ = io.papermc.paper.util.CoordinateUtils.getChunkCoordinate(player.getZ());
  
                  regionizedWorldData.mobSpawnMap.addOrUpdate(player, chunkX, chunkZ, range); // Folia - region threading
                  player.lastEntitySpawnRadiusSquared = (double)((range << 4) * (range << 4)); // used in anyPlayerCloseEnoughForSpawning
 -                player.playerNaturallySpawnedEvent = event;
 +                if (!this.level.kaiijuConfig.disableCreaturesSpawnEvents) player.playerNaturallySpawnedEvent = event; // Kaiiju
              }
-             // Paper end - optimize isOutisdeRange
-             LevelData worlddata = this.level.getLevelData();
+             // Paper end - optimise chunk tick iteration
+ 

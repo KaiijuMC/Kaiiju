@@ -22,10 +22,10 @@ index 6d7356cc07da58b1cef8d8963e790251d765de2c..601b9867d839f4928ba993ee8f00df9c
  
      public boolean fixVoidTrading = true;
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 0df4672abb5e87587da8712b6febf6312e241cda..1818c5ae88c331fb900470436f72049165c9e9f4 100644
+index dd12059f7080f37d4d4f2ed72d9e3d35733956c3..9e36630ec9b0c35101c97b67da5ecdc2af2bb0c3 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
-@@ -825,7 +825,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -931,7 +931,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
          timings.doSounds.stopTiming(); // Spigot
          regionizedWorldData.setHandlingTick(false); // Folia - regionised ticking
          gameprofilerfiller.pop();

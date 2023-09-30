@@ -5,11 +5,11 @@ Subject: [PATCH] Option to disable vanish api
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index cac747a46cccf8b115917a72340e9b81e7a437c9..a3c15f1009dad095b9411242e2d0347a6141984b 100644
+index 23b43de57a07b2b7b180f1aabd17e7e30830b521..59b41c29f42072ec2d3ba03b09e0ead897800ee1 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -212,7 +212,10 @@ public class KaiijuConfig {
-         alternateKeepAlive = getBoolean("network.alternate-keepalive", alternateKeepAlive);
+@@ -210,7 +210,10 @@ public class KaiijuConfig {
+         sendNullEntityPackets = getBoolean("network.send-null-entity-packets", sendNullEntityPackets);
      }
  
 +    public static boolean disableVanishApi = false;
@@ -20,17 +20,17 @@ index cac747a46cccf8b115917a72340e9b81e7a437c9..a3c15f1009dad095b9411242e2d0347a
  
      public static String serverModName = "Kaiiju";
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index 2b9ec3e7ddb5f5d18553bf82717405552f441f45..96ee7b65f292ac86ffa8c5d371e283eba9bd1133 100644
+index c0ee91a1f333434a2529429d670b62a83aeeb7b2..b9ce94c312304aa911bf020dd43efa4223f78946 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
 @@ -1362,7 +1362,11 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
                  // Folia end - region threading
  
                  // CraftBukkit start - respect vanish API
--                if (flag && !io.papermc.paper.util.TickThread.isTickThreadFor(player) || !player.getBukkitEntity().canSee(this.entity.getBukkitEntity())) { // Folia - region threading
+-                if (flag && (!io.papermc.paper.util.TickThread.isTickThreadFor(player) || !player.getBukkitEntity().canSee(this.entity.getBukkitEntity()))) { // Folia - region threading
 +                // Kaiiju start - don't respect vanish API >:D
 +                boolean canSee = true;
-+                if (flag && !dev.kaiijumc.kaiiju.KaiijuConfig.disableVanishApi) canSee = player.getBukkitEntity().canSee(this.entity.getBukkitEntity());
++                if (flag && (!dev.kaiijumc.kaiiju.KaiijuConfig.disableVanishApi) canSee = player.getBukkitEntity().canSee(this.entity.getBukkitEntity()));
 +                if (!io.papermc.paper.util.TickThread.isTickThreadFor(player) || !canSee) { // Folia - region threading
 +                // Kaiiju end
                      flag = false;

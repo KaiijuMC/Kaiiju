@@ -22,7 +22,7 @@ index 05f9c01131e78927d88f1170c3eda4adf25ac8ba..55dcbb48450b24f80e0a04bedeb54f64
  
      private void gameplaySettings() {
 diff --git a/src/main/java/net/minecraft/world/item/BlockItem.java b/src/main/java/net/minecraft/world/item/BlockItem.java
-index ebee8de2ed831755b6fd154f6cc77ac993839bb9..ce5faefe3b67087509833800f0472f14131f2011 100644
+index e483186a5292b3b53bfb1af4d56f55fcc1a6106c..a178bb3a1810c39c0131ccedb926d61b761a4b0e 100644
 --- a/src/main/java/net/minecraft/world/item/BlockItem.java
 +++ b/src/main/java/net/minecraft/world/item/BlockItem.java
 @@ -288,7 +288,7 @@ public class BlockItem extends Item {

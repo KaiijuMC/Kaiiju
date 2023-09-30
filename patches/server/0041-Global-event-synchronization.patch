@@ -5,10 +5,10 @@ Subject: [PATCH] Global event synchronization
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 7ae19ea532ee0d15774466899d33cb1f130bd9a7..dd6a9ca1c6a2feada31829d0c8ada4e67fdf0cf6 100644
+index 15cdfc9bf0e4a12f1f3e9e8c224f7a5bacd9bfc7..e8c4d6529a47ea18ec3ce1a95ae057ee82a20370 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -248,8 +248,10 @@ public class KaiijuConfig {
+@@ -244,8 +244,10 @@ public class KaiijuConfig {
      }
  
      public static boolean disableEnsureTickThreadChecks = false;

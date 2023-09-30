@@ -5,10 +5,10 @@ Subject: [PATCH] Server mod name
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 46ae5b84ee5b87b0ed0b93e920689e44288a50d2..778de435ca3c13ccc2f2d86030e3529436a2d945 100644
+index 859c2ac4e46b840f9552d1ccbf9409c9666e84de..2aa40f154c48ee7558b0efdc3bf26e205bb9f799 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -215,6 +215,9 @@ public class KaiijuConfig {
+@@ -213,6 +213,9 @@ public class KaiijuConfig {
      private static void optimizationSettings() {
      }
  
@@ -19,10 +19,10 @@ index 46ae5b84ee5b87b0ed0b93e920689e44288a50d2..778de435ca3c13ccc2f2d86030e35294
      }
  }
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 7243443d4bf24ad0b32b8a76d9b8701cca8612a7..3a358d159532faaf29af0118ecbfc255d9610969 100644
+index 84242c7cdbeccda4c9a23e0376daf80ce221e504..033796ff383a70876ea89d29dd50e0ad926ae42f 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1811,7 +1811,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1816,7 +1816,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
      @DontObfuscate
      public String getServerModName() {

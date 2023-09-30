@@ -5,10 +5,10 @@ Subject: [PATCH] Toggle shared random for players
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 778de435ca3c13ccc2f2d86030e3529436a2d945..cac747a46cccf8b115917a72340e9b81e7a437c9 100644
+index 2aa40f154c48ee7558b0efdc3bf26e205bb9f799..23b43de57a07b2b7b180f1aabd17e7e30830b521 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -216,8 +216,10 @@ public class KaiijuConfig {
+@@ -214,8 +214,10 @@ public class KaiijuConfig {
      }
  
      public static String serverModName = "Kaiiju";
@@ -20,10 +20,10 @@ index 778de435ca3c13ccc2f2d86030e3529436a2d945..cac747a46cccf8b115917a72340e9b81
      }
  }
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index fa35d2c1c8de225acd68e08f15976c92f7ab82aa..455f9aeac15123201d2677cdc8ba159d36229e91 100644
+index e1b6673729e71bdc929bc7b76983108a59e55891..01d1360d7e3a31b985f24f825d304ae75a99814c 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -567,6 +567,11 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+@@ -555,6 +555,11 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
          this.bb = Entity.INITIAL_AABB;
          this.stuckSpeedMultiplier = Vec3.ZERO;
          this.nextStep = 1.0F;

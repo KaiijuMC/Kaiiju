@@ -5,10 +5,10 @@ Subject: [PATCH] Option to disable ensure tick thread checks
 
 
 diff --git a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-index 8232ff317f44c698cac94656e4a910d75b73f402..12738605442b9cdd086b2b29ff372d12552993b8 100644
+index b0515b073f30f6b3417b28b7fb2242e9ca309354..2f5520f66da082dc1bc1f17ef3d7ed75bcf436fd 100644
 --- a/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
 +++ b/src/main/java/dev/kaiijumc/kaiiju/KaiijuConfig.java
-@@ -230,6 +230,9 @@ public class KaiijuConfig {
+@@ -228,6 +228,9 @@ public class KaiijuConfig {
          sharedRandomForPlayers = getBoolean("gameplay.shared-random-for-players", sharedRandomForPlayers);
      }
  
@@ -19,7 +19,7 @@ index 8232ff317f44c698cac94656e4a910d75b73f402..12738605442b9cdd086b2b29ff372d12
      }
  }
 diff --git a/src/main/java/io/papermc/paper/util/TickThread.java b/src/main/java/io/papermc/paper/util/TickThread.java
-index cb453dd110fc37fae75257a4576512126207763e..492e6a512343001d3d772d2d8b427d2d84e89da5 100644
+index c6b3c747d4c9792c3b690af4d45b13d2b05039ee..6da5a1e6e2ab7493d24e7f79f601499cb30e5c3c 100644
 --- a/src/main/java/io/papermc/paper/util/TickThread.java
 +++ b/src/main/java/io/papermc/paper/util/TickThread.java
 @@ -46,6 +46,7 @@ public class TickThread extends Thread {
