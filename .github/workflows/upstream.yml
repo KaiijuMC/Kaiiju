@@ -10,9 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Git Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set up JDK
-        uses: actions/setup-java@v2.5.0
+        uses: actions/setup-java@v3
         with:
           java-version: '17'
           cache: 'gradle'
@@ -28,7 +28,7 @@ jobs:
       - name: Rebuild Patches
         run: ./gradlew rebuildPatches --stacktrace
       - name: Upload Paperclip jar
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: kaiiju.jar
           path: build/libs/kaiiju-paperclip-*-reobf.jar
