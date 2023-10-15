@@ -5,12 +5,12 @@ Subject: [PATCH] Allow user to enable moving into unloaded chunks
 
 
 diff --git a/src/main/java/io/papermc/paper/configuration/WorldConfiguration.java b/src/main/java/io/papermc/paper/configuration/WorldConfiguration.java
-index cb56735107028af16efe633f7179ba4c0481b0df..6ec138eb51d5386da4ad8ac5142aa68e291a7c96 100644
+index 1e3ae1cb466b4757ce7fc0bd0201190230756bcc..8cf64c784d1768275b94fd1e4125c7c8742b3d5d 100644
 --- a/src/main/java/io/papermc/paper/configuration/WorldConfiguration.java
 +++ b/src/main/java/io/papermc/paper/configuration/WorldConfiguration.java
-@@ -467,14 +467,14 @@ public class WorldConfiguration extends ConfigurationPart {
-     public class Chunks extends Post {
-         @Override
+@@ -473,14 +473,14 @@ public class WorldConfiguration extends ConfigurationPart {
+         // Folia start - region threading - force prevent moving into unloaded chunks
+         @PostProcess
          public void postProcess() {
 -            this.preventMovingIntoUnloadedChunks = true;
 +            //this.preventMovingIntoUnloadedChunks = true; // Kaiiju - Don't

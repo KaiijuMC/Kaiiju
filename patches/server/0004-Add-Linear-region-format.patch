@@ -9,7 +9,7 @@ This format saves about 50% of disk space.
 Documentation: https://github.com/xymb-endcrystalme/LinearRegionFileFormatTools
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 2af41a9a1d64502046e1e714802a7b95abfd149b..07efc7e9593f619c3b71bb3936077a66a0f2964d 100644
+index b374c8caf62db3e1325a3cb01bdd890a835541af..7dd84de137e863cfc20582c1451a03ef6e4e495a 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -19,6 +19,10 @@ dependencies {
@@ -598,7 +598,7 @@ index 513833c2ea23df5b079d157bc5cb89d5c9754c0b..abf5e2a06af9853b58ac9107cd6e9787
          long expectedChunks = (long)regionFiles.length * (32L * 32L);
  
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index a1cbf387c72482034eeee6be8a5c2228131601a9..90991db650d2f0e9a3f7b00bb5b7586ade003bb0 100644
+index 0f7e53dbac964391763bf6b380e65ce955a8a7a5..5868be332437cfa2cf21d48c02ba0bb73255b365 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
 @@ -210,7 +210,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
@@ -619,7 +619,7 @@ index a1cbf387c72482034eeee6be8a5c2228131601a9..90991db650d2f0e9a3f7b00bb5b7586a
          this.setServerViewDistance(viewDistance);
          // Paper start
          this.dataRegionManager = new io.papermc.paper.chunk.SingleThreadChunkRegionManager(this.level, 2, (1.0 / 3.0), 1, 6, "Data", DataRegionData::new, DataRegionSectionData::new);
-@@ -813,13 +813,13 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -818,13 +818,13 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
  
      // Paper start - chunk status cache "api"
      public ChunkStatus getChunkStatusOnDiskIfCached(ChunkPos chunkPos) {
@@ -635,7 +635,7 @@ index a1cbf387c72482034eeee6be8a5c2228131601a9..90991db650d2f0e9a3f7b00bb5b7586a
  
          if (regionFile == null || !regionFileCache.chunkExists(chunkPos)) {
              return null;
-@@ -837,7 +837,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -842,7 +842,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
      }
  
      public void updateChunkStatusOnDisk(ChunkPos chunkPos, @Nullable CompoundTag compound) throws IOException {
@@ -645,7 +645,7 @@ index a1cbf387c72482034eeee6be8a5c2228131601a9..90991db650d2f0e9a3f7b00bb5b7586a
          regionFile.setStatus(chunkPos.x, chunkPos.z, ChunkSerializer.getStatus(compound));
      }
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 8b41da9d1f43340b6ba3812a93f681419d0d7cd8..eb7a06f4d0e87d8cba86c7eccf2c1fa02ad503d2 100644
+index 02937e40d429f42643f77b17c04277be535dc434..3e2c14b9acc9e5bec70055646387b51f0be43105 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -451,8 +451,8 @@ public class ServerLevel extends Level implements WorldGenLevel {

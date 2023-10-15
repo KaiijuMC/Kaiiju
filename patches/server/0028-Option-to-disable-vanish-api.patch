@@ -20,10 +20,10 @@ index 23b43de57a07b2b7b180f1aabd17e7e30830b521..59b41c29f42072ec2d3ba03b09e0ead8
  
      public static String serverModName = "Kaiiju";
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index c0ee91a1f333434a2529429d670b62a83aeeb7b2..43d0afb4aa3c02bfbfdaa2723bd8f9fbd4846a1f 100644
+index 04e249699e1c1a82d4c94b94b815ffa8fd97a99e..fbb0723ebd7dfef04252de694dc29b979c563452 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
-@@ -1362,7 +1362,11 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -1376,7 +1376,11 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
                  // Folia end - region threading
  
                  // CraftBukkit start - respect vanish API

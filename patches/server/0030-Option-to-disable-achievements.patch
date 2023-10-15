@@ -24,10 +24,10 @@ index 9f0095f2196133a8bcffd5306aa9ac0b99b2f8d7..31d66bb2fcf4bb7262df2d8006e307fe
  
      public boolean fixVoidTrading = true;
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index b61a9a14952ed5f063d6e343c1a07aa57ae90320..ee4603089d852496c51e4af13dcf4b0abc4dc35d 100644
+index 374dc5fd0ad15ace5314f2b9c675d1770a43f45a..0a65f35f247a39e89d64721499162b419475da4f 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-@@ -799,7 +799,7 @@ public class ServerPlayer extends Player {
+@@ -800,7 +800,7 @@ public class ServerPlayer extends Player {
  
      @Override
      protected void onInsideBlock(BlockState state) {
@@ -36,7 +36,7 @@ index b61a9a14952ed5f063d6e343c1a07aa57ae90320..ee4603089d852496c51e4af13dcf4b0a
      }
  
      @Override
-@@ -846,9 +846,9 @@ public class ServerPlayer extends Player {
+@@ -847,9 +847,9 @@ public class ServerPlayer extends Player {
              }
          }
  
@@ -48,7 +48,7 @@ index b61a9a14952ed5f063d6e343c1a07aa57ae90320..ee4603089d852496c51e4af13dcf4b0a
          }
  
          this.trackStartFallingPosition();
-@@ -923,7 +923,7 @@ public class ServerPlayer extends Player {
+@@ -924,7 +924,7 @@ public class ServerPlayer extends Player {
              }
  
              if (this.tickCount % 20 == 0) {
@@ -57,7 +57,7 @@ index b61a9a14952ed5f063d6e343c1a07aa57ae90320..ee4603089d852496c51e4af13dcf4b0a
              }
  
              // CraftBukkit start - initialize oldLevel, fire PlayerLevelChangeEvent, and tick client-sided world border
-@@ -952,7 +952,7 @@ public class ServerPlayer extends Player {
+@@ -953,7 +953,7 @@ public class ServerPlayer extends Player {
      @Override
      public void resetFallDistance() {
          if (this.getHealth() > 0.0F && this.startingToFallPosition != null) {
@@ -66,7 +66,7 @@ index b61a9a14952ed5f063d6e343c1a07aa57ae90320..ee4603089d852496c51e4af13dcf4b0a
          }
  
          this.startingToFallPosition = null;
-@@ -971,7 +971,7 @@ public class ServerPlayer extends Player {
+@@ -972,7 +972,7 @@ public class ServerPlayer extends Player {
              if (this.enteredLavaOnVehiclePosition == null) {
                  this.enteredLavaOnVehiclePosition = this.position();
              } else {
@@ -75,7 +75,7 @@ index b61a9a14952ed5f063d6e343c1a07aa57ae90320..ee4603089d852496c51e4af13dcf4b0a
              }
          }
  
-@@ -1175,7 +1175,7 @@ public class ServerPlayer extends Player {
+@@ -1176,7 +1176,7 @@ public class ServerPlayer extends Player {
  
              this.handleTeamKill(s, s1, ObjectiveCriteria.TEAM_KILL);
              this.handleTeamKill(s1, s, ObjectiveCriteria.KILLED_BY_TEAM);
@@ -84,7 +84,7 @@ index b61a9a14952ed5f063d6e343c1a07aa57ae90320..ee4603089d852496c51e4af13dcf4b0a
          }
      }
  
-@@ -1293,7 +1293,7 @@ public class ServerPlayer extends Player {
+@@ -1294,7 +1294,7 @@ public class ServerPlayer extends Player {
          this.wonGame = false;
  
          this.respawn((player) -> {
@@ -93,7 +93,7 @@ index b61a9a14952ed5f063d6e343c1a07aa57ae90320..ee4603089d852496c51e4af13dcf4b0a
          }, true);
      }
  
-@@ -1787,14 +1787,14 @@ public class ServerPlayer extends Player {
+@@ -1788,14 +1788,14 @@ public class ServerPlayer extends Player {
              maindimensionkey1 = resourcekey1;
          }
          // Paper end
@@ -111,7 +111,7 @@ index b61a9a14952ed5f063d6e343c1a07aa57ae90320..ee4603089d852496c51e4af13dcf4b0a
          }
  
          if (maindimensionkey1 != Level.NETHER) { // CraftBukkit
-@@ -1872,7 +1872,7 @@ public class ServerPlayer extends Player {
+@@ -1873,7 +1873,7 @@ public class ServerPlayer extends Player {
                  {
                      Either<Player.BedSleepingProblem, Unit> either = super.startSleepInBed(blockposition, force).ifRight((unit) -> {
                          this.awardStat(Stats.SLEEP_IN_BED);
@@ -120,7 +120,7 @@ index b61a9a14952ed5f063d6e343c1a07aa57ae90320..ee4603089d852496c51e4af13dcf4b0a
                      });
  
                      if (!this.serverLevel().canSleepThroughNights()) {
-@@ -2163,7 +2163,7 @@ public class ServerPlayer extends Player {
+@@ -2164,7 +2164,7 @@ public class ServerPlayer extends Player {
  
      @Override
      public void triggerRecipeCrafted(RecipeHolder<?> recipe, List<ItemStack> ingredients) {
@@ -129,7 +129,7 @@ index b61a9a14952ed5f063d6e343c1a07aa57ae90320..ee4603089d852496c51e4af13dcf4b0a
      }
  
      @Override
-@@ -2292,14 +2292,14 @@ public class ServerPlayer extends Player {
+@@ -2293,14 +2293,14 @@ public class ServerPlayer extends Player {
              this.levitationStartPos = this.position();
          }
  
@@ -146,7 +146,7 @@ index b61a9a14952ed5f063d6e343c1a07aa57ae90320..ee4603089d852496c51e4af13dcf4b0a
      }
  
      @Override
-@@ -2310,7 +2310,7 @@ public class ServerPlayer extends Player {
+@@ -2311,7 +2311,7 @@ public class ServerPlayer extends Player {
              this.levitationStartPos = null;
          }
  
@@ -155,7 +155,7 @@ index b61a9a14952ed5f063d6e343c1a07aa57ae90320..ee4603089d852496c51e4af13dcf4b0a
      }
  
      @Override
-@@ -2855,7 +2855,7 @@ public class ServerPlayer extends Player {
+@@ -2856,7 +2856,7 @@ public class ServerPlayer extends Player {
  
      @Override
      protected void updateUsingItem(ItemStack stack) {
@@ -164,7 +164,7 @@ index b61a9a14952ed5f063d6e343c1a07aa57ae90320..ee4603089d852496c51e4af13dcf4b0a
          super.updateUsingItem(stack);
      }
  
-@@ -2884,7 +2884,7 @@ public class ServerPlayer extends Player {
+@@ -2885,7 +2885,7 @@ public class ServerPlayer extends Player {
          Entity entity = item.getOwner();
  
          if (entity != null) {

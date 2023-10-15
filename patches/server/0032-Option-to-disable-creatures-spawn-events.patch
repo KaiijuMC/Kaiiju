@@ -25,10 +25,10 @@ index 31d66bb2fcf4bb7262df2d8006e307fee92660ea..c9830912019079369268bfbf2c95de18
  
      public boolean fixVoidTrading = true;
 diff --git a/src/main/java/net/minecraft/server/level/ServerChunkCache.java b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-index 18735dbd0d2bae1576d2bdb7402d98e9affbd599..2ae03f7dc08c00318cafa305a92ab21115d6bc02 100644
+index 72a5973c6e150533ec70496d72b53c80a142eef7..891edd228699915f165ddf3ca4fcee502874780d 100644
 --- a/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 +++ b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-@@ -530,7 +530,11 @@ public class ServerChunkCache extends ChunkSource {
+@@ -540,7 +540,11 @@ public class ServerChunkCache extends ChunkSource {
                  chunkRange = (chunkRange > viewDistance) ? viewDistance : chunkRange;
                  chunkRange = (chunkRange > DistanceManager.MOB_SPAWN_RANGE) ? DistanceManager.MOB_SPAWN_RANGE : chunkRange;
  
@@ -41,7 +41,7 @@ index 18735dbd0d2bae1576d2bdb7402d98e9affbd599..2ae03f7dc08c00318cafa305a92ab211
                  event.callEvent();
                  if (event.isCancelled() || event.getSpawnRadius() < 0) {
                      regionizedWorldData.mobSpawnMap.remove(player); // Folia - region threading
-@@ -538,14 +542,18 @@ public class ServerChunkCache extends ChunkSource {
+@@ -548,14 +552,18 @@ public class ServerChunkCache extends ChunkSource {
                      player.lastEntitySpawnRadiusSquared = -1.0;
                      continue;
                  }

@@ -5,7 +5,7 @@ Subject: [PATCH] Rebranding
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 521ff85fcf10fc85fe706d6fa3778e0569551829..2af41a9a1d64502046e1e714802a7b95abfd149b 100644
+index 0dbcd376ab443af4853f0a02612866d71c5e9164..b374c8caf62db3e1325a3cb01bdd890a835541af 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -14,7 +14,7 @@ val alsoShade: Configuration by configurations.creating
@@ -132,7 +132,7 @@ index 1d714d3eff11ed14f218656008190017494d4830..d39859f19afc4372999782a209f3836c
          stringbuilder.append(CrashReport.DATE_TIME_FORMATTER.format(ZonedDateTime.now()));
          stringbuilder.append("\n");
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index f9cf331202d0768a054e575c8909369920b3d59f..356f1fd44df5a9cf77655f788650415cadab53e1 100644
+index 2f2a8a0c05024115f3b7bd69ae400fadff2f36c5..4d13cfdb642a67a5db20b1567868f24a37d949c3 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -982,7 +982,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -144,7 +144,7 @@ index f9cf331202d0768a054e575c8909369920b3d59f..356f1fd44df5a9cf77655f788650415c
              while (this.getRunningThread().isAlive()) {
                  this.getRunningThread().stop();
                  try {
-@@ -1816,7 +1816,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1833,7 +1833,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
      @DontObfuscate
      public String getServerModName() {
@@ -154,7 +154,7 @@ index f9cf331202d0768a054e575c8909369920b3d59f..356f1fd44df5a9cf77655f788650415c
  
      public SystemReport fillSystemReport(SystemReport details) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 249ff636a40f6493444a6ea8b8a5e017cb2c30eb..c750e9ea6576877473a3b82b7ab558e58017e172 100644
+index a50a9ffda4875061fb8840873115119f334f0519..66723512de9b9fc92cdeeabb2cf96aa5fad10aaa 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -267,7 +267,7 @@ import javax.annotation.Nullable; // Paper

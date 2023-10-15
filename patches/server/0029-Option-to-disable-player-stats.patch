@@ -21,10 +21,10 @@ index 59b41c29f42072ec2d3ba03b09e0ead897800ee1..b11a329ead2347917d24d932c9a1a826
  
      public static String serverModName = "Kaiiju";
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index 500b05ce2cda7b2c0e5332e2921d55a3101fc451..b61a9a14952ed5f063d6e343c1a07aa57ae90320 100644
+index 42ff3d94ee451ced69c1059f0dbd45085489a60d..374dc5fd0ad15ace5314f2b9c675d1770a43f45a 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-@@ -2143,6 +2143,7 @@ public class ServerPlayer extends Player {
+@@ -2144,6 +2144,7 @@ public class ServerPlayer extends Player {
  
      @Override
      public void awardStat(Stat<?> stat, int amount) {

@@ -5,7 +5,7 @@ Subject: [PATCH] Entity ticking throttling & removal to prevent lag.
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 8aa2f328f7fe3d85f7ddf05fa0259061eb950fff..30b2bf1776f3cc7526daad8b0d74be18084a3b0d 100644
+index 5e79a464c912466952547cc294557821b6ff3576..6557a587f51f421b477557b17883578542fa1baf 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -23,6 +23,7 @@ dependencies {
@@ -319,18 +319,18 @@ index 31397e53ab76266356c7582280d264c0f1df2504..4d077e459f385f86a0f35dd72d4fdc3a
          dev.kaiijumc.kaiiju.KaiijuConfig.registerCommands();
          // Kaiiju end
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 9e36630ec9b0c35101c97b67da5ecdc2af2bb0c3..d4d128e36924753ef480c8c5f1cfd459808c6b32 100644
+index ca065f1600713a7f509e54580c625287e94d1e40..6a3964d3120dfd98c7a434dc86e221aeebcb0145 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
-@@ -955,6 +955,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
-                 } // Folia end - region threading
+@@ -968,6 +968,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+                 } finally { profiler.stopTimer(ca.spottedleaf.leafprofiler.LProfilerRegistry.DRAGON_FIGHT_TICK); } // Folia - profiler
              }
  
 +            if (kaiijuConfig.enableEntityThrottling) regionizedWorldData.entityThrottler.tickLimiterStart(); // Kaiiju
              org.spigotmc.ActivationRange.activateEntities(this); // Spigot
              timings.entityTick.startTiming(); // Spigot
-             regionizedWorldData.forEachTickingEntity((entity) -> { // Folia - regionised ticking
-@@ -977,6 +978,13 @@ public class ServerLevel extends Level implements WorldGenLevel {
+             profiler.startTimer(ca.spottedleaf.leafprofiler.LProfilerRegistry.ENTITY_TICK); try { // Folia - profiler
+@@ -991,6 +992,13 @@ public class ServerLevel extends Level implements WorldGenLevel {
                                  entity.stopRiding();
                              }
  
@@ -344,16 +344,16 @@ index 9e36630ec9b0c35101c97b67da5ecdc2af2bb0c3..d4d128e36924753ef480c8c5f1cfd459
                              gameprofilerfiller.push("tick");
                              this.guardEntityTick(this::tickNonPassenger, entity);
                              gameprofilerfiller.pop();
-@@ -984,6 +992,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
-                     }
+@@ -999,6 +1007,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
                  }
              });
+             } finally { profiler.stopTimer(ca.spottedleaf.leafprofiler.LProfilerRegistry.ENTITY_TICK); } // Folia - profiler
 +            if (kaiijuConfig.enableEntityThrottling) regionizedWorldData.entityThrottler.tickLimiterFinish(regionizedWorldData); // Kaiiju
              timings.entityTick.stopTiming(); // Spigot
              timings.tickEntities.stopTiming(); // Spigot
              gameprofilerfiller.pop();
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index ee9b4515cab3b9e1df73b01cb6246f283fba1eaf..f1fa2555b89946f7073fa2714bb252739f5f501f 100644
+index d29fe7ac0c68b2d57a0c6b6d06bbb4436bfc4c14..b0e08392520fe21ef7b2dd66272da68411887223 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
 @@ -179,6 +179,11 @@ public class Main {
